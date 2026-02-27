@@ -154,6 +154,7 @@ For the selected element (joined on `semantic_id` across catalog and dictionary)
 *   **FHIR mapping block**: `fhir_r4_path`, `fhir_data_type`, and derived FHIR resource name, with easy copy‑to‑clipboard behavior.
 *   **Survivorship & sourcing block**: `hie_survivorship_logic`, `innovaccer_survivorship_logic`, `data_source_rank_reference`, `coverage_personids`, `granularity_level`.
 *   **Quality & governance block**: `data_quality_notes`, `privacy_security`, and visual flags for missing critical values (for example, no FHIR mapping or no survivorship logic).
+*   **Message‑format mappings block (optional)**: when `hl7_adt_catalog.parquet` and/or `ccda_catalog.parquet` are present, side‑by‑side tables show how the same master patient element maps into HL7 ADT segments/fields and CCD/CCDA XML paths.
 
 The overall experience should let CHI stewards and architects use the app as a **practical management tool**, not just a static viewer.
 

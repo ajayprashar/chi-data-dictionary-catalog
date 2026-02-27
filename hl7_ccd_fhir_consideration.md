@@ -611,3 +611,62 @@ There IS source-specific logic on inbound, but it's captured in the **format cat
     - "Which L3 attributes don't have ADT mappings yet?"
 
 This foundation keeps metadata **simple to manage** (separate concerns) and **quick to reference** (visual diagrams + decision trees).
+
+---
+
+## Current CHI Metadata Viewer ERD (POC)
+
+The Mermaid ERD below captures the **actual Parquet structures used by the current Streamlit app**—the master patient catalog/dictionary plus the small ADT/CCD catalogs.
+
+```mermaid
+erDiagram
+    MASTER_PATIENT_CATALOG {
+        string semantic_id PK
+        string uscdi_element
+        string uscdi_description
+        string classification
+        string ruleset_category
+        string privacy_security
+        string fhir_resource   "derived from fhir_r4_path"
+    }
+
+    MASTER_PATIENT_DICTIONARY {
+        string semantic_id PK, FK
+        string hie_survivorship_logic
+        string data_source_rank_reference
+        string coverage_personids
+        string granularity_level
+        string innovaccer_survivorship_logic
+        string data_quality_notes
+        string fhir_r4_path
+        string fhir_data_type
+    }
+
+    HL7_ADT_CATALOG {
+        string message_format   "ADT"
+        string message_type
+        string segment_id
+        string field_id
+        string field_name
+        string data_type
+        string optionality
+        string cardinality
+        string semantic_id FK
+        string fhir_r4_path
+        string notes
+    }
+
+    CCDA_CATALOG {
+        string message_format   "CCD"
+        string section_name
+        string entry_type
+        string xml_path
+        string semantic_id FK
+        string fhir_r4_path
+        string notes
+    }
+
+    MASTER_PATIENT_CATALOG ||--|| MASTER_PATIENT_DICTIONARY : "has dictionary row"
+    MASTER_PATIENT_CATALOG ||--o{ HL7_ADT_CATALOG         : "maps to ADT fields"
+    MASTER_PATIENT_CATALOG ||--o{ CCDA_CATALOG            : "maps to CCD/CCDA paths"
+```
