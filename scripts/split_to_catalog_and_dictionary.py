@@ -3,16 +3,16 @@
 Split a combined metadata CSV into catalog and dictionary Parquet files.
 
 Reads a single CSV (one row per data element with both catalog and dictionary
-columns), splits by column set, and writes data_catalog.parquet and
-data_dictionary.parquet. Both tables include Semantic ID for joining.
+columns), splits by column set, and writes master_patient_catalog.parquet and
+master_patient_dictionary.parquet. Both tables include Semantic ID for joining.
 
 Usage:
   python scripts/split_to_catalog_and_dictionary.py combined_metadata.csv
   python scripts/split_to_catalog_and_dictionary.py combined_metadata.csv -d output_dir
 
 Output (default: same directory as input):
-  data_catalog.parquet
-  data_dictionary.parquet
+  master_patient_catalog.parquet
+  master_patient_dictionary.parquet
 """
 
 import argparse
@@ -108,7 +108,7 @@ def main() -> None:
     catalog = df[catalog_cols].copy()
     # Rename columns to snake_case for Parquet/schema friendliness
     catalog = catalog.rename(columns={c: to_snake(c) for c in catalog.columns})
-    catalog_path = out_dir / "data_catalog.parquet"
+    catalog_path = out_dir / "master_patient_catalog.parquet"
     catalog.to_parquet(catalog_path, index=False)
     print(f"Wrote catalog: {catalog_path} ({len(catalog)} rows)")
 
@@ -122,7 +122,7 @@ def main() -> None:
     # Historical name fix: SHIE -> HIE in the Parquet schema
     if "shie_survivorship_logic" in dictionary.columns:
         dictionary = dictionary.rename(columns={"shie_survivorship_logic": "hie_survivorship_logic"})
-    dictionary_path = out_dir / "data_dictionary.parquet"
+    dictionary_path = out_dir / "master_patient_dictionary.parquet"
     dictionary.to_parquet(dictionary_path, index=False)
     print(f"Wrote dictionary: {dictionary_path} ({len(dictionary)} rows)")
 

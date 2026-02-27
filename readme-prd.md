@@ -92,15 +92,18 @@ This mirrors enterprise metadata patterns while remaining simple.
 
 ### Artifacts
 
-*   **data_catalog.parquet** — Catalog table (Semantic ID, element name, description, classification, ruleset category, privacy/security).
-*   **data_dictionary.parquet** — Dictionary table (Semantic ID plus FHIR paths, survivorship logic, data quality notes, and other definition/rule columns).
+*   **master_patient_catalog.parquet** — Master patient catalog (Semantic ID, element name, description, classification, ruleset category, privacy/security).
+*   **master_patient_dictionary.parquet** — Master patient dictionary (Semantic ID plus FHIR paths, survivorship logic, data quality notes, and other definition/rule columns).
 *   Source data is authored in Excel; a single combined export is split into these two Parquet files by the project script (see *Data pipeline* below).
+*   Optional **message-format catalogs** for interoperability demonstrations:
+    *   `hl7_adt_catalog.parquet` — Example HL7 ADT field mappings (PID segment for a few core demographics).
+    *   `ccda_catalog.parquet` — Example CCD/CCDA XML paths for the same master patient elements.
 
 ### Data pipeline
 
 1. Author or edit metadata in Excel (one sheet or linked sheets).
 2. Export a single combined CSV (e.g., one row per USCDI element with all catalog and dictionary columns).
-3. Run the project script to split the CSV into **data_catalog.parquet** and **data_dictionary.parquet**:
+3. Run the project script to split the CSV into **master_patient_catalog.parquet** and **master_patient_dictionary.parquet**:
    `python scripts/split_to_catalog_and_dictionary.py <combined_export.csv>`
 4. The local viewer reads both Parquet files and joins on Semantic ID to present a record‑centric view.
 5. For querying the Parquet files in Jupyter with DuckDB (Python), see **docs/jupyter-duckdb-parquet-setup.md**.

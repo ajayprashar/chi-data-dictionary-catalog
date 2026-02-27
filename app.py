@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 """
-Streamlit viewer for the CHI data catalog & data dictionary.
+Streamlit viewer for the CHI master patient catalog & data dictionary.
 
-- Reads two Parquet files: data_catalog.parquet and data_dictionary.parquet.
+- Reads two Parquet files: master_patient_catalog.parquet and master_patient_dictionary.parquet.
 - Joins them on semantic_id.
-- Provides search, filtering (including by FHIR resource), and a detail view.
+- Provides search, filtering (including by FHIR resource and format scope), and a detail view.
 
 Run from the project root:
 
@@ -28,12 +28,12 @@ PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 @lru_cache(maxsize=1)
 def load_data() -> pd.DataFrame:
     """Load and join catalog + dictionary into a single DataFrame."""
-    cat_path = os.path.join(PROJECT_ROOT, "data_catalog.parquet")
-    dict_path = os.path.join(PROJECT_ROOT, "data_dictionary.parquet")
+    cat_path = os.path.join(PROJECT_ROOT, "master_patient_catalog.parquet")
+    dict_path = os.path.join(PROJECT_ROOT, "master_patient_dictionary.parquet")
 
     if not os.path.exists(cat_path) or not os.path.exists(dict_path):
         raise FileNotFoundError(
-            "Expected data_catalog.parquet and data_dictionary.parquet in the project root. "
+            "Expected master_patient_catalog.parquet and master_patient_dictionary.parquet in the project root. "
             "Run scripts/split_to_catalog_and_dictionary.py first."
         )
 
@@ -65,6 +65,22 @@ def load_data() -> pd.DataFrame:
     # Derive a FHIR resource name from fhir_r4_path (e.g. "Patient.name.given" -> "Patient")
     df["fhir_resource"] = df["fhir_r4_path"].fillna("").str.split(".", n=1).str[0]
     return df
+
+
+@lru_cache(maxsize=1)
+def load_message_catalogs() -> tuple[pd.DataFrame | None, pd.DataFrame | None]:
+    """
+    Load optional HL7 ADT and CCD/CCDA catalogs.
+
+    These are small POC files that map master patient elements (semantic_id)
+    into message-specific fields/paths.
+    """
+    adt_path = os.path.join(PROJECT_ROOT, "hl7_adt_catalog.parquet")
+    ccda_path = os.path.join(PROJECT_ROOT, "ccda_catalog.parquet")
+
+    adt_df = pd.read_parquet(adt_path) if os.path.exists(adt_path) else None
+    ccda_df = pd.read_parquet(ccda_path) if os.path.exists(ccda_path) else None
+    return adt_df, ccda_df
 
 
 def inject_theme(theme: str) -> None:
@@ -110,13 +126,17 @@ def inject_theme(theme: str) -> None:
         }
 
         .header-caption {
-            margin: 0.15rem 0 0.1rem 0;
+            font-size: 0.8rem;
+            font-weight: 400;
             color: #4b5563;
+            margin-left: 0.5rem;
         }
-        .header-results {
-            margin: 0.05rem 0 0.5rem 0;
+        .title-row {
+            display: flex;
+            align-items: baseline;
+            gap: 0.25rem;
+            margin-bottom: 0.4rem;
         }
-
         h5 {
             margin-top: 0.4rem;
             margin-bottom: 0.15rem;
@@ -215,13 +235,17 @@ def inject_theme(theme: str) -> None:
         }
 
         .header-caption {
-            margin: 0.15rem 0 0.1rem 0;
+            font-size: 0.8rem;
+            font-weight: 400;
             color: #a0aec0;
+            margin-left: 0.5rem;
         }
-        .header-results {
-            margin: 0.05rem 0 0.5rem 0;
+        .title-row {
+            display: flex;
+            align-items: baseline;
+            gap: 0.25rem;
+            margin-bottom: 0.4rem;
         }
-
         h5 {
             margin-top: 0.4rem;
             margin-bottom: 0.15rem;
@@ -307,12 +331,17 @@ def apply_filters(df: pd.DataFrame) -> pd.DataFrame:
     return filtered
 
 
-def render_detail(df: pd.DataFrame, selected_id: str) -> None:
+def render_detail(
+    df: pd.DataFrame,
+    selected_id: str,
+    adt_df: pd.DataFrame | None = None,
+    ccda_df: pd.DataFrame | None = None,
+) -> None:
     """Render the detail view for a single semantic_id."""
     record = df[df["semantic_id"] == selected_id].iloc[0]
 
     # Single, vertically stacked layout (no tabs) to minimize clicks and maximize visible context.
-    st.markdown("##### Catalog (from `data_catalog.parquet`)")
+    st.markdown("##### Catalog (from `master_patient_catalog.parquet`)")
     render_field("Semantic ID", record.semantic_id)
     render_field("USCDI Element", record.uscdi_element)
     render_field("Description", record.uscdi_description)
@@ -320,7 +349,7 @@ def render_detail(df: pd.DataFrame, selected_id: str) -> None:
     render_field("Ruleset Category", record.ruleset_category)
     render_field("Privacy/Security", record.privacy_security)
 
-    st.markdown("##### Dictionary – FHIR Mapping (from `data_dictionary.parquet`)")
+    st.markdown("##### Dictionary – FHIR Mapping (from `master_patient_dictionary.parquet`)")
     render_field("Resource", record.fhir_resource)
     render_field("FHIR Path", record.fhir_r4_path)
     render_field("FHIR Data Type", record.fhir_data_type)
@@ -334,6 +363,54 @@ def render_detail(df: pd.DataFrame, selected_id: str) -> None:
 
     st.markdown("##### Dictionary – Quality & Governance")
     render_field("Quality & Governance Notes", record.data_quality_notes)
+
+    # Optional HL7 ADT / CCD mappings for this element, shown side by side
+    adt_rows = None
+    if adt_df is not None:
+        adt_rows = adt_df[adt_df["semantic_id"] == selected_id]
+
+    ccda_rows = None
+    if ccda_df is not None:
+        ccda_rows = ccda_df[ccda_df["semantic_id"] == selected_id]
+
+    if (adt_rows is not None and not adt_rows.empty) or (
+        ccda_rows is not None and not ccda_rows.empty
+    ):
+        st.markdown("##### Message-format mappings")
+        col_adt, col_ccd = st.columns(2)
+
+        with col_adt:
+            if adt_rows is not None and not adt_rows.empty:
+                st.markdown("**HL7 ADT (from `hl7_adt_catalog.parquet`)**")
+                st.dataframe(
+                    adt_rows[
+                        [
+                            "message_type",
+                            "segment_id",
+                            "field_id",
+                            "field_name",
+                            "notes",
+                        ]
+                    ].reset_index(drop=True),
+                    hide_index=True,
+                    use_container_width=True,
+                )
+
+        with col_ccd:
+            if ccda_rows is not None and not ccda_rows.empty:
+                st.markdown("**CCD / CCDA (from `ccda_catalog.parquet`)**")
+                st.dataframe(
+                    ccda_rows[
+                        [
+                            "section_name",
+                            "entry_type",
+                            "xml_path",
+                            "notes",
+                        ]
+                    ].reset_index(drop=True),
+                    hide_index=True,
+                    use_container_width=True,
+                )
 
 
 def main() -> None:
@@ -351,12 +428,15 @@ def main() -> None:
 
     inject_theme(theme)
 
-    st.title("Community Health Insights (CHI) Metadata Catalog")
     st.markdown(
-        '<p class="header-caption">'
-        "Local viewer for the CHI data catalog and data dictionary. "
-        "Data is read from Parquet files in this folder; Excel remains the authoring source."
-        "</p>",
+        """
+        <div class="title-row">
+          <h1>Community Health Insights (CHI) Metadata Catalog</h1>
+          <span class="header-caption">
+            Local viewer for the CHI data catalog and data dictionary. Data is read from Parquet files in this folder; Excel remains the authoring source.
+          </span>
+        </div>
+        """,
         unsafe_allow_html=True,
     )
 
@@ -366,6 +446,10 @@ def main() -> None:
         st.error(str(exc))
         st.stop()
 
+    # Optional message catalogs (ADT / CCD)
+    adt_df, ccda_df = load_message_catalogs()
+
+    # Apply search/attribute filters from sidebar (no format gating; all formats always visible)
     filtered = apply_filters(df)
 
     if filtered.empty:
@@ -434,7 +518,7 @@ def main() -> None:
 
     with col_detail:
         st.markdown("#### Element detail")
-        render_detail(filtered, selected_id or default_id)
+        render_detail(filtered, selected_id, adt_df=adt_df, ccda_df=ccda_df)
 
 
 if __name__ == "__main__":

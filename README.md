@@ -22,7 +22,7 @@ Lightweight, local proof‑of‑concept for viewing a **data catalog** and **dat
 
 4. **Open the viewer notebook**:
    - In Cursor/VS Code: open `chi-data-dictionary-catalog.ipynb` and select the `.venv` interpreter.
-   - Run the first cell (`os.chdir(...)`) and the DuckDB query cells to explore `data_catalog.parquet` and `data_dictionary.parquet`.
+   - Run the first cell (`os.chdir(...)`) and the DuckDB query cells to explore `master_patient_catalog.parquet` and `master_patient_dictionary.parquet`.
 
 For more detail on Jupyter + DuckDB setup, see `docs/jupyter-duckdb-parquet-setup.md`.
 
@@ -40,8 +40,8 @@ For more detail on Jupyter + DuckDB setup, see `docs/jupyter-duckdb-parquet-setu
    ```
 
 4. The script regenerates:
-   - `data_catalog.parquet` — catalog view (one row per element).
-   - `data_dictionary.parquet` — dictionary view (definition and rules per element).
+   - `master_patient_catalog.parquet` — catalog view (one row per element).
+   - `master_patient_dictionary.parquet` — dictionary view (definition and rules per element).
 
 Both files use **snake_case** column names (e.g. `semantic_id`, `uscdi_element`, `hie_survivorship_logic`).
 
@@ -52,7 +52,7 @@ Both files use **snake_case** column names (e.g. `semantic_id`, `uscdi_element`,
 - `readme-prd.md` — 1‑page executive PRD for stakeholders.
 - `README.md` — this technical quick‑start guide.
 - `scripts/split_to_catalog_and_dictionary.py` — CSV → Parquet splitter.
-- `data_catalog.parquet` — catalog table.
-- `data_dictionary.parquet` — dictionary table.
+- `master_patient_catalog.parquet` — catalog table.
+- `master_patient_dictionary.parquet` — dictionary table.
 - `docs/jupyter-duckdb-parquet-setup.md` — full notebook + DuckDB setup instructions.
 
