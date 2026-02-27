@@ -107,6 +107,55 @@ This mirrors enterprise metadata patterns while remaining simple.
 
 ***
 
+## Portability & Deployment
+
+*   **Single‑folder app**: All artifacts live under one project folder (this directory). Copying or zipping this folder copies the entire POC.
+*   **No machine‑specific paths**: Scripts and notebooks rely on relative paths from the project root. The same folder layout works on any Windows PC.
+*   **Local runtime only**: The viewer uses an in‑process DuckDB engine and Parquet files. No external database, web server, or licensed platform is required.
+*   **Reproducible setup**:
+    *   Create a local virtual environment in the project folder.
+    *   Install dependencies from `requirements.txt`.
+    *   Open either the Streamlit app (`streamlit run app.py`) or the Jupyter notebook `chi-data-dictionary-catalog.ipynb` and point it at the Parquet files in this folder.
+*   **Mobility requirement**: A user can move the POC to a new machine by copying the folder, recreating the virtual environment, and reinstalling from `requirements.txt`—no additional configuration files, registries, or services.
+
+***
+
+## Viewer UX (Streamlit POC)
+
+The viewer is a **Streamlit app** that presents the catalog and dictionary as a management tool for the **Community Health Insights (CHI)** data model.
+
+### Key user workflows
+
+*   **Find an element quickly**: Type a `semantic_id`, USCDI element name, description, or FHIR path and immediately jump to that element.
+*   **Filter by FHIR resource**: Narrow to a specific FHIR resource (e.g., `Patient`, `Observation`) and browse only those elements.
+*   **Review one element in depth**: See all relevant catalog and dictionary metadata for a selected element on a single screen, grouped into logical sections.
+*   **Scan for gaps and risks**: Identify elements that are missing FHIR mappings, have low coverage, or are marked as sensitive/PII.
+
+### Search, filters, and layout
+
+*   **Global search**: A search box that matches across `semantic_id`, `uscdi_element`, `uscdi_description`, and `fhir_r4_path`, updating results as the user types.
+*   **Filters** (multi‑select where applicable):
+    *   FHIR resource (derived from `fhir_r4_path`, e.g., `Patient`, `Observation`, `Encounter`).
+    *   `classification` (e.g., Master Demographics, SDOH).
+    *   `ruleset_category` (e.g., Static Identity, Dynamic Identity).
+    *   `privacy_security` (e.g., PII / Sensitive).
+*   **Two‑pane layout**:
+    *   Left: search + filters + a scrollable list/table of matching elements (with a clear “N results” indicator).
+    *   Right: a detail view for the currently selected element.
+
+### Element detail view
+
+For the selected element (joined on `semantic_id` across catalog and dictionary), the app presents:
+
+*   **Identity & catalog block**: `semantic_id`, `uscdi_element`, `uscdi_description`, `classification`, `ruleset_category`.
+*   **FHIR mapping block**: `fhir_r4_path`, `fhir_data_type`, and derived FHIR resource name, with easy copy‑to‑clipboard behavior.
+*   **Survivorship & sourcing block**: `hie_survivorship_logic`, `innovaccer_survivorship_logic`, `data_source_rank_reference`, `coverage_personids`, `granularity_level`.
+*   **Quality & governance block**: `data_quality_notes`, `privacy_security`, and visual flags for missing critical values (for example, no FHIR mapping or no survivorship logic).
+
+The overall experience should let CHI stewards and architects use the app as a **practical management tool**, not just a static viewer.
+
+***
+
 ## Success Criteria
 
 *   Stakeholders can intuitively review a single data element and all its metadata
