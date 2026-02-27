@@ -1,0 +1,5 @@
+event_type,file_count,percentage_of_total,description
+A01,3927,0.95,Admit
+A02,10405,2.52,Transfer
+A03,15225,3.68,Discharge
+A08,383877,92.85,Update (registration update) - dominates volume

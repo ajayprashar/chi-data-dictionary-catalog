@@ -1,0 +1,35 @@
+section,inv_column,entry_type,xml_path,semantic_id,fhir_r4_path,notes
+Demographics,,Patient Name,/ClinicalDocument/recordTarget/patientRole/patient/name,Patient.name_last,Patient.name.family,CCD demographics name (family)
+Demographics,,Date of Birth,/ClinicalDocument/recordTarget/patientRole/patient/birthTime,Patient.birth_date,Patient.birthDate,CCD birthTime
+Participants,fn,First Name,associatedEntity/associatedPerson/name/given/node(),Patient.name_first,Patient.name.given,Contact/guarantor first name
+Participants,ln,Last Name,associatedEntity/associatedPerson/name/family/node(),Patient.name_last,Patient.name.family,Contact/guarantor last name
+Participants,psa1,Address Line 1,associatedEntity/addr/streetAddressLine[1]/node(),Patient.address_line1,Patient.address.line,Contact address line 1
+Participants,psa2,Address Line 2,associatedEntity/addr/streetAddressLine[2]/node(),Patient.address_line2,Patient.address.line,Contact address line 2
+Participants,pci,City,associatedEntity/addr/city/node(),Patient.address_city,Patient.address.city,Contact city
+Participants,pstn,State,associatedEntity/addr/state/node(),Patient.address_state,Patient.address.state,Contact state
+Participants,pz,Zip,associatedEntity/addr/postalCode/node(),Patient.address_zip,Patient.address.postalCode,Contact zip
+Participants,pcy,Country,associatedEntity/addr/country/node(),Patient.address_country,Patient.address.country,Contact country
+Participants,tel1,Telephone,associatedEntity/telecom/@value,Patient.phone,Patient.telecom (system=phone),Contact phone
+DocumentationOf,pcpid,PCP Id,documentationOf/serviceEvent/performer/assignedEntity/id/@extension,Encounter.participant,Encounter.participant.actor,PCP / care team performer
+DocumentationOf,pcpidt,PCP Id Type,serviceEvent/performer/assignedEntity,Encounter.participant,Encounter.participant.actor,PCP id type
+Encounters,efdt,Encounter Start Date,component/section/entry/encounter/effectiveTime,Encounter.period.start,Encounter.period.start,Encounter effectiveTime
+Encounters,et,Encounter Type,component/section/entry/encounter/code/@code,Encounter.class,Encounter.class,Encounter type code
+Encounters,eid,Encounter ID,component/section/entry/encounter/id/@extension,Encounter.identifier,Encounter.identifier,Encounter id
+Encounters,er,Encounter Reason,component/section/entry/encounter/code/originalText/reference/@value,Encounter.reasonCode,Encounter.reasonCode,Reason for visit
+Encounters,eldt,Encounter End Date,component/section/entry/encounter/entryRelationship/observation/effectiveTime/high/@value,Encounter.period.end,Encounter.period.end,Diagnosis effectiveTime high
+Encounters,sln,Place of Service,serviceEvent/performer/assignedEntity/code/@displayName,Encounter.serviceType,Encounter.serviceType,Perform location / service type
+Encounters,atpnpi,Attending Provider NPI,component/section/entry/encounter/participant/assignedEntity/id/@extension,Encounter.participant,Encounter.participant.actor,Visit provider NPI
+Encounters,pd,Diagnosis Code,component/section/entry/encounter/entryRelationship/observation/value/@code,Condition.code,Condition.code,Encounter diagnosis code
+Encounters,pdcs,Diagnosis Coding System,component/section/entry/encounter/entryRelationship/observation/value/@codeSystem,Condition.code,Condition.code,Diagnosis code system
+Encounters,pdn,Diagnosis Name,component/section/entry/encounter/entryRelationship/observation/value/originalText/reference/@value,Condition.code,Condition.code.text,Diagnosis description
+Problems,pbc,Problem Code,section/entry/act/entryRelationship/observation/code/@code,Condition.code,Condition.code,Problem list code
+Problems,pbn,Problem Description,section/entry/act/text/reference/@value,Condition.code,Condition.code.text,Problem description
+Problems,pbfdt,Problem Onset Date,section/entry/act/effectiveTime/low/@value,Condition.onsetDateTime,Condition.onsetDateTime,Problem onset
+Problems,pbldt,Problem Resolution Date,section/entry/act/effectiveTime/high/@value,Condition.abatementDateTime,Condition.abatementDateTime,Problem resolution
+Insurance,inpid,Insurance Plan ID,section/entry/act/id/@extension,Coverage.identifier,Coverage.identifier,Plan / member id
+Insurance,inpn,Insurance Plan Name,section/entry/act/entryRelationship/act/text/reference/@value,Coverage.payor,Coverage.payor,Plan name
+Insurance,inpfdt,Plan Effective Date,section/entry/act/participant[@typeCode='COV']/time/low/@value,Coverage.period.start,Coverage.period.start,Plan effective
+Insurance,inpldt,Plan Expiration Date,section/entry/act/participant[@typeCode='COV']/time/high/@value,Coverage.period.end,Coverage.period.end,Plan expiration
+Insurance,ptsid,Subscriber ID,section/entry/act/participant[@typeCode='COV']/participantRole/id/@extension,Coverage.subscriberId,Coverage.subscriberId,Subscriber id
+Insurance,infn,Subscriber First Name,recordTarget/patientRole/patient/name/given,Patient.name_first,Patient.name.given,Subscriber first name (from patient role)
+Insurance,inln,Subscriber Last Name,recordTarget/patientRole/patient/name/family,Patient.name_last,Patient.name.family,Subscriber last name

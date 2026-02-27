@@ -1,0 +1,10 @@
+segment_id,data_received,notes
+AL1,N,Expected per ACH mapping; not received in 2-3 months
+DG1,Y,Diagnosis segment
+IN1,Y,Insurance segment
+PD1,Y,Additional demographics / PCP
+PID,Y,Patient identification
+PV1,Y,Visit/encounter
+PV2,Y,Visit additional info
+NK1,N,Next of kin; expected per ACH; not received
+GT1,N,Guarantor; expected per ACH; not received

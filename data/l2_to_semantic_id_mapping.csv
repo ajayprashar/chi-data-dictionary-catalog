@@ -1,0 +1,48 @@
+segment,hl7_field,field_id,l2_column,display_name,semantic_id,fhir_r4_path,recommended,data_type,optionality,cardinality,notes
+PID,PID.3.1,PID-3,ID,Source Member ID,Patient.identifier,Patient.identifier,Mandatory,CX,R,1,MRN/patient identifier in source system
+PID,PID.3.5,PID-3,IDT,Source Member ID Type,Patient.identifier,Patient.identifier.type,Mandatory,IS,R,1,MRN / Patient ID / Subscriber ID
+PID,PID.5.1,PID-5,LN,Last Name,Patient.name_last,Patient.name.family,Mandatory,XPN,R,1,Patient last name
+PID,PID.5.2,PID-5,FN,First Name,Patient.name_first,Patient.name.given,Mandatory,XPN,R,1,Patient first name
+PID,PID.5.3,PID-5,MN,Middle Name,Patient.name_middle,Patient.name.given,Mandatory,XPN,R,1,CMT: 77.53% fill; alphanumeric values observed
+PID,PID.7.1,PID-7,DOB,Patient Date of Birth,Patient.birth_date,Patient.birthDate,Mandatory,TS,R,1,YYYYMMDD format
+PID,PID.8.1,PID-8,GN,Patient Gender code,Patient.birth_sex,Patient.extension(us-core-birthsex),Mandatory,IS,R,1,F/M/U
+PID,PID.10.1,PID-10,RACE,Patient Race Code,Patient.race,Patient.extension(us-core-race),,CE,O,1,CMT: 0% fill
+PID,PID.10.2,PID-10,RACEN,Patient Race Name/Description,Patient.race,Patient.extension(us-core-race),Good to have,ST,O,1,CMT: 0% fill
+PID,PID.11.1,PID-11,PSA1,Patient Primary Street Address 1,Patient.address_line1,Patient.address.line,Good to have,XAD,O,1,96.44% fill CMT
+PID,PID.11.2,PID-11,PSA2,Patient Primary Street Address 2,Patient.address_line2,Patient.address.line,Good to have,XAD,O,1,CMT: 0% fill
+PID,PID.11.3,PID-11,PCI,Patient Primary City,Patient.address_city,Patient.address.city,Good to have,XAD,O,1,96.63% fill CMT
+PID,PID.11.4,PID-11,PST,Patient Primary State code,Patient.address_state,Patient.address.state,Good to have,XAD,O,1,100% fill CMT
+PID,PID.11.5,PID-11,PZ,Patient Primary Zip,Patient.address_zip,Patient.address.postalCode,Good to have,XAD,O,1,95.78% fill CMT
+PID,PID.11.6,PID-11,PCY,Patient Primary Country Code,Patient.address_country,Patient.address.country,Good to have,XAD,O,1,CMT: 0% fill; default USA per SYN
+PID,PID.11.9,PID-11,PCT,Patient Primary County code,Patient.address,Patient.address.district,Good to have,XAD,O,1,CMT: 0% fill
+PID,PID.13.1,PID-13,TEL1,Patient Primary Telephone,Patient.phone,Patient.telecom (system=phone),Good to have,XTN,O,1,Ingest as received; 7/9-digit values observed
+PID,PID.13.4,PID-13,EML1,Patient Primary Email,Patient.email,Patient.telecom (system=email),Good to have,XTN,O,1,CMT: 0% fill
+PID,PID.15.1,PID-15,PL,Patient primary language Code,Patient.language,Patient.communication.language,,CE,O,1,CMT: 0% fill
+PID,PID.16.1,PID-16,MS,Patient Marital Status Code,Patient.marital_status,Patient.maritalStatus,Good to have,CE,O,1,CMT: 0% fill
+PID,PID.16.2,PID-16,MSN,Patient Marital Status Name/Description,Patient.marital_status,Patient.maritalStatus,Good to have,ST,O,1,CMT: 0% fill
+PID,PID.17.1,PID-17,REL,Patient Religion,Patient.religion,Patient.extension(patient-religion),,CE,O,1,CMT: 0% fill
+PID,PID.19.1,PID-19,SSN,Patient SSN,Patient.ssn,Patient.identifier (system=SSN),Good to have,ST,O,1,CMT: 0% fill
+PID,PID.22.1,PID-22,ETHN,Patient Ethnicity Code,Patient.ethnicity,Patient.extension(us-core-ethnicity),Good to have,CE,O,1,CMT: 0% fill
+PID,PID.22.2,PID-22,ETHNM,Patient Ethnicity Name/Description,Patient.ethnicity,Patient.extension(us-core-ethnicity),Good to have,ST,O,1,CMT: 0% fill
+PID,PID.29.1,PID-29,DOD,Patient Date of Death,Patient.death_date,Patient.deceased[x],Mandatory,TS,O,1,CMT: 0% fill; critical for EMPI
+PID,PID.30.1,PID-30,DF,Patient Deceased Flag Code,Patient.death_date,Patient.deceased[x],Good to have,IS,O,1,Y/N; CMT: 0% fill
+PV1,PV1.2.1,PV1-2,ET,Encounter Type,Encounter.class,Encounter.class,Mandatory,IS,R,1,E/I/O/V; CMT: 99.99% fill
+PV1,PV1.4.1,PV1-4,FTN,Facility Name,Encounter.serviceProvider,Encounter.serviceProvider,Mandatory,XON,R,1,Facility where service provided
+PV1,PV1.19.1,PV1-19,EID,Encounter ID,Encounter.identifier,Encounter.identifier,Mandatory,CX,R,1,EMR encounter ID; CMT: 99.99% fill
+PV1,PV1.44.1,PV1-44,EFDT,Encounter Start Date,Encounter.period.start,Encounter.period.start,Mandatory,TS,R,1,CMT: 99.99% fill
+PV1,PV1.45.1,PV1-45,ELDT,Encounter End Date,Encounter.period.end,Encounter.period.end,Mandatory,TS,O,1,CMT: 22.85% fill (ongoing encounters)
+PV1,PV1.36.1,PV1-36,DRDC,Discharge Disposition Code,Encounter.hospitalization.dischargeDisposition,Encounter.hospitalization.dischargeDisposition,Mandatory,CE,O,1,Ingest as received per SYN; CMT: 18.63% fill
+PV2,PV2.3.1,PV2-3,ER,Encounter Reason,Encounter.reasonCode,Encounter.reasonCode,,CE,O,1,Chief complaint; CMT: 8.4% fill
+PV1,PV1.3.1,PV1-3,Point_of_Care,Point of Care,Encounter.location,Encounter.location,,IS,O,1,CMT: 99.67% fill
+PV1,PV1.3.2,PV1-3,Room,Room,Encounter.location,Encounter.location,,IS,O,1,CMT: 81.61% fill
+PV1,PV1.3.3,PV1-3,Bed,Bed,Encounter.location,Encounter.location,,IS,O,1,CMT: 81.42% fill
+PV1,PV1.3.4.1,PV1-3,FTID,Facility ID,Encounter.serviceProvider,Encounter.serviceProvider,,HD,O,1,Facility ID; CMT: 98.73% fill
+PV1,PV1.10.1,PV1-10,STC,Service Type Code,Encounter.serviceType,Encounter.serviceType,Mandatory,CE,R,1,CMT: 99.99% fill
+PD1,PD1.4.1,PD1-4,PCPID,PCP Id,Encounter.participant,Encounter.participant.actor,Mandatory,XCN,O,1,CMT: 0% fill
+PD1,PD1.4.2,PD1-4,PCP_LN,PCP Last Name,Encounter.participant,Encounter.participant.actor,Mandatory,XCN,O,1,CMT: 0% fill
+PD1,PD1.4.3,PD1-4,PCP_FN,PCP First Name,Encounter.participant,Encounter.participant.actor,Mandatory,XCN,O,1,CMT: 0% fill
+IN1,IN1.36.1,IN1-36,INPID,Insurance Plan ID,Coverage.identifier,Coverage.identifier,Mandatory,ST,O,1,CMT: 99.26% fill
+IN1,IN1.4.1,IN1-4,INCN,Payer Name,Coverage.payor,Coverage.payor,Good to have,XON,O,1,CMT: 100% fill
+DG1,DG1.2.1,DG1-2,PDCS,Primary Diagnosis Coding System,Condition.code,Condition.code,Mandatory,CE,O,1,CMT: 48.37% fill
+DG1,DG1.3.1,DG1-3,PD,Primary Diagnosis code,Condition.code,Condition.code,Mandatory,CE,O,1,CMT: 48.4% fill
+DG1,DG1.3.2,DG1-3,PDN,Primary Diagnosis Name,Condition.code,Condition.code.text,,ST,O,1,CMT: 99.98% fill

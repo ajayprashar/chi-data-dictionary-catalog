@@ -45,6 +45,11 @@ For more detail on Jupyter + DuckDB setup, see `docs/jupyter-duckdb-parquet-setu
 
 Both files use **snake_case** column names (e.g. `semantic_id`, `uscdi_element`, `hie_survivorship_logic`).
 
+**Optional — rebuild message-format catalogs:**  
+- ADT: `python scripts/build_adt_catalog_from_mapping.py` → `hl7_adt_catalog.parquet` (from `data/l2_to_semantic_id_mapping.csv`).  
+- CCD/CCDA: `python scripts/build_ccda_catalog_from_mapping.py` → `ccda_catalog.parquet` (from `data/ccd_to_semantic_id_mapping.csv`).  
+See `data/README.md` and `docs/cmt-adt-feed-and-master-patient.md`.
+
 ---
 
 ### Files of interest

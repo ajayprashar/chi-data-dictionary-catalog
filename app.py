@@ -83,6 +83,22 @@ def load_message_catalogs() -> tuple[pd.DataFrame | None, pd.DataFrame | None]:
     return adt_df, ccda_df
 
 
+@lru_cache(maxsize=1)
+def load_cmt_feed_profile() -> tuple[pd.DataFrame | None, pd.DataFrame | None]:
+    """
+    Load optional CMT ADT feed profile (segment availability and event types).
+
+    Returns (segments_df, event_types_df) or (None, None) if data/ files are missing.
+    """
+    data_dir = os.path.join(PROJECT_ROOT, "data")
+    segments_path = os.path.join(data_dir, "cmt_feed_segments.csv")
+    events_path = os.path.join(data_dir, "cmt_feed_event_types.csv")
+
+    segments_df = pd.read_csv(segments_path) if os.path.exists(segments_path) else None
+    events_df = pd.read_csv(events_path) if os.path.exists(events_path) else None
+    return segments_df, events_df
+
+
 def inject_theme(theme: str) -> None:
     """Inject light or dark (terminal) theme CSS."""
     if theme == "Clinical (light)":
@@ -451,6 +467,30 @@ def main() -> None:
 
     # Apply search/attribute filters from sidebar (no format gating; all formats always visible)
     filtered = apply_filters(df)
+
+    # Optional CMT ADT feed profile in sidebar (segment availability + event types)
+    segments_df, events_df = load_cmt_feed_profile()
+    if segments_df is not None or events_df is not None:
+        st.sidebar.divider()
+        st.sidebar.header("CMT ADT feed profile")
+        st.sidebar.caption("Source: data/cmt_feed_*.csv (PointClickCare ADT)")
+        if segments_df is not None and not segments_df.empty:
+            st.sidebar.subheader("Segments")
+            st.sidebar.dataframe(
+                segments_df,
+                hide_index=True,
+                use_container_width=True,
+                column_config={"data_received": st.column_config.TextColumn("Received"),
+                               "notes": st.column_config.TextColumn("Notes")},
+            )
+        if events_df is not None and not events_df.empty:
+            st.sidebar.subheader("Event types")
+            st.sidebar.dataframe(
+                events_df,
+                hide_index=True,
+                use_container_width=True,
+                column_config={"percentage_of_total": st.column_config.TextColumn("%")},
+            )
 
     if filtered.empty:
         st.info("No elements match the current criteria. Relax filters or clear the search term.")
