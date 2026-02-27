@@ -1,0 +1,5 @@
+# Minimal deps: catalog/dictionary split script + DuckDB/Parquet in Jupyter
+# See docs/jupyter-duckdb-parquet-setup.md for notebook setup.
+pandas>=2.0.0
+pyarrow>=14.0.0
+duckdb>=0.9.0
