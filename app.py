@@ -13,6 +13,7 @@ Run from the project root:
 
 from __future__ import annotations
 
+import glob
 import os
 from functools import lru_cache
 from typing import List
@@ -84,201 +85,170 @@ def load_message_catalogs() -> tuple[pd.DataFrame | None, pd.DataFrame | None]:
 
 
 @lru_cache(maxsize=1)
-def load_cmt_feed_profile() -> tuple[pd.DataFrame | None, pd.DataFrame | None]:
+def load_four_tables_for_review() -> tuple[
+    pd.DataFrame | None, pd.DataFrame | None, pd.DataFrame | None, pd.DataFrame | None
+]:
     """
-    Load optional CMT ADT feed profile (segment availability and event types).
+    Load all four ERD tables as separate DataFrames for the Documentation table preview.
 
-    Returns (segments_df, event_types_df) or (None, None) if data/ files are missing.
+    Returns (catalog_df, dictionary_df, adt_catalog_df, ccda_catalog_df); each is None if file missing.
+    """
+    cat_path = os.path.join(PROJECT_ROOT, "master_patient_catalog.parquet")
+    dict_path = os.path.join(PROJECT_ROOT, "master_patient_dictionary.parquet")
+    adt_path = os.path.join(PROJECT_ROOT, "hl7_adt_catalog.parquet")
+    ccda_path = os.path.join(PROJECT_ROOT, "ccda_catalog.parquet")
+
+    catalog_df = pd.read_parquet(cat_path) if os.path.exists(cat_path) else None
+    dictionary_df = pd.read_parquet(dict_path) if os.path.exists(dict_path) else None
+    adt_df = pd.read_parquet(adt_path) if os.path.exists(adt_path) else None
+    ccda_df = pd.read_parquet(ccda_path) if os.path.exists(ccda_path) else None
+    return catalog_df, dictionary_df, adt_df, ccda_df
+
+
+def _discover_feed_profiles() -> List[tuple[str, pd.DataFrame | None, pd.DataFrame | None]]:
+    """
+    Discover all data source feed profiles in data/ by convention.
+
+    Looks for data/*_feed_segments.csv; for each, derives source_id (e.g. cmt_feed_segments -> cmt)
+    and loads the matching *_feed_event_types.csv if present.
+    Returns list of (source_id, segments_df, events_df). segments_df/events_df may be None if file missing.
     """
     data_dir = os.path.join(PROJECT_ROOT, "data")
-    segments_path = os.path.join(data_dir, "cmt_feed_segments.csv")
-    events_path = os.path.join(data_dir, "cmt_feed_event_types.csv")
+    if not os.path.isdir(data_dir):
+        return []
+    pattern = os.path.join(data_dir, "*_feed_segments.csv")
+    out: List[tuple[str, pd.DataFrame | None, pd.DataFrame | None]] = []
+    for path in sorted(glob.glob(pattern)):
+        base = os.path.basename(path)
+        # e.g. cmt_feed_segments.csv -> source_id = cmt
+        source_id = base.replace("_feed_segments.csv", "").replace("_feed_segments", "")
+        if not source_id:
+            continue
+        segments_df = pd.read_csv(path) if os.path.exists(path) else None
+        events_path = os.path.join(data_dir, f"{source_id}_feed_event_types.csv")
+        events_df = pd.read_csv(events_path) if os.path.exists(events_path) else None
+        out.append((source_id, segments_df, events_df))
+    return out
 
-    segments_df = pd.read_csv(segments_path) if os.path.exists(segments_path) else None
-    events_df = pd.read_csv(events_path) if os.path.exists(events_path) else None
-    return segments_df, events_df
+
+@lru_cache(maxsize=1)
+def load_all_feed_profiles() -> tuple[tuple[str, pd.DataFrame | None, pd.DataFrame | None], ...]:
+    """Load all discovered feed profiles (cached). Returns tuple of (source_id, segments_df, events_df)."""
+    return tuple(_discover_feed_profiles())
 
 
-def inject_theme(theme: str) -> None:
-    """Inject light or dark (terminal) theme CSS."""
-    if theme == "Clinical (light)":
-        css = """
-        <style>
-        html, body, [data-testid="stAppViewContainer"] {
-            font-size: 0.95rem;
-            background-color: #f3f4f6;
-            color: #111827;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        }
+def inject_theme() -> None:
+    """Inject medical-app style theme: light main area, dark sidebar, green accents, red for alerts."""
+    css = """
+    <style>
+    /* Main content: white / light grey */
+    html, body, [data-testid="stAppViewContainer"] {
+        font-size: 0.95rem;
+        background-color: #f8f9fa;
+        color: #1a1d21;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
 
-        [data-testid="stSidebar"] {
-            background-color: #ffffff;
-        }
+    [data-testid="stAppViewContainer"] .block-container {
+        padding-top: 1.0rem;
+        padding-bottom: 1.0rem;
+    }
 
-        [data-testid="stAppViewContainer"] .block-container {
-            padding-top: 1.0rem;
-            padding-bottom: 1.0rem;
-        }
+    /* Sidebar: dark grey/black like medical app nav */
+    [data-testid="stSidebar"] {
+        background-color: #2d3238;
+        color: #ffffff;
+    }
+    [data-testid="stSidebar"] label {
+        color: #e8eaed;
+        font-weight: 500;
+    }
+    [data-testid="stSidebar"] .stTextInput input,
+    [data-testid="stSidebar"] .stMultiSelect div[role="combobox"],
+    [data-testid="stSidebar"] .stSelectbox > div {
+        background-color: #3c4249;
+        color: #ffffff;
+        border: 1px solid #4a5159;
+    }
+    [data-testid="stSidebar"] .stMultiSelect span,
+    [data-testid="stSidebar"] .stSelectbox span {
+        color: #e8eaed;
+    }
+    [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3 {
+        color: #ffffff;
+    }
 
-        .field-row {
-            display: flex;
-            gap: 0.5rem;
-            align-items: flex-start;
-            margin-bottom: 0.2rem;
-        }
-        .field-label {
-            min-width: 10rem;
-            font-weight: 600;
-            white-space: nowrap;
-            text-align: right;
-            color: #374151;
-        }
-        .field-value {
-            flex: 1;
-            background-color: #e5e7eb;  /* darker gray for better contrast */
-            padding: 0.2rem 0.55rem;
-            border-radius: 4px;
-            border: 1px solid #9ca3af;
-        }
+    /* Primary accent: green (buttons, headings, active state) */
+    h1, h2, h3 { color: #1a1d21; }
+    h4, h5 {
+        margin-top: 0.4rem;
+        margin-bottom: 0.15rem;
+        color: #2e7d32;
+    }
+    [data-testid="stAppViewContainer"] a {
+        color: #2e7d32;
+    }
+    [data-testid="baseButton-primary"] {
+        background-color: #2e7d32 !important;
+        color: #ffffff !important;
+        border-color: #2e7d32 !important;
+    }
+    [data-testid="baseButton-primary"]:hover {
+        background-color: #1b5e20 !important;
+        border-color: #1b5e20 !important;
+    }
 
-        .header-caption {
-            font-size: 0.8rem;
-            font-weight: 400;
-            color: #4b5563;
-            margin-left: 0.5rem;
-        }
-        .title-row {
-            display: flex;
-            align-items: baseline;
-            gap: 0.25rem;
-            margin-bottom: 0.4rem;
-        }
-        h5 {
-            margin-top: 0.4rem;
-            margin-bottom: 0.15rem;
-            color: #2b6cb0;
-        }
+    /* Alerts / important: red */
+    [data-testid="stAlert"] [data-baseweb="notification"] {
+        border-left-color: #c62828;
+    }
+    .stException .message { color: #b71c1c; }
 
-        /* Summary box under Elements table */
-        .summary-box {
-            margin-top: 0.4rem;
-            padding: 0.4rem 0.6rem;
-            border-radius: 4px;
-            border: 1px solid #d1d5db;
-            background-color: #f9fafb;
-            font-size: 0.9rem;
-        }
-        </style>
-        """
-    else:
-        # Terminal (dark) theme
-        css = """
-        <style>
-        html, body, [data-testid="stAppViewContainer"] {
-            font-size: 0.9rem;
-            background-color: #0b0c10;
-            color: #e5e5e5;
-            font-family: "Consolas", "SF Mono", "Menlo", "Liberation Mono", monospace;
-        }
+    .field-row {
+        display: flex;
+        gap: 0.5rem;
+        align-items: flex-start;
+        margin-bottom: 0.2rem;
+    }
+    .field-label {
+        min-width: 10rem;
+        font-weight: 600;
+        white-space: nowrap;
+        text-align: right;
+        color: #374151;
+    }
+    .field-value {
+        flex: 1;
+        background-color: #ffffff;
+        padding: 0.2rem 0.55rem;
+        border-radius: 4px;
+        border: 1px solid #dadce0;
+        color: #1a1d21;
+    }
 
-        [data-testid="stSidebar"] {
-            background-color: #101218;
-            color: #e5e5e5;
-        }
+    .header-caption {
+        font-size: 0.8rem;
+        font-weight: 400;
+        color: #5f6368;
+        margin-left: 0.5rem;
+    }
+    .title-row {
+        display: flex;
+        align-items: baseline;
+        gap: 0.25rem;
+        margin-bottom: 0.4rem;
+    }
 
-        /* Improve readability of inputs and labels in dark sidebar */
-        [data-testid="stSidebar"] label {
-            color: #e5e5e5;
-            font-weight: 500;
-        }
-        [data-testid="stSidebar"] input,
-        [data-testid="stSidebar"] textarea,
-        [data-testid="stSidebar"] select,
-        [data-testid="stSidebar"] .stTextInput input,
-        [data-testid="stSidebar"] .stMultiSelect div[role="combobox"] {
-            background-color: #141821;
-            color: #e5e5e5;
-            border: 1px solid #2e3440;
-        }
-        [data-testid="stSidebar"] .stMultiSelect span,
-        [data-testid="stSidebar"] .stSelectbox span {
-            color: #e5e5e5;
-        }
-
-        /* Header strip for toolbar + sidebar toggle */
-        [data-testid="stHeader"] {
-            background-color: #111827;
-            color: #e5e5e5;
-        }
-        [data-testid="stHeader"] svg,
-        [data-testid="stHeader"] button {
-            color: #e5e5e5 !important;
-            fill: #e5e5e5 !important;
-        }
-        /* Ensure sidebar collapse/expand control is visible on dark background */
-        [data-testid="collapsedControl"] svg,
-        [data-testid="collapsedControl"] button,
-        [data-testid="stSidebarCollapseButton"] svg,
-        [data-testid="stSidebarCollapseButton"] button {
-            color: #e5e5e5 !important;
-            fill: #e5e5e5 !important;
-        }
-
-        [data-testid="stAppViewContainer"] .block-container {
-            padding-top: 1.0rem;
-            padding-bottom: 1.0rem;
-        }
-
-        .field-row {
-            display: flex;
-            gap: 0.5rem;
-            align-items: flex-start;
-            margin-bottom: 0.18rem;
-        }
-        .field-label {
-            min-width: 11rem;
-            font-weight: 600;
-            white-space: nowrap;
-            text-align: right;
-            color: #88c0d0;
-        }
-        .field-value {
-            flex: 1;
-            background-color: #141821;
-            padding: 0.18rem 0.5rem;
-            border-radius: 3px;
-            border: 1px solid #2e3440;
-        }
-
-        .header-caption {
-            font-size: 0.8rem;
-            font-weight: 400;
-            color: #a0aec0;
-            margin-left: 0.5rem;
-        }
-        .title-row {
-            display: flex;
-            align-items: baseline;
-            gap: 0.25rem;
-            margin-bottom: 0.4rem;
-        }
-        h5 {
-            margin-top: 0.4rem;
-            margin-bottom: 0.15rem;
-            color: #a3be8c;
-        }
-
-        .summary-box {
-            margin-top: 0.4rem;
-            padding: 0.4rem 0.6rem;
-            border-radius: 4px;
-            border: 1px solid #2e3440;
-            background-color: #0f1118;
-            font-size: 0.9rem;
-        }
-        </style>
-        """
-
+    .summary-box {
+        margin-top: 0.4rem;
+        padding: 0.4rem 0.6rem;
+        border-radius: 4px;
+        border: 1px solid #dadce0;
+        background-color: #ffffff;
+        font-size: 0.9rem;
+    }
+    </style>
+    """
     st.markdown(css, unsafe_allow_html=True)
 
 
@@ -429,20 +399,97 @@ def render_detail(
                 )
 
 
+# Current POC ERD (aligned with master_patient_*.parquet, hl7_adt_catalog.parquet, ccda_catalog.parquet)
+# FHIR: canonical path/type in MASTER_PATIENT_DICTIONARY; per-format path in ADT/CCDA catalogs. No FHIR resource instance data stored here.
+#
+# Mermaid erDiagram syntax (keep in sync with hl7_ccd_fhir_consideration.md):
+# - Attribute keys: only PK, FK, UK are valid. For an attribute that is both PK and FK use "PK, FK"
+#   (comma-separated). Writing "PK_FK" causes "Syntax error in graph" in Mermaid 9.x.
+# - Relationship cardinality: use single braces, e.g. ||--o{ (one-to-many). Double braces ||--o{{
+#   are invalid and cause syntax errors.
+_ERD_MERMAID = """
+erDiagram
+    MASTER_PATIENT_CATALOG {
+        string semantic_id PK
+        string uscdi_element
+        string uscdi_description
+        string classification
+        string ruleset_category
+        string privacy_security
+        string fhir_resource
+    }
+    MASTER_PATIENT_DICTIONARY {
+        string semantic_id PK, FK
+        string hie_survivorship_logic
+        string data_source_rank_reference
+        string coverage_personids
+        string granularity_level
+        string innovaccer_survivorship_logic
+        string data_quality_notes
+        string fhir_r4_path
+        string fhir_data_type
+    }
+    HL7_ADT_CATALOG {
+        string message_format
+        string message_type
+        string segment_id
+        string field_id
+        string field_name
+        string semantic_id FK
+        string fhir_r4_path
+        string notes
+    }
+    CCDA_CATALOG {
+        string message_format
+        string section_name
+        string entry_type
+        string xml_path
+        string semantic_id FK
+        string fhir_r4_path
+        string notes
+    }
+    MASTER_PATIENT_CATALOG ||--|| MASTER_PATIENT_DICTIONARY : contains
+    MASTER_PATIENT_CATALOG ||--o{ HL7_ADT_CATALOG : maps
+    MASTER_PATIENT_CATALOG ||--o{ CCDA_CATALOG : maps
+"""
+
+
+def _render_erd(streamlit_module: "st") -> None:
+    """Render the POC ERD in-browser with Mermaid 9 (single-brace diagram; no mermaid.ink)."""
+    mermaid_src = _ERD_MERMAID.strip()
+    html_content = f"""
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@9.4.3/dist/mermaid.min.js?v=9"></script>
+  <style>body {{ margin: 0; font-family: sans-serif; }} .mermaid {{ margin: 0.5rem 0; }}</style>
+</head>
+<body>
+  <div class="mermaid">{mermaid_src}</div>
+  <script>
+    mermaid.initialize({{ startOnLoad: true, theme: "neutral" }});
+  </script>
+</body>
+</html>
+"""
+    try:
+        streamlit_module.components.v1.html(html_content, height=420, scrolling=False)
+    except Exception:
+        streamlit_module.code(mermaid_src, language="mermaid")
+    with streamlit_module.expander("Mermaid source (copy to Mermaid Live to edit)", expanded=False):
+        streamlit_module.code(mermaid_src, language="mermaid")
+    streamlit_module.caption(
+        "Mermaid source: **hl7_ccd_fhir_consideration.md** (Current CHI Metadata Viewer ERD). Copy to [Mermaid Live](https://mermaid.live) to edit. "
+        "**FHIR:** Path and type are stored in **MASTER_PATIENT_DICTIONARY** (canonical) and in **HL7_ADT_CATALOG** / **CCDA_CATALOG** (per-format); this POC does not store FHIR resource instance data (that lives in FHIR servers/APIs)."
+    )
+
+
 def main() -> None:
     st.set_page_config(
         page_title="CHI Metadata Catalog Viewer",
         layout="wide",
     )
-    # Theme toggle (light vs terminal dark)
-    with st.sidebar:
-        theme = st.selectbox(
-            "Theme",
-            options=["Clinical (light)", "Terminal (dark)"],
-            index=1,
-        )
-
-    inject_theme(theme)
+    inject_theme()
 
     st.markdown(
         """
@@ -468,35 +515,11 @@ def main() -> None:
     # Apply search/attribute filters from sidebar (no format gating; all formats always visible)
     filtered = apply_filters(df)
 
-    # Optional CMT ADT feed profile in sidebar (segment availability + event types)
-    segments_df, events_df = load_cmt_feed_profile()
-    if segments_df is not None or events_df is not None:
-        st.sidebar.divider()
-        st.sidebar.header("CMT ADT feed profile")
-        st.sidebar.caption("Source: data/cmt_feed_*.csv (PointClickCare ADT)")
-        if segments_df is not None and not segments_df.empty:
-            st.sidebar.subheader("Segments")
-            st.sidebar.dataframe(
-                segments_df,
-                hide_index=True,
-                use_container_width=True,
-                column_config={"data_received": st.column_config.TextColumn("Received"),
-                               "notes": st.column_config.TextColumn("Notes")},
-            )
-        if events_df is not None and not events_df.empty:
-            st.sidebar.subheader("Event types")
-            st.sidebar.dataframe(
-                events_df,
-                hide_index=True,
-                use_container_width=True,
-                column_config={"percentage_of_total": st.column_config.TextColumn("%")},
-            )
-
     if filtered.empty:
         st.info("No elements match the current criteria. Relax filters or clear the search term.")
         return
 
-    # Aggregate summary for current filtered set (used under Elements table)
+    # Aggregate summary for current filtered set (for Documentation expander)
     total = len(filtered)
     distinct_resources = (
         filtered["fhir_resource"].fillna("").str.strip().replace("", pd.NA).dropna().nunique()
@@ -532,20 +555,44 @@ def main() -> None:
             on_select="rerun",
         )
 
-        # Compact summary using the space under the Elements table (line-by-line)
-        st.markdown(
-            f"""
-            <div class="summary-box">
-              <strong>Summary for current filters</strong><br/>
-              {total} element(s)<br/>
-              {distinct_resources} FHIR resource type(s)<br/>
-              {with_fhir} with FHIR mapping, {missing_fhir} missing<br/>
-              {missing_surv} missing HIE survivorship logic<br/>
-              {pii_count} with privacy/security flags
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
+        # Data source feed profiles: dropdown to pick source, then show that source's tables
+        feed_profiles = load_all_feed_profiles()
+        if feed_profiles:
+            st.markdown("---")
+            st.markdown("#### Data source profiles")
+            # Only list sources that have at least one table
+            valid_sources = [
+                (sid, seg, evt) for sid, seg, evt in feed_profiles
+                if (seg is not None and not seg.empty) or (evt is not None and not evt.empty)
+            ]
+            if valid_sources:
+                options = [f"{sid.upper()} feed profile" for sid, _, _ in valid_sources]
+                selected_label = st.selectbox(
+                    "Feed profile",
+                    options=options,
+                    index=0,
+                    label_visibility="collapsed",
+                )
+                idx = options.index(selected_label)
+                source_id, segments_df, events_df = valid_sources[idx]
+                st.caption(f"Source: data/{source_id}_feed_*.csv")
+                if segments_df is not None and not segments_df.empty:
+                    st.markdown("**Segments**")
+                    st.dataframe(
+                        segments_df,
+                        hide_index=True,
+                        use_container_width=True,
+                        column_config={"data_received": st.column_config.TextColumn("Received"),
+                                       "notes": st.column_config.TextColumn("Notes")},
+                    )
+                if events_df is not None and not events_df.empty:
+                    st.markdown("**Event types**")
+                    st.dataframe(
+                        events_df,
+                        hide_index=True,
+                        use_container_width=True,
+                        column_config={"percentage_of_total": st.column_config.TextColumn("%")},
+                    )
 
         # Determine selected semantic_id from the row selection; default to first row
         selected_rows = getattr(event, "selection", None)
@@ -559,6 +606,49 @@ def main() -> None:
     with col_detail:
         st.markdown("#### Element detail")
         render_detail(filtered, selected_id, adt_df=adt_df, ccda_df=ccda_df)
+
+    # Documentation at bottom of page: summary + doc link + ERD (collapsed by default)
+    st.markdown("---")
+    with st.expander("**Documentation**", expanded=False):
+        st.markdown("**Summary for current filters**")
+        st.markdown(
+            f"- {total} element(s) · {distinct_resources} FHIR resource type(s)  \n"
+            f"- {with_fhir} with FHIR mapping, {missing_fhir} missing  \n"
+            f"- {missing_surv} missing HIE survivorship logic  \n"
+            f"- {pii_count} with privacy/security flags"
+        )
+        st.markdown("---")
+        st.markdown("**Data model (ERD)**")
+        _render_erd(st)
+        st.markdown("---")
+        st.markdown("**Table preview (for review)**")
+        _row_options = [50, 500, 5_000_000_000_000]
+        col_rows, _ = st.columns([1, 5])
+        with col_rows:
+            row_limit = st.selectbox(
+                "Rows to show per table",
+                options=_row_options,
+                index=0,
+                format_func=lambda x: "5 trillion" if x == 5_000_000_000_000 else str(x),
+                key="doc_erd_table_rows",
+            )
+        catalog_df, dictionary_df, adt_df, ccda_df = load_four_tables_for_review()
+        if catalog_df is not None:
+            st.markdown("**MASTER_PATIENT_CATALOG**")
+            st.dataframe(catalog_df.head(row_limit), use_container_width=True)
+        if dictionary_df is not None:
+            st.markdown("**MASTER_PATIENT_DICTIONARY**")
+            st.dataframe(dictionary_df.head(row_limit), use_container_width=True)
+        if adt_df is not None:
+            st.markdown("**HL7_ADT_CATALOG**")
+            st.dataframe(adt_df.head(row_limit), use_container_width=True)
+        if ccda_df is not None:
+            st.markdown("**CCDA_CATALOG**")
+            st.dataframe(ccda_df.head(row_limit), use_container_width=True)
+        if catalog_df is None and dictionary_df is None and adt_df is None and ccda_df is None:
+            st.caption("No Parquet tables found in project root.")
+        st.markdown("---")
+        st.caption("Full docs: **readme-prd.md**, **README.md**, **docs/** in the project folder.")
 
 
 if __name__ == "__main__":

@@ -616,7 +616,7 @@ This foundation keeps metadata **simple to manage** (separate concerns) and **qu
 
 ## Current CHI Metadata Viewer ERD (POC)
 
-The Mermaid ERD below captures the **actual Parquet structures used by the current Streamlit app**—the master patient catalog/dictionary plus the small ADT/CCD catalogs.
+The Mermaid ERD below captures the **actual Parquet structures used by the current Streamlit app**—the master patient catalog/dictionary plus the small ADT/CCD catalogs. **Where FHIR appears:** FHIR path and data type are stored as metadata in **MASTER_PATIENT_DICTIONARY** (`fhir_r4_path`, `fhir_data_type`) and in **HL7_ADT_CATALOG** / **CCDA_CATALOG** (per-format `fhir_r4_path`). This POC does **not** store FHIR resource instance data (e.g. Patient/Encounter JSON); that would live in FHIR servers, APIs, or other data stores, not in these Parquet files.
 
 ```mermaid
 erDiagram
@@ -670,3 +670,19 @@ erDiagram
     MASTER_PATIENT_CATALOG ||--o{ HL7_ADT_CATALOG         : "maps to ADT fields"
     MASTER_PATIENT_CATALOG ||--o{ CCDA_CATALOG            : "maps to CCD/CCDA paths"
 ```
+
+### Mermaid ERD syntax notes (avoid "Syntax error in graph")
+
+When editing this ERD (here or in the Streamlit app’s `_ERD_MERMAID`), follow these rules so Mermaid 9.x can parse it:
+
+1. **Attribute keys**  
+   Only `PK`, `FK`, and `UK` are valid. For an attribute that is both primary and foreign key, use **comma-separated** keys: `PK, FK`.  
+   - **Wrong:** `semantic_id PK_FK` → causes "Syntax error in graph".  
+   - **Right:** `semantic_id PK, FK`.
+
+2. **Relationship cardinality**  
+   Use **single** braces in the cardinality (e.g. one-to-many: `||--o{`).  
+   - **Wrong:** `||--o{{` (double brace) → causes syntax error.  
+   - **Right:** `||--o{`.
+
+Keep the diagram in `app.py` and in this file in sync when changing the ERD.
