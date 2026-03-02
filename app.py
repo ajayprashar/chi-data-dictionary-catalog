@@ -390,7 +390,7 @@ def render_detail(
         """
         <div class="title-row">
           <h4>Dictionary – FHIR Mapping</h4>
-          <span class="header-caption">from master_patient_dictionary.parquet</span>
+          <span class="header-caption">from master_patient_dictionary.parquet · Canonical FHIR R4 path &amp; type for this element</span>
         </div>
         """,
         unsafe_allow_html=True,
@@ -447,40 +447,46 @@ def render_detail(
             """,
             unsafe_allow_html=True,
         )
-        col_adt, col_ccd = st.columns(2)
 
-        with col_adt:
-            if adt_rows is not None and not adt_rows.empty:
-                st.markdown("**HL7 ADT (from `hl7_adt_catalog.parquet`)**")
-                st.dataframe(
-                    adt_rows[
-                        [
-                            "message_type",
-                            "segment_id",
-                            "field_id",
-                            "field_name",
-                            "notes",
-                        ]
-                    ].reset_index(drop=True),
-                    hide_index=True,
-                    use_container_width=True,
-                )
+        if adt_rows is not None and not adt_rows.empty:
+            st.markdown("**HL7 ADT (from `hl7_adt_catalog.parquet`)**")
+            st.dataframe(
+                adt_rows[
+                    [
+                        "message_type",
+                        "segment_id",
+                        "field_id",
+                        "field_name",
+                        "notes",
+                    ]
+                ].reset_index(drop=True),
+                hide_index=True,
+                use_container_width=True,
+                column_config={
+                    "notes": st.column_config.TextColumn("Notes", width="large"),
+                },
+            )
 
-        with col_ccd:
-            if ccda_rows is not None and not ccda_rows.empty:
-                st.markdown("**CCD / CCDA (from `ccda_catalog.parquet`)**")
-                st.dataframe(
-                    ccda_rows[
-                        [
-                            "section_name",
-                            "entry_type",
-                            "xml_path",
-                            "notes",
-                        ]
-                    ].reset_index(drop=True),
-                    hide_index=True,
-                    use_container_width=True,
-                )
+        if ccda_rows is not None and not ccda_rows.empty:
+            st.markdown("**CCD / CCDA (from `ccda_catalog.parquet`)**")
+            st.dataframe(
+                ccda_rows[
+                    [
+                        "section_name",
+                        "entry_type",
+                        "xml_path",
+                        "notes",
+                    ]
+                ].reset_index(drop=True),
+                hide_index=True,
+                use_container_width=True,
+                column_config={
+                    "section_name": st.column_config.TextColumn("Section", width="small"),
+                    "entry_type": st.column_config.TextColumn("Entry type", width="small"),
+                    "xml_path": st.column_config.TextColumn("XML path", width="medium"),
+                    "notes": st.column_config.TextColumn("Notes", width="large"),
+                },
+            )
 
 
 # Current POC ERD (aligned with master_patient_*.parquet, hl7_adt_catalog.parquet, ccda_catalog.parquet)
