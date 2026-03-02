@@ -686,3 +686,62 @@ When editing this ERD (here or in the Streamlit app’s `_ERD_MERMAID`), follow 
    - **Right:** `||--o{`.
 
 Keep the diagram in `app.py` and in this file in sync when changing the ERD. If the in‑app ERD breaks again, the safest fix is to copy this entire `erDiagram` block into `_ERD_MERMAID` in `app.py`.
+
+---
+
+## Table definitions and future extensions
+
+### Current tables (POC)
+
+- **MASTER_PATIENT_CATALOG**  
+  Catalog view of CHI data elements; one row per `semantic_id`. Contains element name, USCDI reference, classification, ruleset category, privacy/security flags, and a derived FHIR resource name.
+
+- **MASTER_PATIENT_DICTIONARY**  
+  Dictionary view of each element; one row per `semantic_id`. Contains survivorship logic, data source rank reference, coverage metrics, granularity level, Innovaccer-specific logic, data‑quality notes, and the canonical FHIR R4 path and data type.
+
+- **HL7_ADT_CATALOG**  
+  Message-format catalog for HL7 ADT. Each row describes where a `semantic_id` appears in ADT messages (message type, segment/field), plus HL7 data type, optionality, cardinality, and an optional FHIR path and notes.
+
+- **CCDA_CATALOG**  
+  Message-format catalog for CCD/CCDA. Each row describes where a `semantic_id` appears in CCD/CCDA XML (section, entry type, XML path), plus an optional FHIR path and notes.
+
+These four tables support the current POC goal: a single CHI catalog/dictionary that maps to FHIR R4, HL7 ADT, and CCD/CCDA locations.
+
+### Versioning / effective dating (future extension)
+
+To support change over time (schema changes, rule changes, mapping changes), introduce **effective dating** columns on the dictionary and mapping tables; for example:
+
+- Add to `MASTER_PATIENT_DICTIONARY`, `HL7_ADT_CATALOG`, and `CCDA_CATALOG`:
+  - `effective_start_date` (DATE or TIMESTAMP)
+  - `effective_end_date` (DATE or TIMESTAMP, nullable)
+  - Optional `version_label` (e.g., `"v1.0"`, `"2026-CHI-refresh"`)
+
+Semantics:
+
+- At query time, filter on a **point-in-time**:  
+  `WHERE effective_start_date <= :as_of AND (effective_end_date IS NULL OR effective_end_date > :as_of)`.
+- This allows multiple historical rows per `semantic_id` and message location while keeping the catalog view (`MASTER_PATIENT_CATALOG`) stable.
+
+### Value set / code system support (future extension)
+
+Many data elements are coded (LOINC, SNOMED CT, ICD‑10, local codes). Rather than embedding codes directly into the four core tables, model them separately:
+
+- **VALUE_SET_DEFINITION**  
+  - `value_set_id` (PK)  
+  - `name`  
+  - `description`  
+  - `code_system` (e.g., `LOINC`, `SNOMED`, `ICD10CM`)  
+  - `version` (e.g., `2.74`, `2026-03`)  
+
+- **VALUE_SET_MEMBER**  
+  - `value_set_id` (FK → VALUE_SET_DEFINITION)  
+  - `code`  
+  - `display`  
+  - Optional `definition`, `inactive_flag`.
+
+- **SEMANTIC_ID_VALUE_SET** (bridge)  
+  - `semantic_id` (FK → MASTER_PATIENT_CATALOG/DICTIONARY)  
+  - `value_set_id` (FK → VALUE_SET_DEFINITION)  
+  - Optional `binding_strength` (`required`, `extensible`, `preferred`) and `binding_notes`.
+
+This keeps the core catalog/dictionary tables focused on **where** data lives and **how** it behaves, while the value‑set tables capture **which codes are allowed or expected** for a given element.

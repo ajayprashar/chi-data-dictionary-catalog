@@ -754,16 +754,16 @@ def main() -> None:
             )
         catalog_df, dictionary_df, adt_df, ccda_df = load_four_tables_for_review()
         if catalog_df is not None:
-            st.markdown("**MASTER_PATIENT_CATALOG**")
+            st.markdown("**MASTER_PATIENT_CATALOG** — Catalog data elements (what exists and how they’re grouped).")
             st.dataframe(catalog_df.head(row_limit), use_container_width=True)
         if dictionary_df is not None:
-            st.markdown("**MASTER_PATIENT_DICTIONARY**")
+            st.markdown("**MASTER_PATIENT_DICTIONARY** — Per-element rules, survivorship logic, and canonical FHIR path/type.")
             st.dataframe(dictionary_df.head(row_limit), use_container_width=True)
         if adt_df is not None:
-            st.markdown("**HL7_ADT_CATALOG**")
+            st.markdown("**HL7_ADT_CATALOG** — Where each catalog element lands in HL7 ADT messages (segment/field, data type, optionality).")
             st.dataframe(adt_df.head(row_limit), use_container_width=True)
         if ccda_df is not None:
-            st.markdown("**CCDA_CATALOG**")
+            st.markdown("**CCDA_CATALOG** — Where each catalog element lands in CCD/CCDA XML (section, entry type, XML path).")
             st.dataframe(ccda_df.head(row_limit), use_container_width=True)
         if catalog_df is None and dictionary_df is None and adt_df is None and ccda_df is None:
             st.caption("No Parquet tables found in project root.")
