@@ -495,7 +495,7 @@ def render_detail(
                     ]
                 ].reset_index(drop=True),
                 hide_index=True,
-                use_container_width=True,
+                width="stretch",
                 column_config={
                     "notes": st.column_config.TextColumn("Notes", width="large"),
                 },
@@ -513,7 +513,7 @@ def render_detail(
                     ]
                 ].reset_index(drop=True),
                 hide_index=True,
-                use_container_width=True,
+                width="stretch",
                 column_config={
                     "section_name": st.column_config.TextColumn("Section", width="small"),
                     "entry_type": st.column_config.TextColumn("Entry type", width="small"),
@@ -726,7 +726,7 @@ def _render_erd_future(streamlit_module: "st") -> None:
 </html>
 """
     try:
-        streamlit_module.components.v1.html(html_content, height=520, scrolling=False)
+        streamlit_module.components.v1.html(html_content, height=700, scrolling=True)
     except Exception:
         streamlit_module.code(mermaid_src, language="mermaid")
     with streamlit_module.expander("Mermaid source (copy to Mermaid Live to edit)", expanded=False):
@@ -811,7 +811,7 @@ def main() -> None:
         event = st.dataframe(
             list_view,
             hide_index=True,
-            use_container_width=True,
+            width="stretch",
             selection_mode="single-row",
             on_select="rerun",
         )
@@ -849,7 +849,7 @@ def main() -> None:
                     st.dataframe(
                         segments_df,
                         hide_index=True,
-                        use_container_width=True,
+                        width="stretch",
                         column_config={"data_received": st.column_config.TextColumn("Received"),
                                        "notes": st.column_config.TextColumn("Notes")},
                     )
@@ -858,7 +858,7 @@ def main() -> None:
                     st.dataframe(
                         events_df,
                         hide_index=True,
-                        use_container_width=True,
+                        width="stretch",
                         column_config={"percentage_of_total": st.column_config.TextColumn("%")},
                     )
 
@@ -912,13 +912,13 @@ def main() -> None:
         catalog_df, dictionary_df, adt_df, ccda_df = load_four_tables_for_review()
         if catalog_df is not None:
             st.markdown('<div class="section-block section-catalog"><strong>MASTER_PATIENT_CATALOG</strong> — Catalog data elements (what exists and how they\'re grouped).</div>', unsafe_allow_html=True)
-            st.dataframe(catalog_df.head(row_limit), use_container_width=True)
+            st.dataframe(catalog_df.head(row_limit), width="stretch")
         if dictionary_df is not None:
             st.markdown('<div class="section-block section-fhir"><strong>MASTER_PATIENT_DICTIONARY</strong> — Per-element rules, survivorship logic, and canonical FHIR path/type.</div>', unsafe_allow_html=True)
-            st.dataframe(dictionary_df.head(row_limit), use_container_width=True)
+            st.dataframe(dictionary_df.head(row_limit), width="stretch")
         if adt_df is not None:
             st.markdown('<div class="section-block section-adt"><strong>HL7_ADT_CATALOG</strong> — Where each catalog element lands in HL7 ADT messages (segment/field, data type, optionality).</div>', unsafe_allow_html=True)
-            st.dataframe(adt_df.head(row_limit), use_container_width=True)
+            st.dataframe(adt_df.head(row_limit), width="stretch")
             st.caption(
                 "HL7 ADT columns: **data_type** is the HL7 v2 field data type (e.g., ST, NM, XPN). "
                 "**optionality** usually follows HL7 v2 codes (R = required, O = optional, C = conditional, X = not used). "
@@ -926,7 +926,7 @@ def main() -> None:
             )
         if ccda_df is not None:
             st.markdown('<div class="section-block section-ccda"><strong>CCDA_CATALOG</strong> — Where each catalog element lands in CCD/CCDA XML (section, entry type, XML path).</div>', unsafe_allow_html=True)
-            st.dataframe(ccda_df.head(row_limit), use_container_width=True)
+            st.dataframe(ccda_df.head(row_limit), width="stretch")
         if catalog_df is None and dictionary_df is None and adt_df is None and ccda_df is None:
             st.caption("No Parquet tables found in project root.")
         st.markdown("---")
