@@ -685,4 +685,4 @@ When editing this ERD (here or in the Streamlit app’s `_ERD_MERMAID`), follow 
    - **Wrong:** `||--o{{` (double brace) → causes syntax error.  
    - **Right:** `||--o{`.
 
-Keep the diagram in `app.py` and in this file in sync when changing the ERD.
+Keep the diagram in `app.py` and in this file in sync when changing the ERD. If the in‑app ERD breaks again, the safest fix is to copy this entire `erDiagram` block into `_ERD_MERMAID` in `app.py`.

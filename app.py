@@ -506,8 +506,9 @@ erDiagram
         string classification
         string ruleset_category
         string privacy_security
-        string fhir_resource
+        string fhir_resource   "derived from fhir_r4_path"
     }
+
     MASTER_PATIENT_DICTIONARY {
         string semantic_id PK, FK
         string hie_survivorship_logic
@@ -519,18 +520,23 @@ erDiagram
         string fhir_r4_path
         string fhir_data_type
     }
+
     HL7_ADT_CATALOG {
-        string message_format
+        string message_format   "ADT"
         string message_type
         string segment_id
         string field_id
         string field_name
+        string data_type
+        string optionality
+        string cardinality
         string semantic_id FK
         string fhir_r4_path
         string notes
     }
+
     CCDA_CATALOG {
-        string message_format
+        string message_format   "CCD"
         string section_name
         string entry_type
         string xml_path
@@ -538,9 +544,10 @@ erDiagram
         string fhir_r4_path
         string notes
     }
-    MASTER_PATIENT_CATALOG ||--|| MASTER_PATIENT_DICTIONARY : contains
-    MASTER_PATIENT_CATALOG ||--o{ HL7_ADT_CATALOG : maps
-    MASTER_PATIENT_CATALOG ||--o{ CCDA_CATALOG : maps
+
+    MASTER_PATIENT_CATALOG ||--|| MASTER_PATIENT_DICTIONARY : "has dictionary row"
+    MASTER_PATIENT_CATALOG ||--o{ HL7_ADT_CATALOG         : "maps to ADT fields"
+    MASTER_PATIENT_CATALOG ||--o{ CCDA_CATALOG            : "maps to CCD/CCDA paths"
 """
 
 
@@ -636,8 +643,8 @@ def main() -> None:
         st.markdown(
             """
             <div class="title-row">
-              <h4>Elements</h4>
-              <span class="header-caption">Use the selection column on the left to choose an element.</span>
+              <h4>Catalog elements</h4>
+              <span class="header-caption">Catalog data elements from master_patient_catalog.parquet. Use the selection column on the left to choose an element.</span>
             </div>
             """,
             unsafe_allow_html=True,
@@ -722,6 +729,9 @@ def main() -> None:
     # Documentation at bottom of page: summary + doc link + ERD (collapsed by default)
     st.markdown("---")
     with st.expander("**Documentation**", expanded=False):
+        st.markdown(
+            "This section documents the current filtered subset and the Parquet tables that back this app."
+        )
         st.markdown("#### Summary for current filters")
         st.markdown(
             f"- {total} element(s) · {distinct_resources} FHIR resource type(s)  \n"
@@ -758,7 +768,7 @@ def main() -> None:
         if catalog_df is None and dictionary_df is None and adt_df is None and ccda_df is None:
             st.caption("No Parquet tables found in project root.")
         st.markdown("---")
-        st.caption("Full docs: **readme-prd.md**, **README.md**, **docs/** in the project folder.")
+        st.caption("Full project docs: **readme-prd.md**, **README.md**, and **docs/** in the project folder.")
 
 
 if __name__ == "__main__":
