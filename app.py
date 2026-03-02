@@ -138,26 +138,26 @@ def load_all_feed_profiles() -> tuple[tuple[str, pd.DataFrame | None, pd.DataFra
 
 
 def inject_theme() -> None:
-    """Inject medical-app style theme: light main area, dark sidebar, green accents, red for alerts."""
+    """Inject medical-app style theme: light, clinical neutrals with green accents and good label/value contrast."""
     css = """
     <style>
-    /* Main content: white / light grey */
+    /* Main content: soft grey background, dark readable text */
     html, body, [data-testid="stAppViewContainer"] {
         font-size: 0.95rem;
-        background-color: #f8f9fa;
-        color: #1a1d21;
+        background-color: #f3f4f6;  /* app backdrop */
+        color: #111827;
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
     [data-testid="stAppViewContainer"] .block-container {
         padding-top: 1.0rem;
-        padding-bottom: 1.0rem;
+        padding-bottom: 0.5rem;
     }
 
-    /* Sidebar: light variant to match main content */
+    /* Sidebar: slightly darker than main for separation */
     [data-testid="stSidebar"] {
-        background-color: #f3f4f6;
-        color: #1a1d21;
+        background-color: #e5e7eb;
+        color: #111827;
     }
     [data-testid="stSidebar"] label {
         color: #374151;
@@ -167,35 +167,44 @@ def inject_theme() -> None:
     [data-testid="stSidebar"] .stMultiSelect div[role="combobox"],
     [data-testid="stSidebar"] .stSelectbox > div {
         background-color: #ffffff;
-        color: #1a1d21;
+        color: #111827;
         border: 1px solid #d1d5db;
     }
     [data-testid="stSidebar"] .stMultiSelect span,
     [data-testid="stSidebar"] .stSelectbox span {
-        color: #1a1d21;
+        color: #111827;
     }
     [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3 {
-        color: #1a1d21;
+        color: #111827;
     }
 
-    /* Primary accent: green (buttons, headings, active state) */
-    h1, h2, h3 { color: #1a1d21; }
+    /* Primary accent: medical green (buttons, subheadings, links) */
+    h1, h2, h3 {
+        color: #111827;
+        margin-bottom: 0.15rem;
+        font-weight: 600;
+    }
+    /* Make the main app title compact (override Streamlit defaults) */
+    .title-row h1 { font-size: 1.1rem; }
+    h1 { font-size: 1.1rem; }
+    h2 { font-size: 1.0rem; }
+    h3 { font-size: 0.95rem; }
     h4, h5 {
         margin-top: 0.4rem;
         margin-bottom: 0.15rem;
-        color: #2e7d32;
+        color: #047857;
     }
     [data-testid="stAppViewContainer"] a {
-        color: #2e7d32;
+        color: #047857;
     }
     [data-testid="baseButton-primary"] {
-        background-color: #2e7d32 !important;
+        background-color: #059669 !important;
         color: #ffffff !important;
-        border-color: #2e7d32 !important;
+        border-color: #059669 !important;
     }
     [data-testid="baseButton-primary"]:hover {
-        background-color: #1b5e20 !important;
-        border-color: #1b5e20 !important;
+        background-color: #047857 !important;
+        border-color: #047857 !important;
     }
 
     /* Alerts / important: red */
@@ -209,29 +218,37 @@ def inject_theme() -> None:
         gap: 0.5rem;
         align-items: flex-start;
         margin-bottom: 0.2rem;
+        width: 100%;
+    }
+    @media (min-width: 992px) {
+        .field-row {
+            display: inline-flex;
+            width: calc(50% - 0.5rem);  /* two fields per row on large screens */
+            vertical-align: top;
+        }
     }
     .field-label {
-        min-width: 10rem;
+        min-width: 7.5rem;
         font-weight: 600;
         white-space: nowrap;
         text-align: right;
-        color: #374151;
+        color: #4b5563;  /* secondary text */
     }
     .field-value {
         flex: 1;
         background-color: #ffffff;
         padding: 0.2rem 0.55rem;
         border-radius: 4px;
-        border: 1px solid #dadce0;
-        color: #1a1d21;
+        border: 1px solid #d1d5db;
+        color: #111827;
     }
     .field-value-multiline {
         flex: 1;
         background-color: #ffffff;
         padding: 0.2rem 0.55rem;
         border-radius: 4px;
-        border: 1px solid #dadce0;
-        color: #1a1d21;
+        border: 1px solid #d1d5db;
+        color: #111827;
         white-space: pre-wrap;
         min-height: 3.2em;  /* ~3 lines */
         max-height: 6.4em;  /* ~6 lines */
@@ -248,6 +265,7 @@ def inject_theme() -> None:
         display: flex;
         align-items: baseline;
         gap: 0.25rem;
+        margin-top: 0.8rem;
         margin-bottom: 0.4rem;
     }
 
@@ -255,9 +273,14 @@ def inject_theme() -> None:
         margin-top: 0.4rem;
         padding: 0.4rem 0.6rem;
         border-radius: 4px;
-        border: 1px solid #dadce0;
+        border: 1px solid #d1d5db;
         background-color: #ffffff;
         font-size: 0.9rem;
+    }
+    /* Tighter spacing around horizontal rules */
+    hr {
+        margin-top: 0.6rem;
+        margin-bottom: 0.6rem;
     }
     </style>
     """
@@ -347,7 +370,15 @@ def render_detail(
     record = df[df["semantic_id"] == selected_id].iloc[0]
 
     # Single, vertically stacked layout (no tabs) to minimize clicks and maximize visible context.
-    st.markdown("##### Catalog (from `master_patient_catalog.parquet`)")
+    st.markdown(
+        """
+        <div class="title-row">
+          <h4>Catalog</h4>
+          <span class="header-caption">from master_patient_catalog.parquet</span>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
     render_field("Semantic ID", record.semantic_id)
     render_field("USCDI Element", record.uscdi_element)
     render_field("Description", record.uscdi_description)
@@ -355,19 +386,43 @@ def render_detail(
     render_field("Ruleset Category", record.ruleset_category)
     render_field("Privacy/Security", record.privacy_security)
 
-    st.markdown("##### Dictionary – FHIR Mapping (from `master_patient_dictionary.parquet`)")
+    st.markdown(
+        """
+        <div class="title-row">
+          <h4>Dictionary – FHIR Mapping</h4>
+          <span class="header-caption">from master_patient_dictionary.parquet</span>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
     render_field("Resource", record.fhir_resource)
     render_field("FHIR Path", record.fhir_r4_path)
     render_field("FHIR Data Type", record.fhir_data_type)
 
-    st.markdown("##### Dictionary – Survivorship & Sources")
+    st.markdown(
+        """
+        <div class="title-row">
+          <h4>Dictionary – Survivorship & Sources</h4>
+          <span class="header-caption"></span>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
     render_field("HIE Survivorship Logic", record.hie_survivorship_logic)
     render_field("Innovaccer Survivorship Logic", record.innovaccer_survivorship_logic)
     render_field("Data Source Rank Reference", record.data_source_rank_reference)
     render_field("Coverage (# PersonIDs)", record.coverage_personids)
     render_field("Granularity Level", record.granularity_level)
 
-    st.markdown("##### Dictionary – Quality & Governance")
+    st.markdown(
+        """
+        <div class="title-row">
+          <h4>Dictionary – Quality & Governance</h4>
+          <span class="header-caption"></span>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
     render_field("Quality & Governance Notes", record.data_quality_notes)
 
     # Optional HL7 ADT / CCD mappings for this element, shown side by side
@@ -382,7 +437,16 @@ def render_detail(
     if (adt_rows is not None and not adt_rows.empty) or (
         ccda_rows is not None and not ccda_rows.empty
     ):
-        st.markdown("##### Message-format mappings")
+        st.markdown("---")
+        st.markdown(
+            """
+            <div class="title-row">
+              <h4>Message-format mappings</h4>
+              <span class="header-caption"></span>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
         col_adt, col_ccd = st.columns(2)
 
         with col_adt:
@@ -516,7 +580,7 @@ def main() -> None:
         <div class="title-row">
           <h1>Community Health Insights (CHI) Metadata Catalog</h1>
           <span class="header-caption">
-            Local viewer for the CHI data catalog and data dictionary. Data is read from Parquet files in this folder; Excel remains the authoring source.
+            Local viewer for the CHI data catalog and data dictionary, backed by Parquet files in this folder.
           </span>
         </div>
         """,
@@ -563,8 +627,15 @@ def main() -> None:
                 "fhir_resource": "Resource",
             }
         )
-        st.markdown("#### Elements")
-        st.caption("Use the selection column on the left to choose an element.")
+        st.markdown(
+            """
+            <div class="title-row">
+              <h4>Elements</h4>
+              <span class="header-caption">Use the selection column on the left to choose an element.</span>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
         list_view = list_view.reset_index(drop=True)
 
         event = st.dataframe(
@@ -579,7 +650,6 @@ def main() -> None:
         feed_profiles = load_all_feed_profiles()
         if feed_profiles:
             st.markdown("---")
-            st.markdown("#### Data source profiles")
             # Only list sources that have at least one table
             valid_sources = [
                 (sid, seg, evt) for sid, seg, evt in feed_profiles
@@ -595,7 +665,15 @@ def main() -> None:
                 )
                 idx = options.index(selected_label)
                 source_id, segments_df, events_df = valid_sources[idx]
-                st.caption(f"Source: data/{source_id}_feed_*.csv")
+                st.markdown(
+                    f"""
+                    <div class="title-row">
+                      <h4>Data source profiles</h4>
+                      <span class="header-caption">Source: data/{source_id}_feed_*.csv</span>
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
                 if segments_df is not None and not segments_df.empty:
                     st.markdown("**Segments**")
                     st.dataframe(
@@ -624,24 +702,30 @@ def main() -> None:
         selected_id = filtered["semantic_id"].iloc[selected_idx]
 
     with col_detail:
-        st.markdown("#### Element detail")
+        st.markdown(
+            """
+            <div class="title-row">
+              <h4>Element detail</h4>
+              <span class="header-caption"></span>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
         render_detail(filtered, selected_id, adt_df=adt_df, ccda_df=ccda_df)
 
     # Documentation at bottom of page: summary + doc link + ERD (collapsed by default)
     st.markdown("---")
     with st.expander("**Documentation**", expanded=False):
-        st.markdown("**Summary for current filters**")
+        st.markdown("#### Summary for current filters")
         st.markdown(
             f"- {total} element(s) · {distinct_resources} FHIR resource type(s)  \n"
             f"- {with_fhir} with FHIR mapping, {missing_fhir} missing  \n"
             f"- {missing_surv} missing HIE survivorship logic  \n"
             f"- {pii_count} with privacy/security flags"
         )
-        st.markdown("---")
-        st.markdown("**Data model (ERD)**")
+        st.markdown("#### Data model (ERD)")
         _render_erd(st)
-        st.markdown("---")
-        st.markdown("**Table preview (for review)**")
+        st.markdown("#### Table preview (for review)")
         _row_options = [50, 500, 5_000_000_000_000]
         col_rows, _ = st.columns([1, 5])
         with col_rows:
