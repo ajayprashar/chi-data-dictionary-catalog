@@ -154,28 +154,28 @@ def inject_theme() -> None:
         padding-bottom: 1.0rem;
     }
 
-    /* Sidebar: dark grey/black like medical app nav */
+    /* Sidebar: light variant to match main content */
     [data-testid="stSidebar"] {
-        background-color: #2d3238;
-        color: #ffffff;
+        background-color: #f3f4f6;
+        color: #1a1d21;
     }
     [data-testid="stSidebar"] label {
-        color: #e8eaed;
+        color: #374151;
         font-weight: 500;
     }
     [data-testid="stSidebar"] .stTextInput input,
     [data-testid="stSidebar"] .stMultiSelect div[role="combobox"],
     [data-testid="stSidebar"] .stSelectbox > div {
-        background-color: #3c4249;
-        color: #ffffff;
-        border: 1px solid #4a5159;
+        background-color: #ffffff;
+        color: #1a1d21;
+        border: 1px solid #d1d5db;
     }
     [data-testid="stSidebar"] .stMultiSelect span,
     [data-testid="stSidebar"] .stSelectbox span {
-        color: #e8eaed;
+        color: #1a1d21;
     }
     [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3 {
-        color: #ffffff;
+        color: #1a1d21;
     }
 
     /* Primary accent: green (buttons, headings, active state) */
