@@ -762,6 +762,11 @@ def main() -> None:
         if adt_df is not None:
             st.markdown("**HL7_ADT_CATALOG** — Where each catalog element lands in HL7 ADT messages (segment/field, data type, optionality).")
             st.dataframe(adt_df.head(row_limit), use_container_width=True)
+            st.caption(
+                "HL7 ADT columns: **data_type** is the HL7 v2 field data type (e.g., ST, NM, XPN). "
+                "**optionality** usually follows HL7 v2 codes (R = required, O = optional, C = conditional, X = not used). "
+                "**cardinality** expresses how many repetitions are allowed (e.g., 0..1, 0..*, 1..1, 1..*)."
+            )
         if ccda_df is not None:
             st.markdown("**CCDA_CATALOG** — Where each catalog element lands in CCD/CCDA XML (section, entry type, XML path).")
             st.dataframe(ccda_df.head(row_limit), use_container_width=True)
