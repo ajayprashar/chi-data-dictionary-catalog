@@ -374,7 +374,7 @@ def render_detail(
         """
         <div class="title-row">
           <h4>Catalog</h4>
-          <span class="header-caption">from master_patient_catalog.parquet</span>
+          <span class="header-caption">from master_patient_catalog.parquet · What elements exist and how they’re grouped.</span>
         </div>
         """,
         unsafe_allow_html=True,
@@ -403,7 +403,7 @@ def render_detail(
         """
         <div class="title-row">
           <h4>Dictionary – Survivorship & Sources</h4>
-          <span class="header-caption"></span>
+          <span class="header-caption">Business rules and source logic for this element.</span>
         </div>
         """,
         unsafe_allow_html=True,
@@ -442,7 +442,7 @@ def render_detail(
             """
             <div class="title-row">
               <h4>Message-format mappings</h4>
-              <span class="header-caption"></span>
+              <span class="header-caption">Where this element lands in HL7 ADT and CCD/CCDA messages.</span>
             </div>
             """,
             unsafe_allow_html=True,
