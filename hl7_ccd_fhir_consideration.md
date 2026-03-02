@@ -689,6 +689,20 @@ Keep the diagram in `app.py` and in this file in sync when changing the ERD. If 
 
 ---
 
+## FUTURE / POST POC — Extended ERD (coding system tables)
+
+The Streamlit app includes a second ERD under **Documentation → FUTURE / POST POC** that shows the extended model with value-set/code-system tables and crosswalks that were strategically left out of the current POC:
+
+- **VALUE_SET_DEFINITION** — Value set metadata (name, code system, version)
+- **VALUE_SET_MEMBER** — Codes within a value set (code, display, definition)
+- **SEMANTIC_ID_VALUE_SET** — Bridge linking catalog elements to value sets (binding strength, notes)
+- **FHIR_CATALOG** — Format catalog for FHIR (resource type, element path, profile)
+- **INTEROPERABILITY_CROSSWALK** — Partner-specific transformation rules (target field, value mapping)
+
+See the "Value set / code system support (future extension)" and "Key Relationships" sections below for details.
+
+---
+
 ## Table definitions and future extensions
 
 ### Current tables (POC)

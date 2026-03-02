@@ -14,6 +14,7 @@ Run from the project root:
 from __future__ import annotations
 
 import glob
+import html
 import os
 from functools import lru_cache
 from typing import List
@@ -282,6 +283,18 @@ def inject_theme() -> None:
         margin-top: 0.6rem;
         margin-bottom: 0.6rem;
     }
+    /* Standards-domain background tints (subtle, for visual anchoring) */
+    .section-block {
+        padding: 0.5rem 0.6rem;
+        border-radius: 4px;
+        margin-bottom: 0.4rem;
+    }
+    .section-catalog { background-color: #f9fafb; }
+    .section-fhir { background-color: #ecfdf5; }
+    .section-survivorship { background-color: #fffbeb; }
+    .section-quality { background-color: #f5f3ff; }
+    .section-adt { background-color: #eff6ff; }
+    .section-ccda { background-color: #f0fdf4; }
     </style>
     """
     st.markdown(css, unsafe_allow_html=True)
@@ -314,6 +327,36 @@ def render_field(label: str, value: object) -> None:
         """,
         unsafe_allow_html=True,
     )
+
+
+def _render_section_block(
+    section_class: str,
+    title: str,
+    caption: str,
+    fields: list[tuple[str, object]],
+) -> None:
+    """Render a full section (title + fields) in one colored block."""
+    multiline_labels = {
+        "Description",
+        "HIE Survivorship Logic",
+        "Innovaccer Survivorship Logic",
+        "Data Source Rank Reference",
+        "Quality & Governance Notes",
+    }
+    rows = []
+    for label, value in fields:
+        val_class = "field-value-multiline" if label in multiline_labels else "field-value"
+        rows.append(
+            f'<div class="field-row"><div class="field-label">{label}:</div>'
+            f'<div class="{val_class}">{html.escape(format_value(value))}</div></div>'
+        )
+    html_content = f"""
+    <div class="section-block {section_class}">
+      <div class="title-row"><h4>{html.escape(title)}</h4><span class="header-caption">{html.escape(caption)}</span></div>
+      {"".join(rows)}
+    </div>
+    """
+    st.markdown(html_content, unsafe_allow_html=True)
 
 
 def apply_filters(df: pd.DataFrame) -> pd.DataFrame:
@@ -370,60 +413,51 @@ def render_detail(
     record = df[df["semantic_id"] == selected_id].iloc[0]
 
     # Single, vertically stacked layout (no tabs) to minimize clicks and maximize visible context.
-    st.markdown(
-        """
-        <div class="title-row">
-          <h4>Catalog</h4>
-          <span class="header-caption">from master_patient_catalog.parquet · What elements exist and how they’re grouped.</span>
-        </div>
-        """,
-        unsafe_allow_html=True,
+    # Each section uses a subtle background tint to distinguish standards domains.
+    _render_section_block(
+        "section-catalog",
+        "Catalog",
+        "from master_patient_catalog.parquet · What elements exist and how they're grouped.",
+        [
+            ("Semantic ID", record.semantic_id),
+            ("USCDI Element", record.uscdi_element),
+            ("Description", record.uscdi_description),
+            ("Classification", record.classification),
+            ("Ruleset Category", record.ruleset_category),
+            ("Privacy/Security", record.privacy_security),
+        ],
     )
-    render_field("Semantic ID", record.semantic_id)
-    render_field("USCDI Element", record.uscdi_element)
-    render_field("Description", record.uscdi_description)
-    render_field("Classification", record.classification)
-    render_field("Ruleset Category", record.ruleset_category)
-    render_field("Privacy/Security", record.privacy_security)
 
-    st.markdown(
-        """
-        <div class="title-row">
-          <h4>Dictionary – FHIR Mapping</h4>
-          <span class="header-caption">from master_patient_dictionary.parquet · Canonical FHIR R4 path &amp; type for this element</span>
-        </div>
-        """,
-        unsafe_allow_html=True,
+    _render_section_block(
+        "section-fhir",
+        "Dictionary – FHIR Mapping",
+        "from master_patient_dictionary.parquet · Canonical FHIR R4 path & type for this element",
+        [
+            ("Resource", record.fhir_resource),
+            ("FHIR Path", record.fhir_r4_path),
+            ("FHIR Data Type", record.fhir_data_type),
+        ],
     )
-    render_field("Resource", record.fhir_resource)
-    render_field("FHIR Path", record.fhir_r4_path)
-    render_field("FHIR Data Type", record.fhir_data_type)
 
-    st.markdown(
-        """
-        <div class="title-row">
-          <h4>Dictionary – Survivorship & Sources</h4>
-          <span class="header-caption">Business rules and source logic for this element.</span>
-        </div>
-        """,
-        unsafe_allow_html=True,
+    _render_section_block(
+        "section-survivorship",
+        "Dictionary – Survivorship & Sources",
+        "Business rules and source logic for this element.",
+        [
+            ("HIE Survivorship Logic", record.hie_survivorship_logic),
+            ("Innovaccer Survivorship Logic", record.innovaccer_survivorship_logic),
+            ("Data Source Rank Reference", record.data_source_rank_reference),
+            ("Coverage (# PersonIDs)", record.coverage_personids),
+            ("Granularity Level", record.granularity_level),
+        ],
     )
-    render_field("HIE Survivorship Logic", record.hie_survivorship_logic)
-    render_field("Innovaccer Survivorship Logic", record.innovaccer_survivorship_logic)
-    render_field("Data Source Rank Reference", record.data_source_rank_reference)
-    render_field("Coverage (# PersonIDs)", record.coverage_personids)
-    render_field("Granularity Level", record.granularity_level)
 
-    st.markdown(
-        """
-        <div class="title-row">
-          <h4>Dictionary – Quality & Governance</h4>
-          <span class="header-caption"></span>
-        </div>
-        """,
-        unsafe_allow_html=True,
+    _render_section_block(
+        "section-quality",
+        "Dictionary – Quality & Governance",
+        "",
+        [("Quality & Governance Notes", record.data_quality_notes)],
     )
-    render_field("Quality & Governance Notes", record.data_quality_notes)
 
     # Optional HL7 ADT / CCD mappings for this element, shown side by side
     adt_rows = None
@@ -449,7 +483,7 @@ def render_detail(
         )
 
         if adt_rows is not None and not adt_rows.empty:
-            st.markdown("**HL7 ADT (from `hl7_adt_catalog.parquet`)**")
+            st.markdown('<div class="section-block section-adt"><strong>HL7 ADT</strong> (from <code>hl7_adt_catalog.parquet</code>)</div>', unsafe_allow_html=True)
             st.dataframe(
                 adt_rows[
                     [
@@ -468,7 +502,7 @@ def render_detail(
             )
 
         if ccda_rows is not None and not ccda_rows.empty:
-            st.markdown("**CCD / CCDA (from `ccda_catalog.parquet`)**")
+            st.markdown('<div class="section-block section-ccda"><strong>CCD / CCDA</strong> (from <code>ccda_catalog.parquet</code>)</div>', unsafe_allow_html=True)
             st.dataframe(
                 ccda_rows[
                     [
@@ -550,6 +584,98 @@ erDiagram
     MASTER_PATIENT_CATALOG ||--o{ CCDA_CATALOG            : "maps to CCD/CCDA paths"
 """
 
+# Extended ERD for FUTURE / POST POC: value-set/code-system tables and crosswalks (strategically left out of POC)
+# See hl7_ccd_fhir_consideration.md "Value set / code system support (future extension)" and "Key Relationships"
+_ERD_FUTURE_MERMAID = """
+erDiagram
+    MASTER_PATIENT_CATALOG {
+        string semantic_id PK
+        string uscdi_element
+        string uscdi_description
+        string classification
+        string ruleset_category
+        string privacy_security
+        string fhir_resource
+    }
+
+    MASTER_PATIENT_DICTIONARY {
+        string semantic_id PK, FK
+        string hie_survivorship_logic
+        string data_source_rank_reference
+        string fhir_r4_path
+        string fhir_data_type
+    }
+
+    HL7_ADT_CATALOG {
+        string segment_id
+        string field_id
+        string semantic_id FK
+        string fhir_r4_path
+    }
+
+    CCDA_CATALOG {
+        string section_name
+        string entry_type
+        string xml_path
+        string semantic_id FK
+        string fhir_r4_path
+    }
+
+    FHIR_CATALOG {
+        string catalog_id PK
+        string resource_type
+        string element_path
+        string master_attribute_mapping FK
+        string profile_url
+        string cardinality
+    }
+
+    INTEROPERABILITY_CROSSWALK {
+        string crosswalk_id PK
+        string partner_id
+        string message_format
+        string l3_attribute FK
+        string target_field
+        string transformation_rule
+        string value_mapping
+        string effective_date
+    }
+
+    VALUE_SET_DEFINITION {
+        string value_set_id PK
+        string name
+        string description
+        string code_system
+        string version
+    }
+
+    VALUE_SET_MEMBER {
+        string value_set_id FK
+        string code
+        string display
+        string definition
+        string inactive_flag
+    }
+
+    SEMANTIC_ID_VALUE_SET {
+        string semantic_id FK
+        string value_set_id FK
+        string binding_strength
+        string binding_notes
+    }
+
+    MASTER_PATIENT_CATALOG ||--|| MASTER_PATIENT_DICTIONARY : "has dictionary row"
+    MASTER_PATIENT_CATALOG ||--o{ HL7_ADT_CATALOG         : "maps to ADT"
+    MASTER_PATIENT_CATALOG ||--o{ CCDA_CATALOG            : "maps to CCD/CCDA"
+    MASTER_PATIENT_CATALOG ||--o{ FHIR_CATALOG            : "maps to FHIR"
+    MASTER_PATIENT_CATALOG ||--o{ SEMANTIC_ID_VALUE_SET   : "bound to value sets"
+    VALUE_SET_DEFINITION ||--o{ VALUE_SET_MEMBER         : "contains codes"
+    VALUE_SET_DEFINITION ||--o{ SEMANTIC_ID_VALUE_SET   : "bound to elements"
+    HL7_ADT_CATALOG ||--o{ INTEROPERABILITY_CROSSWALK    : "uses crosswalk"
+    CCDA_CATALOG ||--o{ INTEROPERABILITY_CROSSWALK       : "uses crosswalk"
+    FHIR_CATALOG ||--o{ INTEROPERABILITY_CROSSWALK       : "uses crosswalk"
+"""
+
 
 def _render_erd(streamlit_module: "st") -> None:
     """Render the POC ERD in-browser with Mermaid 9 (single-brace diagram; no mermaid.ink)."""
@@ -578,6 +704,37 @@ def _render_erd(streamlit_module: "st") -> None:
     streamlit_module.caption(
         "Mermaid source: **hl7_ccd_fhir_consideration.md** (Current CHI Metadata Viewer ERD). Copy to [Mermaid Live](https://mermaid.live) to edit. "
         "**FHIR:** Path and type are stored in **MASTER_PATIENT_DICTIONARY** (canonical) and in **HL7_ADT_CATALOG** / **CCDA_CATALOG** (per-format); this POC does not store FHIR resource instance data (that lives in FHIR servers/APIs)."
+    )
+
+
+def _render_erd_future(streamlit_module: "st") -> None:
+    """Render the FUTURE / POST POC ERD (value-set tables, FHIR catalog, crosswalks)."""
+    mermaid_src = _ERD_FUTURE_MERMAID.strip()
+    html_content = f"""
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@9.4.3/dist/mermaid.min.js?v=9"></script>
+  <style>body {{ margin: 0; font-family: sans-serif; }} .mermaid {{ margin: 0.5rem 0; }}</style>
+</head>
+<body>
+  <div class="mermaid">{mermaid_src}</div>
+  <script>
+    mermaid.initialize({{ startOnLoad: true, theme: "neutral" }});
+  </script>
+</body>
+</html>
+"""
+    try:
+        streamlit_module.components.v1.html(html_content, height=520, scrolling=False)
+    except Exception:
+        streamlit_module.code(mermaid_src, language="mermaid")
+    with streamlit_module.expander("Mermaid source (copy to Mermaid Live to edit)", expanded=False):
+        streamlit_module.code(mermaid_src, language="mermaid")
+    streamlit_module.caption(
+        "**FUTURE / POST POC:** Value-set/code-system tables (VALUE_SET_DEFINITION, VALUE_SET_MEMBER, SEMANTIC_ID_VALUE_SET), "
+        "FHIR_CATALOG, and INTEROPERABILITY_CROSSWALK were strategically left out of the current POC. "
+        "See **hl7_ccd_fhir_consideration.md** → \"Value set / code system support (future extension)\" and \"Key Relationships\"."
     )
 
 
@@ -754,13 +911,13 @@ def main() -> None:
             )
         catalog_df, dictionary_df, adt_df, ccda_df = load_four_tables_for_review()
         if catalog_df is not None:
-            st.markdown("**MASTER_PATIENT_CATALOG** — Catalog data elements (what exists and how they’re grouped).")
+            st.markdown('<div class="section-block section-catalog"><strong>MASTER_PATIENT_CATALOG</strong> — Catalog data elements (what exists and how they\'re grouped).</div>', unsafe_allow_html=True)
             st.dataframe(catalog_df.head(row_limit), use_container_width=True)
         if dictionary_df is not None:
-            st.markdown("**MASTER_PATIENT_DICTIONARY** — Per-element rules, survivorship logic, and canonical FHIR path/type.")
+            st.markdown('<div class="section-block section-fhir"><strong>MASTER_PATIENT_DICTIONARY</strong> — Per-element rules, survivorship logic, and canonical FHIR path/type.</div>', unsafe_allow_html=True)
             st.dataframe(dictionary_df.head(row_limit), use_container_width=True)
         if adt_df is not None:
-            st.markdown("**HL7_ADT_CATALOG** — Where each catalog element lands in HL7 ADT messages (segment/field, data type, optionality).")
+            st.markdown('<div class="section-block section-adt"><strong>HL7_ADT_CATALOG</strong> — Where each catalog element lands in HL7 ADT messages (segment/field, data type, optionality).</div>', unsafe_allow_html=True)
             st.dataframe(adt_df.head(row_limit), use_container_width=True)
             st.caption(
                 "HL7 ADT columns: **data_type** is the HL7 v2 field data type (e.g., ST, NM, XPN). "
@@ -768,10 +925,17 @@ def main() -> None:
                 "**cardinality** expresses how many repetitions are allowed (e.g., 0..1, 0..*, 1..1, 1..*)."
             )
         if ccda_df is not None:
-            st.markdown("**CCDA_CATALOG** — Where each catalog element lands in CCD/CCDA XML (section, entry type, XML path).")
+            st.markdown('<div class="section-block section-ccda"><strong>CCDA_CATALOG</strong> — Where each catalog element lands in CCD/CCDA XML (section, entry type, XML path).</div>', unsafe_allow_html=True)
             st.dataframe(ccda_df.head(row_limit), use_container_width=True)
         if catalog_df is None and dictionary_df is None and adt_df is None and ccda_df is None:
             st.caption("No Parquet tables found in project root.")
+        st.markdown("---")
+        st.markdown("#### FUTURE / POST POC")
+        st.markdown(
+            "Extended ERD including value-set/code-system tables, FHIR catalog, and interoperability crosswalks "
+            "(strategically left out of the current POC)."
+        )
+        _render_erd_future(st)
         st.markdown("---")
         st.caption("Full project docs: **readme-prd.md**, **README.md**, and **docs/** in the project folder.")
 
