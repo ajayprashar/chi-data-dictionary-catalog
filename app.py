@@ -225,6 +225,18 @@ def inject_theme() -> None:
         border: 1px solid #dadce0;
         color: #1a1d21;
     }
+    .field-value-multiline {
+        flex: 1;
+        background-color: #ffffff;
+        padding: 0.2rem 0.55rem;
+        border-radius: 4px;
+        border: 1px solid #dadce0;
+        color: #1a1d21;
+        white-space: pre-wrap;
+        min-height: 3.2em;  /* ~3 lines */
+        max-height: 6.4em;  /* ~6 lines */
+        overflow-y: auto;
+    }
 
     .header-caption {
         font-size: 0.8rem;
@@ -262,11 +274,19 @@ def format_value(value: object) -> str:
 
 def render_field(label: str, value: object) -> None:
     """Render a single label/value pair with aligned layout and subtle value background."""
+    multiline_labels = {
+        "Description",
+        "HIE Survivorship Logic",
+        "Innovaccer Survivorship Logic",
+        "Data Source Rank Reference",
+        "Quality & Governance Notes",
+    }
+    value_class = "field-value-multiline" if label in multiline_labels else "field-value"
     st.markdown(
         f"""
         <div class="field-row">
           <div class="field-label">{label}:</div>
-          <div class="field-value">{format_value(value)}</div>
+          <div class="{value_class}">{format_value(value)}</div>
         </div>
         """,
         unsafe_allow_html=True,

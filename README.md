@@ -20,7 +20,11 @@ Lightweight, local proof‑of‑concept for viewing a **data catalog** and **dat
    pip install -r requirements.txt
    ```
 
-4. **Open the viewer notebook**:
+4. **Open the published app (no install required)**:
+
+   - `https://chi-data-dictionary-catalog.streamlit.app/`
+
+5. **Open the viewer notebook (local dev)**:
    - In Cursor/VS Code: open `chi-data-dictionary-catalog.ipynb` and select the `.venv` interpreter.
    - Run the first cell (`os.chdir(...)`) and the DuckDB query cells to explore `master_patient_catalog.parquet` and `master_patient_dictionary.parquet`.
 
