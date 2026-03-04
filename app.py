@@ -692,7 +692,7 @@ def _render_tech_spec(st_module: "st", content: str) -> None:
 
 
 def _render_mermaid(st_module: "st", mermaid_src: str, height: int = 450, scrolling: bool = True) -> None:
-    """Render arbitrary Mermaid diagram in-browser via mermaid.js. Falls back to code block on error."""
+    """Render arbitrary Mermaid diagram in-browser via mermaid.js. Uses same config as _render_erd."""
     src = mermaid_src.strip()
     # Prevent </script> in mermaid from closing the script tag
     safe_src = src.replace("</", "<\\/")
@@ -706,12 +706,7 @@ def _render_mermaid(st_module: "st", mermaid_src: str, height: int = 450, scroll
 <body>
   <div class="mermaid">{safe_src}</div>
   <script>
-    mermaid.initialize({{
-      startOnLoad: true,
-      theme: "neutral",
-      flowchart: {{ useMaxWidth: true }},
-      themeVariables: {{ fontSize: "14px" }}
-    }});
+    mermaid.initialize({{ startOnLoad: true, theme: "neutral" }});
   </script>
 </body>
 </html>
