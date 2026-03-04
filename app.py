@@ -939,13 +939,12 @@ def main() -> None:
         st.markdown("#### Technical Specification")
         tech_spec_path = os.path.join(PROJECT_ROOT, "TECH-SPEC.md")
         if os.path.exists(tech_spec_path):
-            with st.expander("View full TECH-SPEC.md (architecture, schemas, UI layout)", expanded=False):
-                try:
-                    with open(tech_spec_path, encoding="utf-8") as f:
-                        tech_spec_md = f.read()
-                    _render_tech_spec(st, tech_spec_md)
-                except Exception as e:
-                    st.caption(f"Could not load TECH-SPEC.md: {e}")
+            try:
+                with open(tech_spec_path, encoding="utf-8") as f:
+                    tech_spec_md = f.read()
+                _render_tech_spec(st, tech_spec_md)
+            except Exception as e:
+                st.caption(f"Could not load TECH-SPEC.md: {e}")
         else:
             st.caption("TECH-SPEC.md not found in project folder. See README.md for setup.")
         if st.button("↑ Return to catalog", key="doc_return_after_spec", help="Minimize documentation and return to the main catalog view"):
