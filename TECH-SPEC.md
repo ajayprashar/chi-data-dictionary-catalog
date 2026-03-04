@@ -6,6 +6,31 @@ For product context (why, who, scope), see **readme-prd.md**. For quick setup, s
 
 ---
 
+## HIE Interoperability Maturity
+
+This architecture has been evaluated against **United States Health Information Exchange (HIE) best practices** and scored **4.1/5** overall (see **EVALUATION.md** for full 25-domain assessment).
+
+**Exemplary areas (5/5):** Master Data Management, Standards Alignment, Roll-Up Strategy, Address Coherence, Three-Domain Separation, Message Format Separation, Race/Ethnicity Interoperability, Backward Compatibility.
+
+**Implemented in POC (addressing EVALUATION.md gaps):**
+- ✅ Stewardship assignment (`data_steward`, `steward_contact`, `approval_status`)
+- ✅ Schema versioning (`schema_version`, `last_modified_date`)
+- ✅ Identity management (`identifier_type`, `identifier_authority`, `identity_resolution_notes`)
+- ✅ Security & consent (`hipaa_category`, `fhir_security_label`, `consent_category`, `de_identification_method`)
+- ✅ FHIR compliance (`fhir_must_support`, `fhir_profile`, `fhir_cardinality`)
+- ✅ Survivorship enhancements (`tie_breaker_rule`, `conflict_detection_enabled`, `manual_override_allowed`)
+- ✅ Data source availability table (links sources to semantic IDs)
+
+**Deferred to production:**
+- Field-level provenance tracking (source + timestamp per value) — runtime data, not metadata schema
+- Machine-readable source hierarchy — current text format sufficient for POC
+- Terminology/value set tables — Domain 3, beyond demographics scope
+- Clinical data elements — beyond current POC scope
+
+See **EVALUATION.md** for detailed scoring, compliance assessment (USCDI v4/v5, FHIR US Core, Carequality, CommonWell), and production roadmap.
+
+---
+
 ## 1. Architecture Strategy
 
 ### 1.1 Why This Architecture Exists
@@ -38,7 +63,50 @@ The CHI metadata catalog architecture was designed to address several strategic 
 - **Forcing HL7 into data_catalog / data_dictionary** — Person-centric and event-centric models were kept separate.
 - **Format-specific dictionaries** — For POC, message catalogs carry minimal notes; a unified crosswalk (future) will handle partner rules.
 
-### 1.4 HIE Interoperability Alignment (Three-Domain Separation)
+### 1.4 Identity Resolution Strategy
+
+The CHI Master Demographics layer (L3) implements **probabilistic identity resolution** via Verato's Master Patient Index (MPI). The catalog and dictionary support this strategy through several mechanisms:
+
+**Identity Management Columns:**
+- `identifier_type` — Taxonomy of identifiers (MRN, SSN, DL, State ID, etc.) for multi-source tracking
+- `identifier_authority` — Issuing authority (State of California, SSA, Hospital MRN) for provenance
+- `identity_resolution_notes` — Match logic transparency: probabilistic linkage strategy, confidence thresholds, match/no-match rules
+
+**Survivorship for Identity Attributes:**
+- Identity attributes (Domain 1) use reliability-based survivorship: hospital-issued legal name ranks higher than self-reported
+- Address and contact info use recency-based survivorship (most recent wins)
+- `composite_group` ensures name components (first, last, middle) are selected as a set from one source
+
+**Match Confidence and Merge/Unmerge:**
+- POC scope: identity resolution is external (Verato). Catalog documents match logic via `identity_resolution_notes`.
+- Production scope: add `match_confidence_score` and audit trail for merge/unmerge operations.
+
+---
+
+### 1.5 Security and PHI Handling
+
+The catalog implements **attribute-level security classification** to support HIPAA compliance, 42 CFR Part 2 (substance use disorder), and FHIR security labeling:
+
+**Security and Privacy Columns:**
+- `privacy_security` — Legacy PII/Sensitive classification
+- `hipaa_category` — HIPAA-specific: "PII" | "PHI" | "SUD_Part2" | "" for regulatory compliance
+- `fhir_security_label` — FHIR security labels: "N" (normal), "R" (restricted), "V" (very restricted)
+- `consent_category` — Consent requirements: "general" | "research" | "sensitive" for opt-in/opt-out directives
+- `de_identification_method` — Strategy for research/public health: "redact" | "suppress" | "generalize" | "pseudonymize"
+
+**Operational Security (Not Metadata Scope):**
+- Encryption at rest: AES-256 for Parquet files (deployment concern, not catalog schema)
+- Access control: role-based (RBAC) enforcement at application layer
+- Audit logging: separate audit table tracks who accessed which semantic_ids when
+- Minimum necessary: application filters semantic_ids based on user role and purpose of use
+
+**Consent Directives:**
+- POC scope: `consent_category` flags which elements require explicit patient consent
+- Production scope: link to FHIR Consent resource for patient opt-in/opt-out tracking
+
+---
+
+### 1.6 HIE Interoperability Alignment (Three-Domain Separation)
 
 The catalog schema aligns with Health Information Exchange (HIE) interoperability best practices and the Master Demographics Three-Domain Separation Strategy:
 
@@ -53,8 +121,14 @@ The catalog schema aligns with Health Information Exchange (HIE) interoperabilit
 - **Roll-up vs. detail** — `rollup_relationship`, `is_rollup` for race, ethnicity, language, etc. (detailed elements point to rollup parent).
 - **Address coherence** — `composite_group` ensures street, city, zip are selected as a set from one source at one timestamp.
 - **Source hierarchy** — `data_source_rank_reference` documents attribute-specific rules (e.g., address: recency; legal name: reliability).
+- **Governance & stewardship** — `data_steward`, `steward_contact`, `approval_status` for ownership transparency.
+- **Identity management** — `identifier_type`, `identifier_authority` for multi-source identity tracking; `identity_resolution_notes` for match logic.
+- **Security & consent** — `hipaa_category`, `fhir_security_label`, `consent_category` for HIPAA/42 CFR Part 2 compliance and attribute-level consent directives.
+- **FHIR compliance** — `fhir_must_support`, `fhir_profile`, `fhir_cardinality` for US Core validation.
+- **Survivorship enhancements** — `tie_breaker_rule`, `conflict_detection_enabled`, `manual_override_allowed` for conflict resolution.
+- **Data source linkage** — `data_source_availability.parquet` table links feed profiles to catalog elements for intelligent source selection.
 
-**Deferred (P2):** `data_source_availability` table linking feed profiles to catalog elements; formal machine-readable `data_source_rank_reference` structure.
+**Deferred (P2):** Formal machine-readable `data_source_rank_reference` structure (current: human-readable text); field-level provenance tracking (source_system_id + timestamp per value).
 
 ---
 
@@ -116,7 +190,8 @@ flowchart TB
 | **master_patient_dictionary.parquet** | Required. Dictionary view. |
 | **hl7_adt_catalog.parquet** | Optional. ADT field mappings. |
 | **ccda_catalog.parquet** | Optional. CCD/CCDA XML mappings. |
-| **scripts/** | `split_to_catalog_and_dictionary.py`, `build_adt_catalog_from_mapping.py`, `build_ccda_catalog_from_mapping.py` |
+| **data_source_availability.parquet** | Optional. Source-to-semantic_id availability matrix. |
+| **scripts/** | `split_to_catalog_and_dictionary.py`, `build_adt_catalog_from_mapping.py`, `build_ccda_catalog_from_mapping.py`, `build_data_source_availability.py` |
 | **data/** | Mapping CSVs, feed profiles (segments, event types) |
 | **docs/** | `adding-data-sources.md`, `cmt-adt-feed-and-master-patient.md`, `jupyter-duckdb-parquet-setup.md` |
 
@@ -125,6 +200,7 @@ flowchart TB
 - **MASTER_PATIENT_CATALOG** ↔ **MASTER_PATIENT_DICTIONARY**: 1:1 on `semantic_id`
 - **MASTER_PATIENT_CATALOG** → **HL7_ADT_CATALOG**: 1:many (one element can map to multiple ADT fields)
 - **MASTER_PATIENT_CATALOG** → **CCDA_CATALOG**: 1:many (one element can map to multiple CCD/CCDA locations)
+- **MASTER_PATIENT_CATALOG** → **DATA_SOURCE_AVAILABILITY**: 1:many (one element can be provided by multiple sources)
 
 ---
 
@@ -206,9 +282,19 @@ flowchart TB
 | `domain` | string | **HIE Three-Domain Separation.** Governance boundary: "Domain 1: Master Demographics" \| "Domain 2: Master Patient Attributes" \| "Domain 3: Clinical Governance". |
 | `ruleset_category` | string | Ruleset (e.g., "Static Identity", "Dynamic Identity"). |
 | `privacy_security` | string | PII/Sensitive flags if applicable. |
+| `hipaa_category` | string | **HIPAA classification.** "PII" \| "PHI" \| "SUD_Part2" \| "" for HIPAA/42 CFR Part 2 compliance. |
+| `fhir_security_label` | string | **FHIR security label.** "N" (normal), "R" (restricted), "V" (very restricted) per FHIR security labeling. |
+| `consent_category` | string | **Consent requirement.** "general" \| "research" \| "sensitive" for consent directive mapping. |
 | `rollup_relationship` | string | **HIE roll-up vs. detail.** Parent semantic_id for detailed elements (e.g., `Patient.race_rollup`). NULL for rollups. |
 | `is_rollup` | string | **HIE roll-up vs. detail.** "true" for rollup categories, "false" for detailed. |
 | `composite_group` | string | **HIE address coherence.** Group identifier for survivorship-as-set (e.g., `Patient.address`). Elements with same value must be selected together from one source at one timestamp. |
+| `identifier_type` | string | **Identity management.** Identifier type taxonomy (e.g., "MRN", "SSN", "DL", "State_ID") for multi-source identity tracking. |
+| `identifier_authority` | string | **Identity management.** Issuing authority (e.g., "State_of_California", "SSA", "Hospital_MRN") for identifier provenance. |
+| `data_steward` | string | **Governance.** Name of data steward responsible for this element. |
+| `steward_contact` | string | **Governance.** Contact information (email, Slack) for data steward. |
+| `approval_status` | string | **Governance.** Approval workflow state: "draft" \| "review" \| "approved" \| "deprecated". |
+| `schema_version` | string | **Versioning.** Schema version for this element (e.g., "1.0", "2.1"). |
+| `last_modified_date` | string | **Versioning.** ISO 8601 date of last modification (e.g., "2026-03-04"). |
 
 **Derived in app:** `fhir_resource` = first token of `fhir_r4_path` (e.g., `Patient.name.given` → `Patient`).
 
@@ -220,7 +306,11 @@ flowchart TB
 |--------|------|-------------|
 | `semantic_id` | string | Primary key, FK to catalog. |
 | `hie_survivorship_logic` | string | HIE survivorship rule text. |
+| `tie_breaker_rule` | string | **Survivorship enhancement.** Tie-breaker when sources have equal rank: "most_recent" \| "most_complete" \| "source_reliability_score". |
+| `conflict_detection_enabled` | string | **Survivorship enhancement.** "true" \| "false" for logging when sources disagree. |
+| `manual_override_allowed` | string | **Survivorship enhancement.** "true" \| "false" for steward intervention capability. |
 | `data_source_rank_reference` | string | Source hierarchy / rank reference. Attribute-specific rules can use structured text: "For address: HMIS > Hospital. For legal name: Hospital > HMIS." |
+| `identity_resolution_notes` | string | **Identity management.** Match logic transparency: probabilistic linkage strategy, confidence thresholds, match/no-match rules. |
 | `coverage_personids` | string | Coverage metric (e.g., # of person IDs). |
 | `granularity_level` | string | Granularity of the element. |
 | `calculation_grain` | string | **HIE temporal (Domain 2).** "monthly" \| "daily" \| "real-time" for calculated attributes (e.g., AF/AG housing status). |
@@ -228,8 +318,12 @@ flowchart TB
 | `recalc_window_months` | string | **HIE temporal (Domain 2).** Rolling recalculation window (e.g., "3" for last 3 months). NULL for static attributes. |
 | `innovaccer_survivorship_logic` | string | Innovaccer-specific survivorship logic. |
 | `data_quality_notes` | string | Quality and governance notes. |
+| `de_identification_method` | string | **Privacy.** De-identification strategy: "redact" \| "suppress" \| "generalize" \| "pseudonymize" for research/public health use. |
 | `fhir_r4_path` | string | Canonical FHIR R4 path (e.g., `Patient.name.given`). |
 | `fhir_data_type` | string | FHIR data type for the element. |
+| `fhir_profile` | string | **FHIR compliance.** US Core or other profile URL (e.g., "http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient"). |
+| `fhir_cardinality` | string | **FHIR compliance.** Cardinality constraint: "0..1" \| "1..1" \| "0..\*" \| "1..\*". |
+| `fhir_must_support` | string | **FHIR compliance.** "true" if US Core Must Support element; "false" otherwise. |
 
 ---
 
@@ -265,7 +359,28 @@ flowchart TB
 
 ---
 
-### 4.5 Feed Profile CSVs
+### 4.5 DATA_SOURCE_AVAILABILITY
+
+**Purpose:** Links data sources (feed profiles) to catalog semantic IDs, documenting which sources can provide which attributes. Supports intelligent source selection for survivorship and enables data quality tracking per source per attribute.
+
+**Grain:** One row per (source_id, semantic_id) combination.
+
+**Source:** Built by `scripts/build_data_source_availability.py` from discovered feed profiles and master catalog.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `source_id` | string | Data source identifier (e.g., "cmt", "sutter"). Matches `*_feed_segments.csv` naming. |
+| `semantic_id` | string | FK to master catalog. |
+| `availability` | string | "full" \| "partial" \| "none" \| "unknown". Indicates whether source provides this attribute. |
+| `completeness_pct` | string | Estimated completeness percentage (0.0-100.0). Empty in POC; production would profile feed data. |
+| `timeliness_sla_hours` | string | Expected data freshness SLA in hours. Empty in POC. |
+| `notes` | string | Source-specific notes (e.g., "Only available for inpatient encounters"). |
+
+**POC Note:** Current implementation creates placeholder rows with `availability="unknown"`. Production implementation would analyze actual feed data to compute real completeness and timeliness metrics.
+
+---
+
+### 4.6 Feed Profile CSVs
 
 **&lt;source_id&gt;_feed_segments.csv**
 
@@ -286,7 +401,7 @@ flowchart TB
 
 ---
 
-### 4.6 Combined CSV (input to split script)
+### 4.7 Combined CSV (input to split script)
 
 Expected columns (Excel headers; script normalizes and converts to snake_case):
 
@@ -424,10 +539,10 @@ Single, vertically stacked layout (no tabs). Four section blocks with distinct b
 
 | Section | CSS Class | Caption | Fields |
 |---------|-----------|---------|--------|
-| **Catalog** | section-catalog (#f9fafb) | from master_patient_catalog.parquet | Semantic ID, USCDI Element, Description, Classification, Domain, Ruleset Category, Privacy/Security, Rollup Relationship, Is Rollup, Composite Group |
-| **Dictionary – FHIR Mapping** | section-fhir (#ecfdf5) | Canonical FHIR R4 path & type | Resource, FHIR Path, FHIR Data Type |
-| **Dictionary – Survivorship & Sources** | section-survivorship (#fffbeb) | Business rules and source logic | HIE Survivorship Logic, Innovaccer Survivorship Logic, Data Source Rank Reference, Coverage (# PersonIDs), Granularity Level, Calculation Grain, Historical Freeze, Recalc Window (Months) |
-| **Dictionary – Quality & Governance** | section-quality (#f5f3ff) | — | Quality & Governance Notes |
+| **Catalog** | section-catalog (#f9fafb) | from master_patient_catalog.parquet | Semantic ID, USCDI Element, Description, Classification, Domain, Ruleset Category, Privacy/Security, HIPAA Category, FHIR Security Label, Consent Category, Rollup Relationship, Is Rollup, Composite Group, Identifier Type, Identifier Authority, Data Steward, Steward Contact, Approval Status, Schema Version, Last Modified Date |
+| **Dictionary – FHIR Mapping** | section-fhir (#ecfdf5) | Canonical FHIR R4 path & type | Resource, FHIR Path, FHIR Data Type, FHIR Profile, FHIR Cardinality, FHIR Must Support |
+| **Dictionary – Survivorship & Sources** | section-survivorship (#fffbeb) | Business rules and source logic | HIE Survivorship Logic, Tie Breaker Rule, Conflict Detection Enabled, Manual Override Allowed, Innovaccer Survivorship Logic, Data Source Rank Reference, Identity Resolution Notes, Coverage (# PersonIDs), Granularity Level, Calculation Grain, Historical Freeze, Recalc Window (Months) |
+| **Dictionary – Quality & Governance** | section-quality (#f5f3ff) | — | Quality & Governance Notes, De-identification Method |
 
 Multiline fields (Description, survivorship logic, Data Source Rank Reference, Quality & Governance Notes) use `field-value-multiline` (scrollable, ~3–6 lines).
 
@@ -457,10 +572,11 @@ The documentation is session-state-driven (not an expander). A button opens the 
 
 ### 6.7 Data Loading Logic
 
-1. `load_data()`: DuckDB in-memory join of catalog + dictionary on `semantic_id`. Cached (`@lru_cache(maxsize=1)`).
+1. `load_data()`: Pandas-based merge of catalog + dictionary on `semantic_id`, with schema tolerance for HIE alignment columns. Cached (`@lru_cache(maxsize=1)`).
 2. `load_message_catalogs()`: Optional ADT and CCDA Parquet. Cached.
 3. `load_all_feed_profiles()`: Discovers `data/*_feed_segments.csv`, derives source_id, loads matching `*_feed_event_types.csv`. Cached.
-4. Filters applied in `apply_filters(df)`; filtered dataframe drives list and detail.
+4. `load_five_tables_for_review()`: Loads all tables (catalog, dictionary, ADT, CCDA, data source availability) for documentation preview. Cached.
+5. Filters applied in `apply_filters(df)`; filtered dataframe drives list and detail.
 
 ### 6.8 Error Handling
 
@@ -483,7 +599,8 @@ Mermaid diagrams (Data Flow, Page Structure, ERD) are rendered via `st.component
 | 2b. Upgrade (existing Parquet) | `python scripts/split_to_catalog_and_dictionary.py --upgrade-schema -d .` | Adds HIE alignment columns to existing Parquet |
 | 3. ADT catalog (optional) | `python scripts/build_adt_catalog_from_mapping.py` | `hl7_adt_catalog.parquet` |
 | 4. CCDA catalog (optional) | `python scripts/build_ccda_catalog_from_mapping.py` | `ccda_catalog.parquet` |
-| 5. Run app | `streamlit run app.py` | Local Streamlit UI |
+| 5. Data source availability | `python scripts/build_data_source_availability.py` | `data_source_availability.parquet` |
+| 6. Run app | `streamlit run app.py` | Local Streamlit UI |
 
 ---
 

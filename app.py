@@ -42,8 +42,17 @@ def load_data() -> pd.DataFrame:
     # Use pandas for schema-tolerant merge (handles old Parquet without HIE columns)
     catalog = pd.read_parquet(cat_path)
     dictionary = pd.read_parquet(dict_path)
-    hie_catalog_cols = ["domain", "rollup_relationship", "is_rollup", "composite_group"]
-    hie_dict_cols = ["calculation_grain", "historical_freeze", "recalc_window_months"]
+    hie_catalog_cols = [
+        "domain", "rollup_relationship", "is_rollup", "composite_group",
+        "data_steward", "steward_contact", "approval_status", "schema_version", "last_modified_date",
+        "identifier_type", "identifier_authority", "hipaa_category", "fhir_security_label", "consent_category"
+    ]
+    hie_dict_cols = [
+        "calculation_grain", "historical_freeze", "recalc_window_months",
+        "fhir_must_support", "fhir_profile", "fhir_cardinality",
+        "identity_resolution_notes", "tie_breaker_rule", "conflict_detection_enabled",
+        "manual_override_allowed", "de_identification_method"
+    ]
     for col in hie_catalog_cols:
         if col not in catalog.columns:
             catalog[col] = ""
@@ -74,24 +83,26 @@ def load_message_catalogs() -> tuple[pd.DataFrame | None, pd.DataFrame | None]:
 
 
 @lru_cache(maxsize=1)
-def load_four_tables_for_review() -> tuple[
-    pd.DataFrame | None, pd.DataFrame | None, pd.DataFrame | None, pd.DataFrame | None
+def load_five_tables_for_review() -> tuple[
+    pd.DataFrame | None, pd.DataFrame | None, pd.DataFrame | None, pd.DataFrame | None, pd.DataFrame | None
 ]:
     """
-    Load all four ERD tables as separate DataFrames for the Documentation table preview.
+    Load all ERD tables as separate DataFrames for the Documentation table preview.
 
-    Returns (catalog_df, dictionary_df, adt_catalog_df, ccda_catalog_df); each is None if file missing.
+    Returns (catalog_df, dictionary_df, adt_catalog_df, ccda_catalog_df, availability_df); each is None if file missing.
     """
     cat_path = os.path.join(PROJECT_ROOT, "master_patient_catalog.parquet")
     dict_path = os.path.join(PROJECT_ROOT, "master_patient_dictionary.parquet")
     adt_path = os.path.join(PROJECT_ROOT, "hl7_adt_catalog.parquet")
     ccda_path = os.path.join(PROJECT_ROOT, "ccda_catalog.parquet")
+    avail_path = os.path.join(PROJECT_ROOT, "data_source_availability.parquet")
 
     catalog_df = pd.read_parquet(cat_path) if os.path.exists(cat_path) else None
     dictionary_df = pd.read_parquet(dict_path) if os.path.exists(dict_path) else None
     adt_df = pd.read_parquet(adt_path) if os.path.exists(adt_path) else None
     ccda_df = pd.read_parquet(ccda_path) if os.path.exists(ccda_path) else None
-    return catalog_df, dictionary_df, adt_df, ccda_df
+    avail_df = pd.read_parquet(avail_path) if os.path.exists(avail_path) else None
+    return catalog_df, dictionary_df, adt_df, ccda_df, avail_df
 
 
 def _discover_feed_profiles() -> List[tuple[str, pd.DataFrame | None, pd.DataFrame | None]]:
@@ -421,9 +432,19 @@ def render_detail(
             ("Domain", getattr(record, "domain", "")),
             ("Ruleset Category", record.ruleset_category),
             ("Privacy/Security", record.privacy_security),
+            ("HIPAA Category", getattr(record, "hipaa_category", "")),
+            ("FHIR Security Label", getattr(record, "fhir_security_label", "")),
+            ("Consent Category", getattr(record, "consent_category", "")),
             ("Rollup Relationship", getattr(record, "rollup_relationship", "")),
             ("Is Rollup", getattr(record, "is_rollup", "")),
             ("Composite Group", getattr(record, "composite_group", "")),
+            ("Identifier Type", getattr(record, "identifier_type", "")),
+            ("Identifier Authority", getattr(record, "identifier_authority", "")),
+            ("Data Steward", getattr(record, "data_steward", "")),
+            ("Steward Contact", getattr(record, "steward_contact", "")),
+            ("Approval Status", getattr(record, "approval_status", "")),
+            ("Schema Version", getattr(record, "schema_version", "")),
+            ("Last Modified Date", getattr(record, "last_modified_date", "")),
         ],
     )
 
@@ -435,6 +456,9 @@ def render_detail(
             ("Resource", record.fhir_resource),
             ("FHIR Path", record.fhir_r4_path),
             ("FHIR Data Type", record.fhir_data_type),
+            ("FHIR Profile", getattr(record, "fhir_profile", "")),
+            ("FHIR Cardinality", getattr(record, "fhir_cardinality", "")),
+            ("FHIR Must Support", getattr(record, "fhir_must_support", "")),
         ],
     )
 
@@ -444,8 +468,12 @@ def render_detail(
         "Business rules and source logic for this element.",
         [
             ("HIE Survivorship Logic", record.hie_survivorship_logic),
+            ("Tie Breaker Rule", getattr(record, "tie_breaker_rule", "")),
+            ("Conflict Detection Enabled", getattr(record, "conflict_detection_enabled", "")),
+            ("Manual Override Allowed", getattr(record, "manual_override_allowed", "")),
             ("Innovaccer Survivorship Logic", record.innovaccer_survivorship_logic),
             ("Data Source Rank Reference", record.data_source_rank_reference),
+            ("Identity Resolution Notes", getattr(record, "identity_resolution_notes", "")),
             ("Coverage (# PersonIDs)", record.coverage_personids),
             ("Granularity Level", record.granularity_level),
             ("Calculation Grain", getattr(record, "calculation_grain", "")),
@@ -458,7 +486,10 @@ def render_detail(
         "section-quality",
         "Dictionary – Quality & Governance",
         "",
-        [("Quality & Governance Notes", record.data_quality_notes)],
+        [
+            ("Quality & Governance Notes", record.data_quality_notes),
+            ("De-identification Method", getattr(record, "de_identification_method", "")),
+        ],
     )
 
     # Optional HL7 ADT / CCD mappings for this element, shown side by side
@@ -546,6 +577,16 @@ erDiagram
         string rollup_relationship
         string is_rollup
         string composite_group
+        string data_steward
+        string steward_contact
+        string approval_status
+        string schema_version
+        string last_modified_date
+        string identifier_type
+        string identifier_authority
+        string hipaa_category
+        string fhir_security_label
+        string consent_category
         string fhir_resource   "derived from fhir_r4_path"
     }
 
@@ -558,6 +599,14 @@ erDiagram
         string calculation_grain
         string historical_freeze
         string recalc_window_months
+        string fhir_must_support
+        string fhir_profile
+        string fhir_cardinality
+        string identity_resolution_notes
+        string tie_breaker_rule
+        string conflict_detection_enabled
+        string manual_override_allowed
+        string de_identification_method
         string innovaccer_survivorship_logic
         string data_quality_notes
         string fhir_r4_path
@@ -981,7 +1030,7 @@ def main() -> None:
                 format_func=lambda x: "5 trillion" if x == 5_000_000_000_000 else str(x),
                 key="doc_erd_table_rows",
             )
-        catalog_df, dictionary_df, adt_df, ccda_df = load_four_tables_for_review()
+        catalog_df, dictionary_df, adt_df, ccda_df, avail_df = load_five_tables_for_review()
         if catalog_df is not None:
             st.markdown('<div class="section-block section-catalog"><strong>MASTER_PATIENT_CATALOG</strong> — Catalog data elements (what exists and how they\'re grouped).</div>', unsafe_allow_html=True)
             st.dataframe(catalog_df.head(row_limit), width="stretch")
@@ -999,7 +1048,15 @@ def main() -> None:
         if ccda_df is not None:
             st.markdown('<div class="section-block section-ccda"><strong>CCDA_CATALOG</strong> — Where each catalog element lands in CCD/CCDA XML (section, entry type, XML path).</div>', unsafe_allow_html=True)
             st.dataframe(ccda_df.head(row_limit), width="stretch")
-        if catalog_df is None and dictionary_df is None and adt_df is None and ccda_df is None:
+        if avail_df is not None:
+            st.markdown('<div class="section-block section-survivorship"><strong>DATA_SOURCE_AVAILABILITY</strong> — Links data sources (feed profiles) to catalog semantic IDs for source selection and quality tracking.</div>', unsafe_allow_html=True)
+            st.dataframe(avail_df.head(row_limit), width="stretch")
+            st.caption(
+                "Source availability columns: **availability** (full/partial/none/unknown), "
+                "**completeness_pct** (0.0-100.0), **timeliness_sla_hours**. "
+                "POC uses placeholder 'unknown'; production would profile actual feed data."
+            )
+        if catalog_df is None and dictionary_df is None and adt_df is None and ccda_df is None and avail_df is None:
             st.caption("No Parquet tables found in project root.")
         st.markdown("---")
         st.markdown("#### FUTURE / POST POC")

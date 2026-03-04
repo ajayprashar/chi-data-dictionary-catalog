@@ -49,14 +49,15 @@ For more detail on Jupyter + DuckDB setup, see `docs/jupyter-duckdb-parquet-setu
 
 Both files use **snake_case** column names (e.g. `semantic_id`, `uscdi_element`, `hie_survivorship_logic`).
 
-**Existing Parquet (no CSV):** To add HIE alignment columns (domain, rollup_relationship, composite_group, calculation_grain, etc.) to existing Parquet without re-running split on a CSV:
+**Existing Parquet (no CSV):** To add HIE alignment columns (governance, identity, security, FHIR compliance, survivorship enhancements) to existing Parquet without re-running split on a CSV:
    ```powershell
    python scripts/split_to_catalog_and_dictionary.py --upgrade-schema -d .
    ```
 
-**Optional — rebuild message-format catalogs:**  
+**Optional — rebuild message-format catalogs & source availability:**  
 - ADT: `python scripts/build_adt_catalog_from_mapping.py` → `hl7_adt_catalog.parquet` (from `data/l2_to_semantic_id_mapping.csv`).  
 - CCD/CCDA: `python scripts/build_ccda_catalog_from_mapping.py` → `ccda_catalog.parquet` (from `data/ccd_to_semantic_id_mapping.csv`).  
+- Data source availability: `python scripts/build_data_source_availability.py` → `data_source_availability.parquet` (links sources to semantic IDs).  
 See `data/README.md` and `docs/cmt-adt-feed-and-master-patient.md`.
 
 ---
@@ -66,8 +67,10 @@ See `data/README.md` and `docs/cmt-adt-feed-and-master-patient.md`.
 - `readme-prd.md` — 1‑page executive PRD for stakeholders.
 - `README.md` — this technical quick‑start guide.
 - `TECH-SPEC.md` — Technical specification: architecture strategy, file/table definitions, column schemas, UI layout.
+- `EVALUATION.md` — HIE interoperability best practices evaluation (4.1/5 overall score).
 - `scripts/split_to_catalog_and_dictionary.py` — CSV → Parquet splitter.
 - `master_patient_catalog.parquet` — catalog table.
 - `master_patient_dictionary.parquet` — dictionary table.
+- `data_source_availability.parquet` — source-to-semantic_id availability matrix.
 - `docs/jupyter-duckdb-parquet-setup.md` — full notebook + DuckDB setup instructions.
 

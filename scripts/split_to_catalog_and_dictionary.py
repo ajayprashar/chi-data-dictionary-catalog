@@ -16,8 +16,8 @@ Output (default: same directory as input):
   master_patient_dictionary.parquet
 
 Upgrade: Use --upgrade-schema to add HIE alignment columns to existing Parquet
-files without a CSV. Adds domain, rollup_relationship, is_rollup, composite_group
-to catalog; calculation_grain, historical_freeze, recalc_window_months to dictionary.
+files without a CSV. Adds governance, identity, security, FHIR compliance, and
+survivorship enhancement columns per EVALUATION.md recommendations.
 """
 
 import argparse
@@ -28,9 +28,12 @@ from pathlib import Path
 import pandas as pd
 
 # Catalog: identity + classification (Semantic ID is primary key)
-# HIE Three-Domain Separation (Gap 1): domain enforces governance boundaries
-# HIE roll-up vs. detail (Gap 2): rollup_relationship, is_rollup for race/ethnicity etc.
-# HIE address coherence (Gap 4): composite_group for survivorship-as-set
+# HIE Three-Domain Separation: domain enforces governance boundaries
+# HIE roll-up vs. detail: rollup_relationship, is_rollup for race/ethnicity etc.
+# HIE address coherence: composite_group for survivorship-as-set
+# HIE governance: data_steward, approval_status for ownership
+# HIE identity: identifier_type, identifier_authority for multi-source tracking
+# HIE security: hipaa_category, fhir_security_label, consent_category
 CATALOG_COLUMNS = [
     "Semantic ID",
     "USCDI Element",
@@ -42,10 +45,24 @@ CATALOG_COLUMNS = [
     "Rollup Relationship",
     "Is Rollup",
     "Composite Group",
+    "Data Steward",
+    "Steward Contact",
+    "Approval Status",
+    "Schema Version",
+    "Last Modified Date",
+    "Identifier Type",
+    "Identifier Authority",
+    "HIPAA Category",
+    "FHIR Security Label",
+    "Consent Category",
 ]
 
 # Dictionary: definition + rules (Semantic ID is foreign key)
-# HIE temporal/grain (Gap 3): calculation_grain, historical_freeze, recalc_window_months for Domain 2
+# HIE temporal/grain: calculation_grain, historical_freeze, recalc_window_months for Domain 2
+# HIE FHIR compliance: fhir_must_support, fhir_profile, fhir_cardinality
+# HIE identity: identity_resolution_notes for match logic transparency
+# HIE survivorship: tie_breaker_rule, conflict_detection, manual_override
+# HIE privacy: de_identification_method
 DICTIONARY_COLUMNS = [
     "Semantic ID",
     "SHIE Survivorship Logic",
@@ -59,6 +76,14 @@ DICTIONARY_COLUMNS = [
     "Calculation Grain",
     "Historical Freeze",
     "Recalc Window (Months)",
+    "FHIR Must Support",
+    "FHIR Profile",
+    "FHIR Cardinality",
+    "Identity Resolution Notes",
+    "Tie Breaker Rule",
+    "Conflict Detection Enabled",
+    "Manual Override Allowed",
+    "De-identification Method",
 ]
 
 
