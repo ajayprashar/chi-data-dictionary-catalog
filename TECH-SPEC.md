@@ -38,6 +38,24 @@ The CHI metadata catalog architecture was designed to address several strategic 
 - **Forcing HL7 into data_catalog / data_dictionary** — Person-centric and event-centric models were kept separate.
 - **Format-specific dictionaries** — For POC, message catalogs carry minimal notes; a unified crosswalk (future) will handle partner rules.
 
+### 1.4 HIE Interoperability Alignment (Three-Domain Separation)
+
+The catalog schema aligns with Health Information Exchange (HIE) interoperability best practices and the Master Demographics Three-Domain Separation Strategy:
+
+| Domain | Scope | Catalog Support |
+|--------|-------|-----------------|
+| **Domain 1: Master Demographics** | Identity attributes, survivorship rules | `classification`, `domain`, `hie_survivorship_logic`, `data_source_rank_reference` |
+| **Domain 2: Master Patient Attributes** | Calculated fields (AF/AG housing status), temporal grain | `calculation_grain`, `historical_freeze`, `recalc_window_months`, `granularity_level` |
+| **Domain 3: Clinical Governance** | Terminology mapping, value sets | `fhir_r4_path`, `fhir_data_type`; value-set tables (future) |
+
+**Additional HIE alignment:**
+
+- **Roll-up vs. detail** — `rollup_relationship`, `is_rollup` for race, ethnicity, language, etc. (detailed elements point to rollup parent).
+- **Address coherence** — `composite_group` ensures street, city, zip are selected as a set from one source at one timestamp.
+- **Source hierarchy** — `data_source_rank_reference` documents attribute-specific rules (e.g., address: recency; legal name: reliability).
+
+**Deferred (P2):** `data_source_availability` table linking feed profiles to catalog elements; formal machine-readable `data_source_rank_reference` structure.
+
 ---
 
 ## 2. Architecture
@@ -185,8 +203,12 @@ flowchart TB
 | `uscdi_element` | string | Human-readable element name (e.g., "First Name"). |
 | `uscdi_description` | string | Description of the element. |
 | `classification` | string | Grouping (e.g., "Master Demographics", "SDOH"). |
+| `domain` | string | **HIE Three-Domain Separation.** Governance boundary: "Domain 1: Master Demographics" \| "Domain 2: Master Patient Attributes" \| "Domain 3: Clinical Governance". |
 | `ruleset_category` | string | Ruleset (e.g., "Static Identity", "Dynamic Identity"). |
 | `privacy_security` | string | PII/Sensitive flags if applicable. |
+| `rollup_relationship` | string | **HIE roll-up vs. detail.** Parent semantic_id for detailed elements (e.g., `Patient.race_rollup`). NULL for rollups. |
+| `is_rollup` | string | **HIE roll-up vs. detail.** "true" for rollup categories, "false" for detailed. |
+| `composite_group` | string | **HIE address coherence.** Group identifier for survivorship-as-set (e.g., `Patient.address`). Elements with same value must be selected together from one source at one timestamp. |
 
 **Derived in app:** `fhir_resource` = first token of `fhir_r4_path` (e.g., `Patient.name.given` → `Patient`).
 
@@ -198,9 +220,12 @@ flowchart TB
 |--------|------|-------------|
 | `semantic_id` | string | Primary key, FK to catalog. |
 | `hie_survivorship_logic` | string | HIE survivorship rule text. |
-| `data_source_rank_reference` | string | Source hierarchy / rank reference. |
+| `data_source_rank_reference` | string | Source hierarchy / rank reference. Attribute-specific rules can use structured text: "For address: HMIS > Hospital. For legal name: Hospital > HMIS." |
 | `coverage_personids` | string | Coverage metric (e.g., # of person IDs). |
 | `granularity_level` | string | Granularity of the element. |
+| `calculation_grain` | string | **HIE temporal (Domain 2).** "monthly" \| "daily" \| "real-time" for calculated attributes (e.g., AF/AG housing status). |
+| `historical_freeze` | string | **HIE temporal (Domain 2).** "true" if past values are immutable (e.g., Jan 2023 stays frozen). |
+| `recalc_window_months` | string | **HIE temporal (Domain 2).** Rolling recalculation window (e.g., "3" for last 3 months). NULL for static attributes. |
 | `innovaccer_survivorship_logic` | string | Innovaccer-specific survivorship logic. |
 | `data_quality_notes` | string | Quality and governance notes. |
 | `fhir_r4_path` | string | Canonical FHIR R4 path (e.g., `Patient.name.given`). |
@@ -376,13 +401,14 @@ flowchart TB
 
 ### 6.2 Sidebar: Search & Filters
 
-- **Quick search:** Free-text, case-insensitive. Searches `semantic_id`, `uscdi_element`, `uscdi_description`, `fhir_r4_path`. Updates results as user types.
+- **Quick search:** Free-text, case-insensitive. Searches `semantic_id`, `uscdi_element`, `uscdi_description`, `fhir_r4_path`, `domain`, `composite_group`. Updates results as user types.
 - **FHIR resource:** Multiselect. Options derived from `fhir_resource` (Patient, Observation, etc.).
 - **Classification:** Multiselect (e.g., Master Demographics, SDOH).
+- **Domain:** Multiselect (e.g., Domain 1: Master Demographics, Domain 2: Master Patient Attributes). HIE Three-Domain Separation.
 - **Ruleset category:** Multiselect (e.g., Static Identity, Dynamic Identity).
 - **Privacy / security:** Multiselect for PII/sensitive flags.
 
-**Logic:** All filters are ANDed. Empty multiselects = no filter on that dimension. Search is OR across the four text columns.
+**Logic:** All filters are ANDed. Empty multiselects = no filter on that dimension. Search is OR across the text columns.
 
 ### 6.3 Left Column: Catalog Elements
 
@@ -398,9 +424,9 @@ Single, vertically stacked layout (no tabs). Four section blocks with distinct b
 
 | Section | CSS Class | Caption | Fields |
 |---------|-----------|---------|--------|
-| **Catalog** | section-catalog (#f9fafb) | from master_patient_catalog.parquet | Semantic ID, USCDI Element, Description, Classification, Ruleset Category, Privacy/Security |
+| **Catalog** | section-catalog (#f9fafb) | from master_patient_catalog.parquet | Semantic ID, USCDI Element, Description, Classification, Domain, Ruleset Category, Privacy/Security, Rollup Relationship, Is Rollup, Composite Group |
 | **Dictionary – FHIR Mapping** | section-fhir (#ecfdf5) | Canonical FHIR R4 path & type | Resource, FHIR Path, FHIR Data Type |
-| **Dictionary – Survivorship & Sources** | section-survivorship (#fffbeb) | Business rules and source logic | HIE Survivorship Logic, Innovaccer Survivorship Logic, Data Source Rank Reference, Coverage (# PersonIDs), Granularity Level |
+| **Dictionary – Survivorship & Sources** | section-survivorship (#fffbeb) | Business rules and source logic | HIE Survivorship Logic, Innovaccer Survivorship Logic, Data Source Rank Reference, Coverage (# PersonIDs), Granularity Level, Calculation Grain, Historical Freeze, Recalc Window (Months) |
 | **Dictionary – Quality & Governance** | section-quality (#f5f3ff) | — | Quality & Governance Notes |
 
 Multiline fields (Description, survivorship logic, Data Source Rank Reference, Quality & Governance Notes) use `field-value-multiline` (scrollable, ~3–6 lines).
@@ -454,6 +480,7 @@ Mermaid diagrams (Data Flow, Page Structure, ERD) are rendered via `st.component
 |------|-----------------|--------|
 | 1. Author | Edit Excel, export combined CSV | `combined_export.csv` |
 | 2. Split | `python scripts/split_to_catalog_and_dictionary.py combined_export.csv` | `master_patient_catalog.parquet`, `master_patient_dictionary.parquet` |
+| 2b. Upgrade (existing Parquet) | `python scripts/split_to_catalog_and_dictionary.py --upgrade-schema -d .` | Adds HIE alignment columns to existing Parquet |
 | 3. ADT catalog (optional) | `python scripts/build_adt_catalog_from_mapping.py` | `hl7_adt_catalog.parquet` |
 | 4. CCDA catalog (optional) | `python scripts/build_ccda_catalog_from_mapping.py` | `ccda_catalog.parquet` |
 | 5. Run app | `streamlit run app.py` | Local Streamlit UI |

@@ -49,6 +49,11 @@ For more detail on Jupyter + DuckDB setup, see `docs/jupyter-duckdb-parquet-setu
 
 Both files use **snake_case** column names (e.g. `semantic_id`, `uscdi_element`, `hie_survivorship_logic`).
 
+**Existing Parquet (no CSV):** To add HIE alignment columns (domain, rollup_relationship, composite_group, calculation_grain, etc.) to existing Parquet without re-running split on a CSV:
+   ```powershell
+   python scripts/split_to_catalog_and_dictionary.py --upgrade-schema -d .
+   ```
+
 **Optional — rebuild message-format catalogs:**  
 - ADT: `python scripts/build_adt_catalog_from_mapping.py` → `hl7_adt_catalog.parquet` (from `data/l2_to_semantic_id_mapping.csv`).  
 - CCD/CCDA: `python scripts/build_ccda_catalog_from_mapping.py` → `ccda_catalog.parquet` (from `data/ccd_to_semantic_id_mapping.csv`).  

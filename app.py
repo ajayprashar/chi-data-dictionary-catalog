@@ -20,7 +20,6 @@ import re
 from functools import lru_cache
 from typing import List
 
-import duckdb
 import pandas as pd
 import streamlit as st
 
@@ -40,30 +39,18 @@ def load_data() -> pd.DataFrame:
             "Run scripts/split_to_catalog_and_dictionary.py first."
         )
 
-    con = duckdb.connect()
-
-    query = f"""
-        SELECT
-            c.semantic_id,
-            c.uscdi_element,
-            c.uscdi_description,
-            c.classification,
-            c.ruleset_category,
-            c.privacy_security,
-            d.hie_survivorship_logic,
-            d.data_source_rank_reference,
-            d.coverage_personids,
-            d.granularity_level,
-            d.innovaccer_survivorship_logic,
-            d.data_quality_notes,
-            d.fhir_r4_path,
-            d.fhir_data_type
-        FROM read_parquet('{cat_path}') AS c
-        JOIN read_parquet('{dict_path}') AS d
-          ON c.semantic_id = d.semantic_id
-    """
-
-    df = con.execute(query).df()
+    # Use pandas for schema-tolerant merge (handles old Parquet without HIE columns)
+    catalog = pd.read_parquet(cat_path)
+    dictionary = pd.read_parquet(dict_path)
+    hie_catalog_cols = ["domain", "rollup_relationship", "is_rollup", "composite_group"]
+    hie_dict_cols = ["calculation_grain", "historical_freeze", "recalc_window_months"]
+    for col in hie_catalog_cols:
+        if col not in catalog.columns:
+            catalog[col] = ""
+    for col in hie_dict_cols:
+        if col not in dictionary.columns:
+            dictionary[col] = ""
+    df = catalog.merge(dictionary, on="semantic_id", how="inner")
 
     # Derive a FHIR resource name from fhir_r4_path (e.g. "Patient.name.given" -> "Patient")
     df["fhir_resource"] = df["fhir_r4_path"].fillna("").str.split(".", n=1).str[0]
@@ -377,6 +364,7 @@ def apply_filters(df: pd.DataFrame) -> pd.DataFrame:
 
     fhir_resources = st.sidebar.multiselect("FHIR resource", options("fhir_resource"))
     classifications = st.sidebar.multiselect("Classification", options("classification"))
+    domains = st.sidebar.multiselect("Domain", options("domain")) if "domain" in df.columns else []
     rulesets = st.sidebar.multiselect("Ruleset category", options("ruleset_category"))
     privacy_flags = st.sidebar.multiselect("Privacy / security", options("privacy_security"))
 
@@ -390,12 +378,18 @@ def apply_filters(df: pd.DataFrame) -> pd.DataFrame:
             | filtered["uscdi_description"].str.contains(search, case=False, na=False)
             | filtered["fhir_r4_path"].str.contains(search, case=False, na=False)
         )
+        if "domain" in filtered.columns:
+            mask = mask | filtered["domain"].str.contains(search, case=False, na=False)
+        if "composite_group" in filtered.columns:
+            mask = mask | filtered["composite_group"].str.contains(search, case=False, na=False)
         filtered = filtered[mask]
 
     if fhir_resources:
         filtered = filtered[filtered["fhir_resource"].isin(fhir_resources)]
     if classifications:
         filtered = filtered[filtered["classification"].isin(classifications)]
+    if domains and "domain" in filtered.columns:
+        filtered = filtered[filtered["domain"].isin(domains)]
     if rulesets:
         filtered = filtered[filtered["ruleset_category"].isin(rulesets)]
     if privacy_flags:
@@ -424,8 +418,12 @@ def render_detail(
             ("USCDI Element", record.uscdi_element),
             ("Description", record.uscdi_description),
             ("Classification", record.classification),
+            ("Domain", getattr(record, "domain", "")),
             ("Ruleset Category", record.ruleset_category),
             ("Privacy/Security", record.privacy_security),
+            ("Rollup Relationship", getattr(record, "rollup_relationship", "")),
+            ("Is Rollup", getattr(record, "is_rollup", "")),
+            ("Composite Group", getattr(record, "composite_group", "")),
         ],
     )
 
@@ -450,6 +448,9 @@ def render_detail(
             ("Data Source Rank Reference", record.data_source_rank_reference),
             ("Coverage (# PersonIDs)", record.coverage_personids),
             ("Granularity Level", record.granularity_level),
+            ("Calculation Grain", getattr(record, "calculation_grain", "")),
+            ("Historical Freeze", getattr(record, "historical_freeze", "")),
+            ("Recalc Window (Months)", getattr(record, "recalc_window_months", "")),
         ],
     )
 
@@ -539,8 +540,12 @@ erDiagram
         string uscdi_element
         string uscdi_description
         string classification
+        string domain
         string ruleset_category
         string privacy_security
+        string rollup_relationship
+        string is_rollup
+        string composite_group
         string fhir_resource   "derived from fhir_r4_path"
     }
 
@@ -550,6 +555,9 @@ erDiagram
         string data_source_rank_reference
         string coverage_personids
         string granularity_level
+        string calculation_grain
+        string historical_freeze
+        string recalc_window_months
         string innovaccer_survivorship_logic
         string data_quality_notes
         string fhir_r4_path
