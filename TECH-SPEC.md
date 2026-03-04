@@ -442,6 +442,10 @@ The documentation is session-state-driven (not an expander). A button opens the 
 - Empty filter result: `st.info("No elements match...")`.
 - Optional catalogs: Graceful absence (ADT/CCDA blocks not shown if no data).
 
+### 6.9 Mermaid Diagram Rendering (Streamlit Cloud)
+
+Mermaid diagrams (Data Flow, Page Structure, ERD) are rendered via `st.components.v1.html()` with mermaid.js. **Do not place Mermaid content inside nested or collapsed expanders.** On Streamlit Cloud, iframes for diagram content that are lazily rendered (e.g., inside `st.expander(..., expanded=False)`) can fail to initialize mermaid properly. Keep all Mermaid diagrams in the same DOM context as the main Documentation content — i.e., render them directly in the flow, not inside a second-level expander. This constraint was discovered when TECH-SPEC diagrams inside a "View full TECH-SPEC.md" expander failed to render; removing the nested expander resolved it.
+
 ---
 
 ## 7. Pipeline Summary
