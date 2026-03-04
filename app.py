@@ -744,7 +744,7 @@ def _render_erd(streamlit_module: "st") -> None:
 </html>
 """
     try:
-        streamlit_module.components.v1.html(html_content, height=420, scrolling=False)
+        streamlit_module.components.v1.html(html_content, height=600, scrolling=True)
     except Exception:
         streamlit_module.code(mermaid_src, language="mermaid")
     with streamlit_module.expander("Mermaid source (copy to Mermaid Live to edit)", expanded=False):
