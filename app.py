@@ -16,6 +16,7 @@ from __future__ import annotations
 import glob
 import html
 import os
+import re
 from functools import lru_cache
 from typing import List
 
@@ -122,7 +123,7 @@ def _discover_feed_profiles() -> List[tuple[str, pd.DataFrame | None, pd.DataFra
     for path in sorted(glob.glob(pattern)):
         base = os.path.basename(path)
         # e.g. cmt_feed_segments.csv -> source_id = cmt
-        source_id = base.replace("_feed_segments.csv", "").replace("_feed_segments", "")
+        source_id = base.replace("_feed_segments.csv", "")
         if not source_id:
             continue
         segments_df = pd.read_csv(path) if os.path.exists(path) else None
@@ -677,6 +678,50 @@ erDiagram
 """
 
 
+def _render_tech_spec(st_module: "st", content: str) -> None:
+    """
+    Render TECH-SPEC markdown, with ```mermaid blocks rendered as diagrams instead of code.
+    """
+    parts = re.split(r"```mermaid\s*\n(.*?)```", content, flags=re.DOTALL)
+    for i, part in enumerate(parts):
+        if i % 2 == 0:
+            if part.strip():
+                st_module.markdown(part)
+        else:
+            _render_mermaid(st_module, part, height=900, scrolling=False)
+
+
+def _render_mermaid(st_module: "st", mermaid_src: str, height: int = 450, scrolling: bool = True) -> None:
+    """Render arbitrary Mermaid diagram in-browser via mermaid.js. Falls back to code block on error."""
+    src = mermaid_src.strip()
+    # Prevent </script> in mermaid from closing the script tag
+    safe_src = src.replace("</", "<\\/")
+    html_content = f"""
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@9.4.3/dist/mermaid.min.js?v=9"></script>
+  <style>body {{ margin: 0; font-family: sans-serif; }} .mermaid {{ margin: 0.5rem 0; }}</style>
+</head>
+<body>
+  <div class="mermaid">{safe_src}</div>
+  <script>
+    mermaid.initialize({{
+      startOnLoad: true,
+      theme: "neutral",
+      flowchart: {{ useMaxWidth: true }},
+      themeVariables: {{ fontSize: "14px" }}
+    }});
+  </script>
+</body>
+</html>
+"""
+    try:
+        st_module.components.v1.html(html_content, height=height, scrolling=scrolling)
+    except Exception:
+        st_module.code(src, language="mermaid")
+
+
 def _render_erd(streamlit_module: "st") -> None:
     """Render the POC ERD in-browser with Mermaid 9 (single-brace diagram; no mermaid.ink)."""
     mermaid_src = _ERD_MERMAID.strip()
@@ -885,10 +930,32 @@ def main() -> None:
 
     # Documentation at bottom of page: summary + doc link + ERD (collapsed by default)
     st.markdown("---")
-    with st.expander("**Documentation**", expanded=False):
+
+    def _return_to_catalog():
+        st.session_state.show_documentation = False
+
+    if st.session_state.get("show_documentation", False):
+        if st.button("↑ Return to catalog", key="doc_return_top", help="Minimize documentation and return to the main catalog view"):
+            _return_to_catalog()
+            st.rerun()
         st.markdown(
             "This section documents the current filtered subset and the Parquet tables that back this app."
         )
+        st.markdown("#### Technical Specification")
+        tech_spec_path = os.path.join(PROJECT_ROOT, "TECH-SPEC.md")
+        if os.path.exists(tech_spec_path):
+            with st.expander("View full TECH-SPEC.md (architecture, schemas, UI layout)", expanded=False):
+                try:
+                    with open(tech_spec_path, encoding="utf-8") as f:
+                        tech_spec_md = f.read()
+                    _render_tech_spec(st, tech_spec_md)
+                except Exception as e:
+                    st.caption(f"Could not load TECH-SPEC.md: {e}")
+        else:
+            st.caption("TECH-SPEC.md not found in project folder. See README.md for setup.")
+        if st.button("↑ Return to catalog", key="doc_return_after_spec", help="Minimize documentation and return to the main catalog view"):
+            _return_to_catalog()
+            st.rerun()
         st.markdown("#### Summary for current filters")
         st.markdown(
             f"- {total} element(s) · {distinct_resources} FHIR resource type(s)  \n"
@@ -898,6 +965,9 @@ def main() -> None:
         )
         st.markdown("#### Data model (ERD)")
         _render_erd(st)
+        if st.button("↑ Return to catalog", key="doc_return_after_erd", help="Minimize documentation and return to the main catalog view"):
+            _return_to_catalog()
+            st.rerun()
         st.markdown("#### Table preview (for review)")
         _row_options = [50, 500, 5_000_000_000_000]
         col_rows, _ = st.columns([1, 5])
@@ -937,7 +1007,20 @@ def main() -> None:
         )
         _render_erd_future(st)
         st.markdown("---")
-        st.caption("Full project docs: **readme-prd.md**, **README.md**, and **docs/** in the project folder.")
+        st.caption("Full project docs: **readme-prd.md**, **README.md**, **TECH-SPEC.md** (technical spec), and **docs/** in the project folder.")
+
+        st.markdown("---")
+        if st.button("↑ Return to catalog", key="doc_return_bottom", help="Minimize documentation and return to the main catalog view"):
+            _return_to_catalog()
+            st.rerun()
+    else:
+        if st.button(
+            "**Documentation** — Summary, ERD, table preview, TECH-SPEC",
+            key="doc_open",
+            help="Open documentation section",
+        ):
+            st.session_state.show_documentation = True
+            st.rerun()
 
 
 if __name__ == "__main__":
