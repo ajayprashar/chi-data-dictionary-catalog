@@ -132,6 +132,38 @@ The catalog schema aligns with Health Information Exchange (HIE) interoperabilit
 
 ---
 
+### 1.7 Terminology & Value Sets — Practical Implementation (DAP as System of Record)
+
+The CHI metadata catalog is **not** intended to re-host full clinical code systems (ICD-10-CM, SNOMED CT, LOINC, RxNorm) or enterprise value sets.
+Those artifacts already exist and are governed within the **Innovaccer DAP platform**, which remains the **system of record** for terminology.
+
+**Design decision (practical scope):**
+
+- **Enterprise terminology & value sets live in DAP.**
+  - CHI does not duplicate full ICD-10/SNOMED/LOINC catalogs in local Parquet tables.
+  - DAP’s terminology services and value-set registries are authoritative for clinical codes.
+
+- **CHI catalog/dictionary reference DAP, they do not replace it.**
+  - When a `semantic_id` is bound to a code system or value set, the dictionary may carry:
+    - A reference identifier (e.g., `dap_value_set_id`, `canonical_concept_id`) rather than a full local copy.
+    - Local governance notes about how CHI uses that value set (e.g., AF/AG-specific interpretation).
+  - Future crosswalk and code-mapping tables (e.g., `CODE_MAPPING`, `interoperability_crosswalk.parquet`) are
+    expected to reference DAP concepts/values, not define global truth.
+
+- **Local tables are used only for CHI-specific overlays.**
+  - If CHI needs a **local extension** that DAP does not manage (e.g., pilot-only AF/AG codes, county-specific
+    reporting codes), those can be modeled as small local tables that:
+    - Reference DAP concepts where possible.
+    - Are explicitly documented as CHI-local overrides or temporary mappings.
+
+This keeps the effort **practical and operational**:
+
+- DAP remains the single source of truth for clinical codes and enterprise value sets.
+- The CHI metadata catalog focuses on **how CHI uses those terminologies** (bindings, governance, crosswalk rules),
+  not on duplicating terminology content.
+
+---
+
 ## 2. Architecture
 
 ### 2.1 High-Level Data Flow

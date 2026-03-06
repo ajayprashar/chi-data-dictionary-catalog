@@ -520,6 +520,7 @@ def render_detail(
             st.dataframe(
                 adt_rows[
                     [
+                        "semantic_id",
                         "message_type",
                         "segment_id",
                         "field_id",
@@ -530,6 +531,7 @@ def render_detail(
                 hide_index=True,
                 width="stretch",
                 column_config={
+                    "semantic_id": st.column_config.TextColumn("Semantic ID", width="medium"),
                     "notes": st.column_config.TextColumn("Notes", width="large"),
                 },
             )
@@ -539,6 +541,7 @@ def render_detail(
             st.dataframe(
                 ccda_rows[
                     [
+                        "semantic_id",
                         "section_name",
                         "entry_type",
                         "xml_path",
@@ -548,6 +551,7 @@ def render_detail(
                 hide_index=True,
                 width="stretch",
                 column_config={
+                    "semantic_id": st.column_config.TextColumn("Semantic ID", width="medium"),
                     "section_name": st.column_config.TextColumn("Section", width="small"),
                     "entry_type": st.column_config.TextColumn("Entry type", width="small"),
                     "xml_path": st.column_config.TextColumn("XML path", width="medium"),
