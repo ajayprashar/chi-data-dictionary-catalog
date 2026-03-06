@@ -947,20 +947,33 @@ def main() -> None:
                 )
                 if segments_df is not None and not segments_df.empty:
                     st.markdown("**Segments**")
+                    segments_view = segments_df.copy()
+                    if "segment_id" in segments_view.columns:
+                        # Explicitly show the linkage key as the trailing column for readability.
+                        segments_view["link_segment_id"] = segments_view["segment_id"]
                     st.dataframe(
-                        segments_df,
+                        segments_view,
                         hide_index=True,
                         width="stretch",
-                        column_config={"data_received": st.column_config.TextColumn("Received"),
-                                       "notes": st.column_config.TextColumn("Notes")},
+                        column_config={
+                            "data_received": st.column_config.TextColumn("Received"),
+                            "notes": st.column_config.TextColumn("Notes"),
+                            "link_segment_id": st.column_config.TextColumn("Link Segment ID"),
+                        },
                     )
                 if events_df is not None and not events_df.empty:
                     st.markdown("**Event types**")
+                    events_view = events_df.copy()
+                    # Event types are event-level and do not map to a single segment_id.
+                    events_view["link_segment_id"] = "event-level (no single segment)"
                     st.dataframe(
-                        events_df,
+                        events_view,
                         hide_index=True,
                         width="stretch",
-                        column_config={"percentage_of_total": st.column_config.TextColumn("%")},
+                        column_config={
+                            "percentage_of_total": st.column_config.TextColumn("%"),
+                            "link_segment_id": st.column_config.TextColumn("Link Segment ID"),
+                        },
                     )
 
         # Determine selected semantic_id from the row selection; default to first row
