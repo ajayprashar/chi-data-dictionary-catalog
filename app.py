@@ -239,15 +239,10 @@ def inject_theme() -> None:
         margin-bottom: 0.2rem;
         width: 100%;
     }
-    @media (min-width: 992px) {
-        .field-row {
-            display: inline-flex;
-            width: calc(50% - 0.5rem);  /* two fields per row on large screens */
-            vertical-align: top;
-        }
-    }
+    /* Keep one field per row so label colons and value boxes align consistently. */
     .field-label {
-        min-width: 7.5rem;
+        width: 10rem;
+        min-width: 10rem;
         font-weight: 600;
         white-space: nowrap;
         text-align: right;
