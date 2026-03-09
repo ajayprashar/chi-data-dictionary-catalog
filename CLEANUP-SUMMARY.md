@@ -4,21 +4,21 @@
 
 ---
 
-## ✅ Automatically Cleaned Up
+## [OK] Automatically Cleaned Up
 
 ### 1. Python Bytecode Cache
 - **Removed:** `__pycache__/` directory
 - **Reason:** Python compiled bytecode, regenerated automatically on next run
-- **Status:** ✅ Deleted (already in `.gitignore`)
+- **Status:** [OK] Deleted (already in `.gitignore`)
 
 ### 2. Temporary Test Scripts
 - **Removed:** `verify_schema.py`, `test_new_fields.py`
 - **Reason:** Temporary verification scripts, no longer needed
-- **Status:** ✅ Deleted
+- **Status:** [OK] Deleted
 
 ---
 
-## ⚠️ Requires User Decision
+## [WARN] Requires User Decision
 
 ### 1. Legacy Combined CSV: `data_catalog.csv`
 
@@ -66,24 +66,24 @@ python -c "import pandas as pd; cat = pd.read_parquet('master_patient_catalog.pa
 
 ## Current File Structure (Clean)
 
-### Core Parquet Files (✅ Current Schema)
+### Core Parquet Files ([OK] Current Schema)
 - `master_patient_catalog.parquet` — 46 rows, 20 columns
 - `master_patient_dictionary.parquet` — 46 rows, 21 columns
 - `hl7_adt_catalog.parquet` — 47 rows (ADT message mappings)
 - `ccda_catalog.parquet` — 34 rows (CCDA XML mappings)
 - `data_source_availability.parquet` — 46 rows (NEW: source availability matrix)
 
-### Scripts (✅ Up to Date)
+### Scripts ([OK] Up to Date)
 - `scripts/split_to_catalog_and_dictionary.py` — CSV splitter with full HIE schema
 - `scripts/build_adt_catalog_from_mapping.py` — ADT catalog builder
 - `scripts/build_ccda_catalog_from_mapping.py` — CCDA catalog builder
 - `scripts/build_data_source_availability.py` — NEW: source availability builder
 
-### Application (✅ Updated)
+### Application ([OK] Updated)
 - `app.py` — Streamlit app with all new fields displayed
 - `chi-data-dictionary-catalog.ipynb` — Jupyter notebook for data exploration
 
-### Documentation (✅ Current)
+### Documentation ([OK] Current)
 - `README.md` — Quick start guide
 - `readme-prd.md` — Executive PRD
 - `TECH-SPEC.md` — Technical specification (updated with new schema)
@@ -92,7 +92,7 @@ python -c "import pandas as pd; cat = pd.read_parquet('master_patient_catalog.pa
 - `hl7_ccd_fhir_consideration.md` — Strategic analysis
 - `ccd_interface_mapping.md` — CCD mapping reference
 
-### Data & Configuration (✅ Valid)
+### Data & Configuration ([OK] Valid)
 - `data/` — Mapping CSVs, feed profiles
 - `docs/` — Additional documentation
 - `.streamlit/config.toml` — Streamlit theme configuration
@@ -131,10 +131,10 @@ python -c "import pandas as pd; cat = pd.read_parquet('master_patient_catalog.pa
 
 ## What Was Cleaned
 
-- ✅ Removed `__pycache__/` (Python bytecode cache)
-- ✅ Removed temporary test scripts
-- ✅ No `.har` files (already deleted by user)
-- ✅ No `.tmp` files
-- ✅ No duplicate or backup files
+- [OK] Removed `__pycache__/` (Python bytecode cache)
+- [OK] Removed temporary test scripts
+- [OK] No `.har` files (already deleted by user)
+- [OK] No `.tmp` files
+- [OK] No duplicate or backup files
 
 **Project is clean and ready for commit.**

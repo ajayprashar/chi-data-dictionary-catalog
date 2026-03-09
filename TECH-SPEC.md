@@ -13,13 +13,13 @@ This architecture has been evaluated against **United States Health Information 
 **Exemplary areas (5/5):** Master Data Management, Standards Alignment, Roll-Up Strategy, Address Coherence, Three-Domain Separation, Message Format Separation, Race/Ethnicity Interoperability, Backward Compatibility.
 
 **Implemented in POC (addressing EVALUATION.md gaps):**
-- ✅ Stewardship assignment (`data_steward`, `steward_contact`, `approval_status`)
-- ✅ Schema versioning (`schema_version`, `last_modified_date`)
-- ✅ Identity management (`identifier_type`, `identifier_authority`, `identity_resolution_notes`)
-- ✅ Security & consent (`hipaa_category`, `fhir_security_label`, `consent_category`, `de_identification_method`)
-- ✅ FHIR compliance (`fhir_must_support`, `fhir_profile`, `fhir_cardinality`)
-- ✅ Survivorship enhancements (`tie_breaker_rule`, `conflict_detection_enabled`, `manual_override_allowed`)
-- ✅ Data source availability table (links sources to semantic IDs)
+- [OK] Stewardship assignment (`data_steward`, `steward_contact`, `approval_status`)
+- [OK] Schema versioning (`schema_version`, `last_modified_date`)
+- [OK] Identity management (`identifier_type`, `identifier_authority`, `identity_resolution_notes`)
+- [OK] Security & consent (`hipaa_category`, `fhir_security_label`, `consent_category`, `de_identification_method`)
+- [OK] FHIR compliance (`fhir_must_support`, `fhir_profile`, `fhir_cardinality`)
+- [OK] Survivorship enhancements (`tie_breaker_rule`, `conflict_detection_enabled`, `manual_override_allowed`)
+- [OK] Data source availability table (links sources to semantic IDs)
 
 **Deferred to production:**
 - Field-level provenance tracking (source + timestamp per value) — runtime data, not metadata schema
