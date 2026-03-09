@@ -367,6 +367,12 @@ flowchart TB
 
 **Derived in app:** `fhir_resource` = first token of `fhir_r4_path` (e.g., `Patient.name.given` → `Patient`).
 
+**USCDI vs FHIR mapping (concept vs representation):**
+
+- `uscdi_element`, `uscdi_data_class`, and `uscdi_data_element` capture **USCDI v4 concepts** (what must be exchanged), independent of any specific format.
+- `fhir_r4_path`, `fhir_profile`, `fhir_cardinality`, and `fhir_must_support` (in the dictionary) capture **how those concepts are represented in FHIR R4 / US Core**.
+- This separation keeps USCDI usage **format-agnostic** while still documenting the FHIR implementation details needed for APIs and exchange.
+
 ---
 
 ### 4.2 MASTER_PATIENT_DICTIONARY
