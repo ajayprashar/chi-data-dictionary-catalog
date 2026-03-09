@@ -142,7 +142,7 @@ The catalog schema aligns with Health Information Exchange (HIE) interoperabilit
 |--------|-------|-----------------|
 | **Domain 1: Master Demographics** | Identity attributes, survivorship rules | `classification`, `domain`, `hie_survivorship_logic`, `data_source_rank_reference` |
 | **Domain 2: Master Patient Attributes** | Calculated fields (AF/AG housing status), temporal grain | `calculation_grain`, `historical_freeze`, `recalc_window_months`, `granularity_level` |
-| **Domain 3: Clinical Governance** | Terminology mapping, value sets | `fhir_r4_path`, `fhir_data_type`; value-set tables (future). USCDI v4 is the baseline for data classes and elements referenced in `uscdi_*` columns. |
+| **Domain 3: Clinical Governance** | Terminology mapping, value sets | `fhir_r4_path`, `fhir_data_type`; value-set tables (future). USCDI v4 is the design baseline for data classes and elements referenced in `uscdi_*` columns, while USCDI v3 remains the current certification baseline. |
 
 **Additional HIE alignment:**
 
@@ -224,6 +224,26 @@ This keeps the effort **practical and operational**:
 - This allows CHI to:
   - Change how an element is rendered in ADT, CCDA, or FHIR **without renaming the semantic_id**.
   - Support multiple message formats in parallel without leaking format-specific details into the core model.
+
+---
+
+### 1.9 Standards references (quick links)
+
+This POC aligns to common U.S. interoperability standards. Use these links when you need the **authoritative specification**.
+
+| Standard | Link | Notes (POC usage) |
+|---------|------|-------------------|
+| **HL7 FHIR R4 (4.0.1)** | [HL7 FHIR R4](https://hl7.org/fhir/R4/) | Base clinical standard for `fhir_r4_path` and related FHIR metadata; US Core profiles used for API-facing design. |
+| **HL7 C-CDA R2.1 (product brief)** | [HL7 C-CDA product brief](https://www.hl7.org/product_brief.cfm?product_id=185) | Core specification for C-CDA Release 2.1, required for CCDs used in federal interoperability programs. |
+| **HL7 C-CDA R2.1 (Web IG)** | [HL7 C-CDA Web IG](https://hl7.org/cda/us/ccda/) | Web implementation guide and template navigator for C-CDA 2.1; useful when reviewing CCDA mappings and sections. |
+| **ONC ISA / ISP** | [ONC Interoperability Standards Platform](https://www.healthit.gov/isp/) | Home for the Interoperability Standards Advisory (ISA), USCDI, USCDI+, and SVAP; reference for current 2026 advisory content. |
+| **USCDI** | [USCDI – data classes and elements](https://isp.healthit.gov/united-states-core-data-interoperability-uscdi) | POC `uscdi_*` columns are aligned to USCDI concepts. USCDI v3 is the mandatory certification baseline as of Jan 1, 2026; newer versions (v4, v5, etc.) are available via SVAP. |
+
+**Notes on version selection (for context):**
+
+- **FHIR R4**: R4 (4.0.1) remains the global production baseline and the foundation for US Core, even though FHIR R5 exists.
+- **USCDI v3**: As of January 1, 2026, USCDI v3 is the required baseline for certified health IT. Newer versions (v4, v5, v6, …) can be adopted via SVAP, but v3 is the current "common denominator" for compliance.
+- **C-CDA R2.1**: Release 2.1 is the required version for CCD/C-CDA documents used in federal programs. Newer drafts (for example, 3.x) are still pre‑production and not widely deployed.
 
 ---
 
