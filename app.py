@@ -42,6 +42,25 @@ def load_data() -> pd.DataFrame:
     # Use pandas for schema-tolerant merge (handles old Parquet without HIE columns)
     catalog = pd.read_parquet(cat_path)
     dictionary = pd.read_parquet(dict_path)
+
+    # Basic sanity check: ensure catalog and dictionary agree on semantic_id coverage.
+    # Inner joins will silently drop elements that do not exist in both tables.
+    # Use dropna().tolist() to avoid relying on pandas Series directly in set().
+    if "semantic_id" in catalog.columns:
+        cat_ids = set(catalog["semantic_id"].dropna().tolist())
+    else:
+        cat_ids = set()
+    if "semantic_id" in dictionary.columns:
+        dict_ids = set(dictionary["semantic_id"].dropna().tolist())
+    else:
+        dict_ids = set()
+    only_in_catalog = sorted(cat_ids - dict_ids)
+    only_in_dictionary = sorted(dict_ids - cat_ids)
+    # Attach mismatch info to the function for use in the Streamlit UI.
+    load_data.join_mismatches = {
+        "only_in_catalog": only_in_catalog,
+        "only_in_dictionary": only_in_dictionary,
+    }
     hie_catalog_cols = [
         "domain", "rollup_relationship", "is_rollup", "composite_group",
         "data_steward", "steward_contact", "approval_status", "schema_version", "last_modified_date",
@@ -864,6 +883,19 @@ def main() -> None:
         st.error(str(exc))
         st.stop()
 
+    # Surface any join mismatches between catalog and dictionary so they are not silent.
+    mismatches = getattr(load_data, "join_mismatches", None)
+    if mismatches:
+        only_in_cat = mismatches.get("only_in_catalog") or []
+        only_in_dict = mismatches.get("only_in_dictionary") or []
+        if only_in_cat or only_in_dict:
+            st.warning(
+                "Catalog and dictionary have mismatched semantic_id values. "
+                f"{len(only_in_cat)} id(s) exist only in the catalog and "
+                f"{len(only_in_dict)} id(s) exist only in the dictionary. "
+                "Only elements present in both tables will appear in the viewer."
+            )
+
     # Optional message catalogs (ADT / CCD)
     adt_df, ccda_df = load_message_catalogs()
 
@@ -890,6 +922,7 @@ def main() -> None:
     col_list, col_detail = st.columns([1.0, 2.2])
 
     with col_list:
+        st.caption(f"{len(filtered)} element(s) match the current filters.")
         list_cols = ["semantic_id", "uscdi_element", "fhir_resource"]
         list_view = filtered[list_cols].rename(
             columns={

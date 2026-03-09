@@ -231,7 +231,7 @@ flowchart TB
     end
 
     subgraph App["STREAMLIT APP (app.py)"]
-        Streamlit["DuckDB in-memory join: catalog + dictionary on semantic_id<br/>Optional: ADT/CCDA for message-format mappings<br/>Discovered: feed segments + event types"]
+        Streamlit["Pandas in-memory join: catalog + dictionary on semantic_id<br/>Optional: ADT/CCDA for message-format mappings<br/>Discovered: feed segments + event types"]
     end
 
     Excel --> Split
@@ -506,9 +506,9 @@ The app joins catalog + dictionary on `semantic_id` and derives `fhir_resource`.
 
 When ADT or CCDA catalogs exist and contain rows for the selected `semantic_id`:
 
-**ADT table columns:** message_type, segment_id, field_id, field_name, notes
+**ADT table columns:** semantic_id, message_type, segment_id, field_id, field_name, notes
 
-**CCDA table columns:** section_name, entry_type, xml_path, notes
+**CCDA table columns:** semantic_id, section_name, entry_type, xml_path, notes
 
 ### 5.3 Empty or Missing Values
 
