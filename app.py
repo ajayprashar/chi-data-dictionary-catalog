@@ -444,13 +444,15 @@ def render_detail(
         "Catalog",
         "from master_patient_catalog.parquet · What elements exist and how they're grouped.",
         [
-            ("Semantic ID", record.semantic_id),
-            ("USCDI Data Class", getattr(record, "uscdi_data_class", "")),
-            ("USCDI Data Element", getattr(record, "uscdi_data_element", "")),
-            ("USCDI Element", record.uscdi_element),
+            # Order is chosen so that USCDI fields appear in the right-hand column
+            # (positions 2, 4, and 6) in the two-column layout.
+            ("Semantic ID", record.semantic_id),  # left, row 1
+            ("USCDI Data Class", getattr(record, "uscdi_data_class", "")),  # right, row 1
+            ("Classification", record.classification),  # left, row 2
+            ("USCDI Data Element", getattr(record, "uscdi_data_element", "")),  # right, row 2
+            ("Domain", getattr(record, "domain", "")),  # left, row 3
+            ("USCDI Element", record.uscdi_element),  # right, row 3
             ("Description", record.uscdi_description),
-            ("Classification", record.classification),
-            ("Domain", getattr(record, "domain", "")),
             ("Ruleset Category", record.ruleset_category),
             ("Privacy/Security", record.privacy_security),
             ("HIPAA Category", getattr(record, "hipaa_category", "")),
