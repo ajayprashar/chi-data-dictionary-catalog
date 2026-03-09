@@ -164,6 +164,41 @@ This keeps the effort **practical and operational**:
 
 ---
 
+### 1.8 Semantic ID Naming Convention
+
+`semantic_id` is the **canonical join key** across this architecture. It is designed to be:
+
+- **Person / concept-centric**, not format-centric.
+- **Stable over time**, even if underlying message formats or storage schemas change.
+- **Human-readable** for stewards, architects, and interface engineers.
+
+**Foundations:**
+
+- Concepts are primarily drawn from **USCDI** and modeled using **FHIR R4** resources and elements
+  (e.g., `Patient`, `Observation`, `Encounter`).
+- `semantic_id` values use a **CHI-specific naming convention** on top of those standards:
+  - Pattern: `Resource.element_subpart` (e.g., `Patient.name_first`, `Patient.name_last`, `Patient.address_street`).
+  - Business-friendly terms (`name_first`, `name_last`) instead of raw FHIR tokens (`given[0]`, `family`).
+- `fhir_r4_path` records the exact FHIR binding (e.g., `Patient.name.family`) separately from `semantic_id`.
+
+**Intentional non-use of HL7 segment/field names:**
+
+- `semantic_id` **never uses HL7 v2 segment/field identifiers** (`PID-5`, `PV1-2`, etc.).
+- HL7 ADT fields are documented in `hl7_adt_catalog.parquet` and linked to `semantic_id`, but `semantic_id` itself
+  remains **agnostic to message formats**.
+
+**Why this matters:**
+
+- `semantic_id` acts as a **format-independent anchor**:
+  - Catalog/dictionary survivorship and governance rules live at the `semantic_id` level.
+  - Message catalogs (ADT/CCDA) map their segment/field/XPath locations back to `semantic_id`.
+  - Crosswalks (future) will use `semantic_id` as the stable key when defining partner-specific rules.
+- This allows CHI to:
+  - Change how an element is rendered in ADT, CCDA, or FHIR **without renaming the semantic_id**.
+  - Support multiple message formats in parallel without leaking format-specific details into the core model.
+
+---
+
 ## 2. Architecture
 
 ### 2.1 High-Level Data Flow
