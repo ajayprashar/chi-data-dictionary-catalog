@@ -253,6 +253,10 @@ def inject_theme() -> None:
         text-align: right;
         color: #4b5563;  /* secondary text */
     }
+    .field-label::after {
+        content: ":";
+        margin-left: 0.15rem;
+    }
     .field-value {
         flex: 1;
         background-color: #ffffff;
@@ -339,7 +343,7 @@ def render_field(label: str, value: object) -> None:
     st.markdown(
         f"""
         <div class="field-row">
-          <div class="field-label">{label}:</div>
+          <div class="field-label">{label}</div>
           <div class="{value_class}">{format_value(value)}</div>
         </div>
         """,
@@ -365,7 +369,7 @@ def _render_section_block(
     for label, value in fields:
         val_class = "field-value-multiline" if label in multiline_labels else "field-value"
         rows.append(
-            f'<div class="field-row"><div class="field-label">{label}:</div>'
+            f'<div class="field-row"><div class="field-label">{label}</div>'
             f'<div class="{val_class}">{html.escape(format_value(value))}</div></div>'
         )
     html_content = f"""
