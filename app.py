@@ -241,8 +241,8 @@ def inject_theme() -> None:
     }
     /* Keep one field per row so label colons and value boxes align consistently. */
     .field-label {
-        width: 10rem;
-        min-width: 10rem;
+        width: 15rem;
+        min-width: 15rem;
         font-weight: 600;
         white-space: nowrap;
         text-align: right;
