@@ -4,6 +4,21 @@ Lightweight, local proof‑of‑concept for viewing a **data catalog** and **dat
 
 ---
 
+### Interoperability staff quick view
+
+If you just want to **use** the app (not run it locally):
+
+- **Open the catalog**: go to `https://chi-data-dictionary-catalog.streamlit.app/`.
+- **Find an element**: use the search box (top left) to type part of the semantic ID, USCDI element name, or FHIR path.
+- **Filter**: use the filters on the left (FHIR resource, classification, domain, privacy) to narrow the list.
+- **See full details**: click a row in the main table; the right side shows all catalog, dictionary, survivorship, and security fields for that element.
+- **See message mappings**: if available, scroll down in the right panel to see how that element maps to HL7 ADT and CCD/CCDA.
+- **See architecture docs**: click the **Documentation** button at the bottom of the page to open the diagrams and technical notes.
+
+You can ignore the rest of this README unless you need to install or run the app locally.
+
+---
+
 ### Quick start (new machine)
 
 1. **Clone or copy this folder** onto the target machine (e.g. `C:\AI\chi-data-dictionary-catalog`).

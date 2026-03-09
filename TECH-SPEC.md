@@ -6,6 +6,32 @@ For product context (why, who, scope), see **readme-prd.md**. For quick setup, s
 
 ---
 
+## Interoperability Staff Quick Guide
+
+This section is written for interoperability, interface, and program staff who are **not** deep data engineers.
+
+- **What this app shows**
+  - A **catalog** of patient data elements (one row per element, such as "First name", "Date of birth").
+  - A **dictionary** that explains how each element is calculated, where it lives in FHIR, and how survivorship works.
+  - Optional views that show **where those elements land in HL7 ADT and CCD/CCDA messages**, and which sources can provide them.
+
+- **How to read one row**
+  - **Semantic ID**: the stable name for the concept (for example, `Patient.name_first`). Treat this as the "universal ID" for that data element.
+  - **USCDI fields**: three columns grouped together:
+    - **USCDI Data Class**: the USCDI bucket (for example, "Patient Demographics").
+    - **USCDI Data Element**: the official USCDI technical element name (for example, "Patient Name").
+    - **USCDI Element**: the friendly label you see in the app (for example, "First Name").
+  - **FHIR path**: where this concept lives in FHIR R4 (for example, `Patient.name.family`). This is how APIs and FHIR interfaces find the data.
+
+- **Three key ideas**
+  - **Master vs. messages**: the catalog/dictionary describe the **master truth about the person**. HL7 ADT and CCD/CCDA catalogs only describe **where that truth is carried** in each message format.
+  - **Survivorship**: the dictionary explains **which source wins** when feeds disagree (for example, which address or legal name is kept).
+  - **Security & consent**: HIPAA, FHIR security labels, and consent columns show **which elements are sensitive** and may need special handling.
+
+If you only need a high-level understanding, you can stop here and use the app. The sections below go into technical detail for engineering and implementation.
+
+---
+
 ## HIE Interoperability Maturity
 
 Latest assessment: **2026-03-04** (see **EVALUATION.md** for full domain scoring and rationale).

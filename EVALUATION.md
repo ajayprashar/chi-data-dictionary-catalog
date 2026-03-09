@@ -10,6 +10,22 @@
 
 ---
 
+## Quick guide for interoperability staff
+
+This document is long and detailed. If you are an interoperability, interface, or program leader and want the **essentials**:
+
+- **What this is**: an independent review of the CHI metadata catalog against common HIE best practices (identity, survivorship, standards, consent, etc.).
+- **Key takeaway**: the current POC has a **strong architecture** and is suitable for a demographics‑focused HIE pilot; remaining gaps are mostly normal "POC to production" items.
+- **Where to look first**:
+  - **Implementation Summary (next section)** — what we changed after the review (new columns, new table, documentation updates).
+  - **Executive Summary** — short narrative of strengths, score, and overall assessment.
+  - **Priority Gaps for Production HIE** — high‑level list of what would be needed before going live.
+- **How to use this**: treat it as a **checklist and reference** when planning a production roadmap; you do not need to read every domain section unless you are designing technical details.
+
+You can stop after these sections if you just need a leadership‑level understanding. The rest of the file is a deep technical dive for architects and engineers.
+
+---
+
 ## Implementation Summary (Post-Evaluation)
 
 Following the initial evaluation, the following gaps were addressed through **metadata schema enhancements** suitable for POC scope:
