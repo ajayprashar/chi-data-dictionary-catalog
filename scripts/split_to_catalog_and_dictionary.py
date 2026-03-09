@@ -34,10 +34,13 @@ import pandas as pd
 # HIE governance: data_steward, approval_status for ownership
 # HIE identity: identifier_type, identifier_authority for multi-source tracking
 # HIE security: hipaa_category, fhir_security_label, consent_category
+# USCDI alignment: data class and technical element name (USCDI v4 baseline)
 CATALOG_COLUMNS = [
     "Semantic ID",
     "USCDI Element",
     "USCDI Description",
+    "USCDI Data Class",
+    "USCDI Data Element",
     "Classification",
     "Ruleset Category",
     "Privacy/Security",

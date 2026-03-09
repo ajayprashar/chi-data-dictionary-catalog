@@ -447,6 +447,8 @@ def render_detail(
             ("Semantic ID", record.semantic_id),
             ("USCDI Element", record.uscdi_element),
             ("Description", record.uscdi_description),
+            ("USCDI Data Class", getattr(record, "uscdi_data_class", "")),
+            ("USCDI Data Element", getattr(record, "uscdi_data_element", "")),
             ("Classification", record.classification),
             ("Domain", getattr(record, "domain", "")),
             ("Ruleset Category", record.ruleset_category),

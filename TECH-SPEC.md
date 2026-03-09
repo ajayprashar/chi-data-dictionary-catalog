@@ -114,7 +114,7 @@ The catalog schema aligns with Health Information Exchange (HIE) interoperabilit
 |--------|-------|-----------------|
 | **Domain 1: Master Demographics** | Identity attributes, survivorship rules | `classification`, `domain`, `hie_survivorship_logic`, `data_source_rank_reference` |
 | **Domain 2: Master Patient Attributes** | Calculated fields (AF/AG housing status), temporal grain | `calculation_grain`, `historical_freeze`, `recalc_window_months`, `granularity_level` |
-| **Domain 3: Clinical Governance** | Terminology mapping, value sets | `fhir_r4_path`, `fhir_data_type`; value-set tables (future) |
+| **Domain 3: Clinical Governance** | Terminology mapping, value sets | `fhir_r4_path`, `fhir_data_type`; value-set tables (future). USCDI v4 is the baseline for data classes and elements referenced in `uscdi_*` columns. |
 
 **Additional HIE alignment:**
 
@@ -345,6 +345,8 @@ flowchart TB
 | `semantic_id` | string | Primary key. Canonical identifier (e.g., `Patient.name_first`, `Patient.birth_date`). |
 | `uscdi_element` | string | Human-readable element name (e.g., "First Name"). |
 | `uscdi_description` | string | Description of the element. |
+| `uscdi_data_class` | string | USCDI v4 **Data Class** (e.g., "Patient Demographics", "Clinical Notes"). Optional; used when aligning elements to specific USCDI classes. |
+| `uscdi_data_element` | string | USCDI v4 **Data Element** technical name (e.g., "Patient Name", "Date of Death"). Optional; used as the USCDI-aligned technical element name. |
 | `classification` | string | Grouping (e.g., "Master Demographics", "SDOH"). |
 | `domain` | string | **HIE Three-Domain Separation.** Governance boundary: "Domain 1: Master Demographics" \| "Domain 2: Master Patient Attributes" \| "Domain 3: Clinical Governance". |
 | `ruleset_category` | string | Ruleset (e.g., "Static Identity", "Dynamic Identity"). |
