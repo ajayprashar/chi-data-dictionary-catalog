@@ -295,6 +295,20 @@ def inject_theme() -> None:
         background-color: #ffffff;
         font-size: 0.9rem;
     }
+    /* Make st.dataframe text size consistent with page content */
+    [data-testid="stDataFrame"] [data-testid="stDataFrameResizable"] {
+        font-size: 0.95rem;
+    }
+    [data-testid="stDataFrame"] table {
+        font-size: 0.95rem;
+    }
+    [data-testid="stDataFrame"] thead th {
+        font-size: 0.95rem;
+        font-weight: 600;
+    }
+    [data-testid="stDataFrame"] tbody td {
+        font-size: 0.95rem;
+    }
     /* Tighter spacing around horizontal rules */
     hr {
         margin-top: 0.6rem;
