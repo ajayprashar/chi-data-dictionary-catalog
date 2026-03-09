@@ -8,7 +8,9 @@ For product context (why, who, scope), see **readme-prd.md**. For quick setup, s
 
 ## HIE Interoperability Maturity
 
-This architecture has been evaluated against **United States Health Information Exchange (HIE) best practices** and scored **4.1/5** overall (see **EVALUATION.md** for full 25-domain assessment).
+Latest assessment: **2026-03-04** (see **EVALUATION.md** for full domain scoring and rationale).
+
+This section is a rolling summary. Re-evaluate when schema, join logic, interoperability mappings, or regulatory baselines change.
 
 **Exemplary areas (5/5):** Master Data Management, Standards Alignment, Roll-Up Strategy, Address Coherence, Three-Domain Separation, Message Format Separation, Race/Ethnicity Interoperability, Backward Compatibility.
 
@@ -480,7 +482,7 @@ flowchart TB
 
 Expected columns (Excel headers; script normalizes and converts to snake_case):
 
-**Catalog:** Semantic ID, USCDI Element, USCDI Description, Classification, Ruleset Category, Privacy/Security
+**Catalog:** Semantic ID, USCDI Element, USCDI Description, USCDI Data Class, USCDI Data Element, Classification, Ruleset Category, Privacy/Security
 
 **Dictionary:** Semantic ID, SHIE Survivorship Logic, Data Source Rank Reference, Coverage (# PersonIDs), Granularity Level, Innovaccer Survivorship Logic, Data Quality Notes, FHIR R4 Path, FHIR Data Type
 
@@ -498,6 +500,8 @@ The app joins catalog + dictionary on `semantic_id` and derives `fhir_resource`.
 | `uscdi_element` | ✓ (as "Element") | ✓ | Search |
 | `fhir_resource` | ✓ (as "Resource") | ✓ (derived) | Multiselect |
 | `uscdi_description` | — | ✓ | Search |
+| `uscdi_data_class` | — | ✓ | — |
+| `uscdi_data_element` | — | ✓ | — |
 | `classification` | — | ✓ | Multiselect |
 | `ruleset_category` | — | ✓ | Multiselect |
 | `privacy_security` | — | ✓ | Multiselect |
@@ -605,8 +609,8 @@ flowchart TB
 - **Dataframe:** Columns Semantic ID, Element, Resource. `selection_mode="single-row"`, `on_select="rerun"`.
 - **Selection:** First selected row, or row 0 if none. Selected row drives the detail view.
 - **Feed profile:** Dropdown lists sources (e.g., "CMT feed profile") discovered from `data/*_feed_segments.csv`. Selecting a source shows:
-  - **Segments:** Dataframe with segment_id, data_received, notes.
-  - **Event types:** Dataframe with event_type, file_count, % of total, description.
+  - **Segments:** Dataframe with segment_id, data_received, notes, link_segment_id.
+  - **Event types:** Dataframe with event_type, file_count, % of total, description, link_segment_id (event-level marker).
 
 ### 6.4 Right Column: Element Detail
 
@@ -614,7 +618,7 @@ Single, vertically stacked layout (no tabs). Four section blocks with distinct b
 
 | Section | CSS Class | Caption | Fields |
 |---------|-----------|---------|--------|
-| **Catalog** | section-catalog (#f9fafb) | from master_patient_catalog.parquet | Semantic ID, USCDI Element, Description, Classification, Domain, Ruleset Category, Privacy/Security, HIPAA Category, FHIR Security Label, Consent Category, Rollup Relationship, Is Rollup, Composite Group, Identifier Type, Identifier Authority, Data Steward, Steward Contact, Approval Status, Schema Version, Last Modified Date |
+| **Catalog** | section-catalog (#f9fafb) | from master_patient_catalog.parquet | Semantic ID, USCDI Data Class, USCDI Data Element, USCDI Element, Description, Classification, Domain, Ruleset Category, Privacy/Security, HIPAA Category, FHIR Security Label, Consent Category, Rollup Relationship, Is Rollup, Composite Group, Identifier Type, Identifier Authority, Data Steward, Steward Contact, Approval Status, Schema Version, Last Modified Date |
 | **Dictionary – FHIR Mapping** | section-fhir (#ecfdf5) | Canonical FHIR R4 path & type | Resource, FHIR Path, FHIR Data Type, FHIR Profile, FHIR Cardinality, FHIR Must Support |
 | **Dictionary – Survivorship & Sources** | section-survivorship (#fffbeb) | Business rules and source logic | HIE Survivorship Logic, Tie Breaker Rule, Conflict Detection Enabled, Manual Override Allowed, Innovaccer Survivorship Logic, Data Source Rank Reference, Identity Resolution Notes, Coverage (# PersonIDs), Granularity Level, Calculation Grain, Historical Freeze, Recalc Window (Months) |
 | **Dictionary – Quality & Governance** | section-quality (#f5f3ff) | — | Quality & Governance Notes, De-identification Method |
