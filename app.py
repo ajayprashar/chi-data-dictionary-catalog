@@ -2,7 +2,7 @@
 """
 Streamlit viewer for the CHI master patient catalog & data dictionary.
 
-- Reads two Parquet files: master_patient_catalog.parquet and master_patient_dictionary.parquet.
+- Reads the master catalog/dictionary Parquet files (preferred `ddc-*` filenames).
 - Joins them on semantic_id.
 - Provides search, filtering (including by FHIR resource and format scope), and a detail view.
 
@@ -27,17 +27,24 @@ import streamlit as st
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 
+CATALOG_PARQUET_PATH = os.path.join(PROJECT_ROOT, "ddc-master_patient_catalog.parquet")
+DICTIONARY_PARQUET_PATH = os.path.join(PROJECT_ROOT, "ddc-master_patient_dictionary.parquet")
+ADT_PARQUET_PATH = os.path.join(PROJECT_ROOT, "ddc-hl7_adt_catalog.parquet")
+CCDA_PARQUET_PATH = os.path.join(PROJECT_ROOT, "ddc-ccda_catalog.parquet")
+AVAIL_PARQUET_PATH = os.path.join(PROJECT_ROOT, "ddc-data_source_availability.parquet")
+
+
 @lru_cache(maxsize=1)
 def load_data() -> pd.DataFrame:
     """Load and join catalog + dictionary into a single DataFrame."""
-    cat_path = os.path.join(PROJECT_ROOT, "master_patient_catalog.parquet")
-    dict_path = os.path.join(PROJECT_ROOT, "master_patient_dictionary.parquet")
-
-    if not os.path.exists(cat_path) or not os.path.exists(dict_path):
+    if not os.path.exists(CATALOG_PARQUET_PATH) or not os.path.exists(DICTIONARY_PARQUET_PATH):
         raise FileNotFoundError(
-            "Expected master_patient_catalog.parquet and master_patient_dictionary.parquet in the project root. "
+            "Expected ddc-master_patient_catalog.parquet and ddc-master_patient_dictionary.parquet in the project root. "
             "Run scripts/split_to_catalog_and_dictionary.py first."
         )
+
+    cat_path = CATALOG_PARQUET_PATH
+    dict_path = DICTIONARY_PARQUET_PATH
 
     # Use pandas for schema-tolerant merge (handles old Parquet without HIE columns)
     catalog = pd.read_parquet(cat_path)
@@ -93,8 +100,8 @@ def load_message_catalogs() -> tuple[pd.DataFrame | None, pd.DataFrame | None]:
     These are small POC files that map master patient elements (semantic_id)
     into message-specific fields/paths.
     """
-    adt_path = os.path.join(PROJECT_ROOT, "hl7_adt_catalog.parquet")
-    ccda_path = os.path.join(PROJECT_ROOT, "ccda_catalog.parquet")
+    adt_path = ADT_PARQUET_PATH
+    ccda_path = CCDA_PARQUET_PATH
 
     adt_df = pd.read_parquet(adt_path) if os.path.exists(adt_path) else None
     ccda_df = pd.read_parquet(ccda_path) if os.path.exists(ccda_path) else None
@@ -110,11 +117,11 @@ def load_five_tables_for_review() -> tuple[
 
     Returns (catalog_df, dictionary_df, adt_catalog_df, ccda_catalog_df, availability_df); each is None if file missing.
     """
-    cat_path = os.path.join(PROJECT_ROOT, "master_patient_catalog.parquet")
-    dict_path = os.path.join(PROJECT_ROOT, "master_patient_dictionary.parquet")
-    adt_path = os.path.join(PROJECT_ROOT, "hl7_adt_catalog.parquet")
-    ccda_path = os.path.join(PROJECT_ROOT, "ccda_catalog.parquet")
-    avail_path = os.path.join(PROJECT_ROOT, "data_source_availability.parquet")
+    cat_path = CATALOG_PARQUET_PATH
+    dict_path = DICTIONARY_PARQUET_PATH
+    adt_path = ADT_PARQUET_PATH
+    ccda_path = CCDA_PARQUET_PATH
+    avail_path = AVAIL_PARQUET_PATH
 
     catalog_df = pd.read_parquet(cat_path) if os.path.exists(cat_path) else None
     dictionary_df = pd.read_parquet(dict_path) if os.path.exists(dict_path) else None
@@ -455,7 +462,7 @@ def render_detail(
     _render_section_block(
         "section-catalog",
         "Catalog",
-        "from master_patient_catalog.parquet · What elements exist and how they're grouped.",
+        "from ddc-master_patient_catalog.parquet · What elements exist and how they're grouped.",
         [
             # Order is chosen so that USCDI fields appear in the right-hand column
             # (positions 2, 4, and 6) in the two-column layout.
@@ -487,7 +494,7 @@ def render_detail(
     _render_section_block(
         "section-fhir",
         "Dictionary – FHIR Mapping",
-        "from master_patient_dictionary.parquet · Canonical FHIR R4 path & type for this element",
+        "from ddc-master_patient_dictionary.parquet · Canonical FHIR R4 path & type for this element",
         [
             ("Resource", record.fhir_resource),
             ("FHIR Path", record.fhir_r4_path),
@@ -552,7 +559,10 @@ def render_detail(
         )
 
         if adt_rows is not None and not adt_rows.empty:
-            st.markdown('<div class="section-block section-adt"><strong>HL7 ADT</strong> (from <code>hl7_adt_catalog.parquet</code>)</div>', unsafe_allow_html=True)
+            st.markdown(
+                '<div class="section-block section-adt"><strong>HL7 ADT</strong> (from <code>ddc-hl7_adt_catalog.parquet</code>)</div>',
+                unsafe_allow_html=True,
+            )
             st.dataframe(
                 adt_rows[
                     [
@@ -573,7 +583,10 @@ def render_detail(
             )
 
         if ccda_rows is not None and not ccda_rows.empty:
-            st.markdown('<div class="section-block section-ccda"><strong>CCD / CCDA</strong> (from <code>ccda_catalog.parquet</code>)</div>', unsafe_allow_html=True)
+            st.markdown(
+                '<div class="section-block section-ccda"><strong>CCD / CCDA</strong> (from <code>ddc-ccda_catalog.parquet</code>)</div>',
+                unsafe_allow_html=True,
+            )
             st.dataframe(
                 ccda_rows[
                     [
@@ -596,7 +609,7 @@ def render_detail(
             )
 
 
-# Current POC ERD (aligned with master_patient_*.parquet, hl7_adt_catalog.parquet, ccda_catalog.parquet)
+# Current POC ERD (aligned with ddc-master_patient_*.parquet, ddc-hl7_adt_catalog.parquet, ddc-ccda_catalog.parquet)
 # FHIR: canonical path/type in MASTER_PATIENT_DICTIONARY; per-format path in ADT/CCDA catalogs. No FHIR resource instance data stored here.
 #
 # Mermaid erDiagram syntax (keep in sync with hl7_ccd_fhir_consideration.md):
@@ -952,7 +965,7 @@ def main() -> None:
             """
             <div class="title-row">
               <h4>Catalog elements</h4>
-              <span class="header-caption">Catalog data elements from master_patient_catalog.parquet. Use the selection column on the left to choose an element.</span>
+              <span class="header-caption">Catalog data elements from ddc-master_patient_catalog.parquet. Use the selection column on the left to choose an element.</span>
             </div>
             """,
             unsafe_allow_html=True,

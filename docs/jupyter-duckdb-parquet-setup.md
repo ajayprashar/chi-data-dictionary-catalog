@@ -40,7 +40,7 @@ The project `requirements.txt` also includes `pandas` and `pyarrow` for the **sp
 
 **Working directory**
 
-The notebook kernel’s current working directory must be the project folder so that relative paths like `'master_patient_catalog.parquet'` resolve. Run this in the **first cell**:
+The notebook kernel’s current working directory must be the project folder so that relative paths like `'ddc-master_patient_catalog.parquet'` resolve. Run this in the **first cell**:
 
 ```python
 import os
@@ -55,10 +55,10 @@ Use DuckDB’s Python API so results display as a normal pandas DataFrame in Jup
 import duckdb
 
 # Option A: relative path (only valid after os.chdir to project folder)
-df = duckdb.query("SELECT * FROM read_parquet('master_patient_catalog.parquet') LIMIT 10").df()
+df = duckdb.query("SELECT * FROM read_parquet('ddc-master_patient_catalog.parquet') LIMIT 10").df()
 
 # Option B: absolute path (works regardless of kernel cwd)
-path = os.path.join(os.getcwd(), 'master_patient_catalog.parquet')
+path = os.path.join(os.getcwd(), 'ddc-master_patient_catalog.parquet')
 df = duckdb.query(f"SELECT * FROM read_parquet('{path}') LIMIT 10").df()
 
 df   # display in notebook

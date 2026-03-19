@@ -56,7 +56,7 @@ mv data_catalog.csv archive/data_catalog_pre_hie_alignment.csv
 **C) Update (if you want a current snapshot)**
 ```powershell
 # Export current Parquet to CSV for Excel editing
-python -c "import pandas as pd; cat = pd.read_parquet('master_patient_catalog.parquet'); dict = pd.read_parquet('master_patient_dictionary.parquet'); combined = cat.merge(dict, on='semantic_id'); combined.to_csv('data_catalog_v2.csv', index=False)"
+python -c "import pandas as pd; cat = pd.read_parquet('ddc-master_patient_catalog.parquet'); dict = pd.read_parquet('ddc-master_patient_dictionary.parquet'); combined = cat.merge(dict, on='semantic_id'); combined.to_csv('data_catalog_v2.csv', index=False)"
 ```
 *Use if: You want a CSV with all current columns for Excel authoring*
 
@@ -67,11 +67,11 @@ python -c "import pandas as pd; cat = pd.read_parquet('master_patient_catalog.pa
 ## Current File Structure (Clean)
 
 ### Core Parquet Files ([OK] Current Schema)
-- `master_patient_catalog.parquet` — 46 rows, 20 columns
-- `master_patient_dictionary.parquet` — 46 rows, 21 columns
-- `hl7_adt_catalog.parquet` — 47 rows (ADT message mappings)
-- `ccda_catalog.parquet` — 34 rows (CCDA XML mappings)
-- `data_source_availability.parquet` — 46 rows (NEW: source availability matrix)
+- `ddc-master_patient_catalog.parquet` — 46 rows, 20 columns
+- `ddc-master_patient_dictionary.parquet` — 46 rows, 21 columns
+- `ddc-hl7_adt_catalog.parquet` — 47 rows (ADT message mappings)
+- `ddc-ccda_catalog.parquet` — 34 rows (CCDA XML mappings)
+- `ddc-data_source_availability.parquet` — 46 rows (NEW: source availability matrix)
 
 ### Scripts ([OK] Up to Date)
 - `scripts/split_to_catalog_and_dictionary.py` — CSV splitter with full HIE schema
@@ -107,14 +107,14 @@ python -c "import pandas as pd; cat = pd.read_parquet('master_patient_catalog.pa
 - README.md
 - TECH-SPEC.md
 - app.py
-- master_patient_catalog.parquet
-- master_patient_dictionary.parquet
+- ddc-master_patient_catalog.parquet
+- ddc-master_patient_dictionary.parquet
 - scripts/split_to_catalog_and_dictionary.py
 
 **New/Untracked (??):**
 - EVALUATION.md
 - GAPS-CLOSED.md
-- data_source_availability.parquet
+- ddc-data_source_availability.parquet
 - scripts/build_data_source_availability.py
 
 **Total:** 10 files changed/added

@@ -1,0 +1,24 @@
+{
+  "name": "chi-data-dictionary-catalog",
+  "version": "1.0.0",
+  "description": "Lightweight local proof-of-concept for viewing a healthcare metadata catalog and data dictionary.",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ajayprashar/chi-data-dictionary-catalog.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ajayprashar/chi-data-dictionary-catalog/issues"
+  },
+  "homepage": "https://github.com/ajayprashar/chi-data-dictionary-catalog#readme",
+  "dependencies": {
+    "airtable": "^0.12.2",
+    "dotenv": "^17.3.1"
+  }
+}

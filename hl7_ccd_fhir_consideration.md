@@ -61,8 +61,8 @@ HL7 ADT messages are **event-centric** and **workflow-aligned**. They model:
 ### **Proposed Architecture: Three-File Model**
 
 ```
-master_patient_catalog.parquet          ← Person-centric attributes (current scope)
-master_patient_dictionary.parquet       ← Survivorship + business rules (current scope)
+ddc-master_patient_catalog.parquet          ← Person-centric attributes (current scope)
+ddc-master_patient_dictionary.parquet       ← Survivorship + business rules (current scope)
 hl7_message_catalog.parquet             ← NEW: HL7 v2 message specifications
 hl7_message_dictionary.parquet          ← NEW: HL7 ADT business rules (optional)
 ```
@@ -147,7 +147,7 @@ Examples that WOULD NOT justify a separate dictionary (keep in master patient di
 - "Patient name survivorship ranks HMIS > EHR > self-reported"
 - "Race/ethnicity follows OMB 15 minimum categories with USCDI expansion"
 
-If your ADT business rules are mostly **"how do I map master attributes into HL7 fields?"** then you don't need a separate dictionary. Just extend `master_patient_dictionary.parquet` with an `hl7_usage` column.
+If your ADT business rules are mostly **"how do I map master attributes into HL7 fields?"** then you don't need a separate dictionary. Just extend `ddc-master_patient_dictionary.parquet` with an `hl7_usage` column.
 
 ### **Implementation Path**
 
@@ -229,9 +229,9 @@ If you treat message specifications as **siblings** to your master patient catal
 These define the structure/schema of each message format:
 
 ```
-master_patient_catalog.parquet           ← Person-centric attributes (current)
-hl7_adt_catalog.parquet                  ← ADT message specs (segments, fields, data types)
-ccda_catalog.parquet                     ← CCDA section/entry specs (XML paths, cardinality)
+ddc-master_patient_catalog.parquet           ← Person-centric attributes (current)
+ddc-hl7_adt_catalog.parquet                  ← ADT message specs (segments, fields, data types)
+ddc-ccda_catalog.parquet                     ← CCDA section/entry specs (XML paths, cardinality)
 fhir_catalog.parquet                     ← FHIR resource profiles (US Core, extensions)
 ```
 
@@ -244,7 +244,7 @@ These define business rules and transformations. Here's where it gets interestin
 **Option A: Format-Specific Dictionaries**
 
 ```
-master_patient_dictionary.parquet         ← L3 survivorship rules ("HMIS address wins")
+ddc-master_patient_dictionary.parquet         ← L3 survivorship rules ("HMIS address wins")
 hl7_adt_dictionary.parquet               ← ADT-specific rules ("A08 triggers on address change")
 ccda_dictionary.parquet                  ← CCDA-specific rules ("Include provenance in header")
 fhir_dictionary.parquet                  ← FHIR-specific rules ("US Core race extension required")
@@ -253,7 +253,7 @@ fhir_dictionary.parquet                  ← FHIR-specific rules ("US Core race 
 **Option B: Unified Crosswalk Dictionary** (Recommended)
 
 ```
-master_patient_dictionary.parquet         ← L3 survivorship rules (stays separate)
+ddc-master_patient_dictionary.parquet         ← L3 survivorship rules (stays separate)
 interoperability_crosswalk.parquet        ← ALL partner × format transformation rules
 ```
 
@@ -273,13 +273,13 @@ If you split these into separate dictionaries per format, you'd duplicate the "S
 
 ```
 # Catalogs (Structure definitions - format-specific)
-master_patient_catalog.parquet           ← Person-centric attributes
-hl7_adt_catalog.parquet                  ← ADT segments/fields/types
-ccda_catalog.parquet                     ← CCDA sections/entries/paths
+ddc-master_patient_catalog.parquet           ← Person-centric attributes
+ddc-hl7_adt_catalog.parquet                  ← ADT segments/fields/types
+ddc-ccda_catalog.parquet                     ← CCDA sections/entries/paths
 fhir_catalog.parquet                     ← FHIR resources/profiles/extensions
 
 # Dictionaries (Business rules - mostly unified)
-master_patient_dictionary.parquet         ← L3 survivorship ("HMIS > EHR for address")
+ddc-master_patient_dictionary.parquet         ← L3 survivorship ("HMIS > EHR for address")
 interoperability_crosswalk.parquet        ← Partner × format rules:
                                             - Partner ID
                                             - Message format (ADT/CCDA/FHIR)
@@ -589,11 +589,11 @@ There IS source-specific logic on inbound, but it's captured in the **format cat
 
 | **File** | **Purpose** | **Owner** | **Update Frequency** |
 | --- | --- | --- | --- |
-| `master_patient_catalog.parquet` | Defines person-centric attributes | Data Standards Lead | Quarterly or when adding attributes |
-| `hl7_adt_catalog.parquet` | Defines ADT message structure | Interface Engineers | When onboarding new ADT partner |
-| `ccda_catalog.parquet` | Defines CCDA document structure | Interface Engineers | When onboarding new CCDA partner |
+| `ddc-master_patient_catalog.parquet` | Defines person-centric attributes | Data Standards Lead | Quarterly or when adding attributes |
+| `ddc-hl7_adt_catalog.parquet` | Defines ADT message structure | Interface Engineers | When onboarding new ADT partner |
+| `ddc-ccda_catalog.parquet` | Defines CCDA document structure | Interface Engineers | When onboarding new CCDA partner |
 | `fhir_catalog.parquet` | Defines FHIR resource structure | Interface Engineers | When FHIR profiles change |
-| `master_patient_dictionary.parquet` | L3 survivorship business rules | Data Governance Committee | When source hierarchy changes |
+| `ddc-master_patient_dictionary.parquet` | L3 survivorship business rules | Data Governance Committee | When source hierarchy changes |
 | `interoperability_crosswalk.parquet` | Partner-specific transformation rules | Interface Engineers + Legal | When DUAs change or partners onboard |
 
 ### **Next Steps for ERD Development**

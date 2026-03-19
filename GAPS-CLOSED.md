@@ -97,7 +97,7 @@ Added to `MASTER_PATIENT_DICTIONARY`:
 
 **Problem:** Feed profiles not linked to catalog semantic IDs; no source availability matrix.
 
-**Solution:** Created `data_source_availability.parquet` with schema:
+**Solution:** Created `ddc-data_source_availability.parquet` with schema:
 
 | Column | Type | Description |
 |--------|------|-------------|
@@ -127,9 +127,9 @@ Added to `MASTER_PATIENT_DICTIONARY`:
 4. **`app.py`** — Updated `load_five_tables_for_review()` to load and display data source availability table
 
 ### Data
-5. **`master_patient_catalog.parquet`** — Upgraded from 10 to 20 columns via `--upgrade-schema`
-6. **`master_patient_dictionary.parquet`** — Upgraded from 12 to 21 columns via `--upgrade-schema`
-7. **`data_source_availability.parquet`** — New table: 46 rows (1 source × 46 semantic IDs)
+5. **`ddc-master_patient_catalog.parquet`** — Upgraded from 10 to 20 columns via `--upgrade-schema`
+6. **`ddc-master_patient_dictionary.parquet`** — Upgraded from 12 to 21 columns via `--upgrade-schema`
+7. **`ddc-data_source_availability.parquet`** — New table: 46 rows (1 source × 46 semantic IDs)
 
 ### Documentation
 8. **`TECH-SPEC.md`** — Added Identity Resolution Strategy (1.4), Security & PHI Handling (1.5), HIE Maturity summary, updated all schema tables (4.1, 4.2, 4.5), updated UI layout (6.4), updated pipeline (7)
@@ -189,7 +189,7 @@ python scripts/split_to_catalog_and_dictionary.py --upgrade-schema -d .
 python scripts/build_data_source_availability.py
 
 # Verify schema
-python -c "import pandas as pd; cat = pd.read_parquet('master_patient_catalog.parquet'); print(f'Catalog: {len(cat.columns)} cols'); dict_df = pd.read_parquet('master_patient_dictionary.parquet'); print(f'Dictionary: {len(dict_df.columns)} cols'); avail = pd.read_parquet('data_source_availability.parquet'); print(f'Availability: {len(avail)} rows')"
+python -c "import pandas as pd; cat = pd.read_parquet('ddc-master_patient_catalog.parquet'); print(f'Catalog: {len(cat.columns)} cols'); dict_df = pd.read_parquet('ddc-master_patient_dictionary.parquet'); print(f'Dictionary: {len(dict_df.columns)} cols'); avail = pd.read_parquet('ddc-data_source_availability.parquet'); print(f'Availability: {len(avail)} rows')"
 ```
 
 ---

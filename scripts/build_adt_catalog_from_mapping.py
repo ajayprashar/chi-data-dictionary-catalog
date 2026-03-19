@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Build hl7_adt_catalog.parquet from the L2 → semantic_id mapping CSV.
+Build `ddc-hl7_adt_catalog.parquet` from the L2 → semantic_id mapping CSV.
 
-Reads data/l2_to_semantic_id_mapping.csv and writes project-root
-hl7_adt_catalog.parquet with columns expected by the Streamlit app:
+Reads `data/l2_to_semantic_id_mapping.csv` and writes project-root
+`ddc-hl7_adt_catalog.parquet` with columns expected by the Streamlit app:
 message_format, message_type, segment_id, field_id, field_name, data_type,
 optionality, cardinality, semantic_id, fhir_r4_path, notes.
 
@@ -11,7 +11,7 @@ Usage:
   python scripts/build_adt_catalog_from_mapping.py
   python scripts/build_adt_catalog_from_mapping.py -o path/to/output.parquet
 
-The script overwrites the output file. Default output: hl7_adt_catalog.parquet
+The script overwrites the output file. Default output: ddc-hl7_adt_catalog.parquet
 in the project root (parent of scripts/).
 """
 
@@ -40,7 +40,7 @@ def main() -> None:
         "-o",
         "--output",
         type=Path,
-        default=project_root / "hl7_adt_catalog.parquet",
+        default=project_root / "ddc-hl7_adt_catalog.parquet",
         help="Output Parquet path",
     )
     args = parser.parse_args()

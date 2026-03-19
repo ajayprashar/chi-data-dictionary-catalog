@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Build data_source_availability.parquet from feed profiles and catalog.
+Build `ddc-data_source_availability.parquet` from feed profiles and catalog.
 
 Links data sources (feed profiles) to catalog semantic IDs, documenting which
 sources can provide which attributes. This supports intelligent source selection
@@ -10,11 +10,11 @@ Usage:
   python scripts/build_data_source_availability.py
 
 Inputs:
-  - master_patient_catalog.parquet (required)
+  - ddc-master_patient_catalog.parquet (required)
   - data/*_feed_segments.csv (feed profiles)
 
 Output:
-  - data_source_availability.parquet
+  - ddc-data_source_availability.parquet
 
 Schema:
   - source_id: Data source identifier (e.g., "cmt", "sutter")
@@ -58,9 +58,9 @@ def build_availability_table() -> pd.DataFrame:
     For POC: creates starter rows linking discovered sources to all catalog semantic IDs
     with placeholder availability="unknown". Production would analyze actual feed data.
     """
-    cat_path = PROJECT_ROOT / "master_patient_catalog.parquet"
+    cat_path = PROJECT_ROOT / "ddc-master_patient_catalog.parquet"
     if not cat_path.exists():
-        print(f"Error: {cat_path} not found.", file=sys.stderr)
+        print(f"Error: expected {cat_path.name} not found.", file=sys.stderr)
         sys.exit(1)
 
     catalog = pd.read_parquet(cat_path)
@@ -94,7 +94,8 @@ def build_availability_table() -> pd.DataFrame:
 
 def main() -> None:
     df = build_availability_table()
-    out_path = PROJECT_ROOT / "data_source_availability.parquet"
+    out_pref_path = PROJECT_ROOT / "ddc-data_source_availability.parquet"
+    out_path = out_pref_path
     df.to_parquet(out_path, index=False)
     print(f"Wrote {len(df)} rows to {out_path}")
     if not df.empty:

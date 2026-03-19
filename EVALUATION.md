@@ -45,7 +45,7 @@ Following the initial evaluation, the following gaps were addressed through **me
 - `de_identification_method` — Privacy & de-identification strategy
 
 **New Table:**
-- `data_source_availability.parquet` — Links data sources (feed profiles) to semantic IDs with availability, completeness, and timeliness metadata
+- `ddc-data_source_availability.parquet` — Links data sources (feed profiles) to semantic IDs with availability, completeness, and timeliness metadata
 
 **Documentation Updates:**
 - Added **Identity Resolution Strategy** section (TECH-SPEC 1.4)
@@ -227,7 +227,7 @@ For production HIE, add:
      "tie_breaker": "source_reliability_score"
    }
    ```
-2. Add `data_source_availability.parquet` linking feed profiles to semantic IDs (already identified as P2)
+2. Add `ddc-data_source_availability.parquet` linking feed profiles to semantic IDs (already identified as P2)
 3. Add `source_data_quality_score` (0.0-1.0) to dictionary for completeness/accuracy metrics
 
 ---
@@ -389,7 +389,7 @@ Implement `interoperability_crosswalk.parquet` with:
 - No **source reliability scoring** or **historical performance metrics**
 
 **Recommendation:**
-Implement `data_source_availability.parquet`:
+Implement `ddc-data_source_availability.parquet`:
 - Columns: `source_id`, `semantic_id`, `availability` (full/partial/none), `completeness_pct`, `timeliness_sla_hours`
 - Enables intelligent source selection for survivorship
 
@@ -398,7 +398,7 @@ Implement `data_source_availability.parquet`:
 ### 16. HL7 v2 ADT Support ⭐⭐⭐⭐
 
 **Strengths:**
-- Dedicated `hl7_adt_catalog.parquet` for message structure
+- Dedicated `ddc-hl7_adt_catalog.parquet` for message structure
 - Proper 1:many mapping (semantic_id → multiple ADT fields)
 - Event type awareness (A01, A03, A08)
 - Segment/field/data type/optionality metadata
@@ -419,7 +419,7 @@ Implement `data_source_availability.parquet`:
 ### 17. CCDA/CCD Support ⭐⭐⭐⭐
 
 **Strengths:**
-- Dedicated `ccda_catalog.parquet` for XML structure
+- Dedicated `ddc-ccda_catalog.parquet` for XML structure
 - Section/entry/xpath mapping
 - Proper separation from master patient attributes
 
@@ -689,7 +689,7 @@ Your architecture is **excellent for a demographics-focused POC**. The HIE align
 ### For Production HIE Deployment
 
 **Phase 1: Operationalize Existing Architecture**
-- Implement `data_source_availability.parquet`
+- Implement `ddc-data_source_availability.parquet`
 - Formalize source hierarchy as structured data
 - Add provenance tracking (source + timestamp per attribute)
 - Implement stewardship assignment

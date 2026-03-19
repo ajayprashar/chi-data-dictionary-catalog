@@ -83,7 +83,7 @@ The CHI metadata catalog architecture was designed to address several strategic 
 | **Dictionary stays separate from message specs** | L3 survivorship rules are independent of interoperability. Partner-specific rules belong in a crosswalk (future), not the core dictionary. |
 | **Link via semantic_id** | The `semantic_id` (e.g., `Patient.name_first`, `Patient.birth_date`) is the universal join key. Master catalog ↔ dictionary is 1:1; master catalog ↔ message catalogs is 1:many. |
 | **Crosswalks for output, not input** | Inbound: everyone's data is normalized to L3 using catalog + dictionary. Outbound: L3 is customized per partner using catalogs + crosswalk. |
-| **POC scope** | Value-set tables, FHIR catalog, and interoperability crosswalk are strategically deferred. The current POC proves the model with four tables. |
+| **POC scope** | Value-set tables, FHIR catalog, and interoperability crosswalk are strategically deferred. The current POC proves the model with the core master tables, optional message-format catalogs, and a source availability table for documentation/review. |
 
 ### 1.3 What Was Explicitly Rejected
 
@@ -154,7 +154,7 @@ The catalog schema aligns with Health Information Exchange (HIE) interoperabilit
 - **Security & consent** — `hipaa_category`, `fhir_security_label`, `consent_category` for HIPAA/42 CFR Part 2 compliance and attribute-level consent directives.
 - **FHIR compliance** — `fhir_must_support`, `fhir_profile`, `fhir_cardinality` for US Core validation.
 - **Survivorship enhancements** — `tie_breaker_rule`, `conflict_detection_enabled`, `manual_override_allowed` for conflict resolution.
-- **Data source linkage** — `data_source_availability.parquet` table links feed profiles to catalog elements for intelligent source selection.
+- **Data source linkage** — `ddc-data_source_availability.parquet` table links feed profiles to catalog elements for intelligent source selection.
 
 **Deferred (P2):** Formal machine-readable `data_source_rank_reference` structure (current: human-readable text); field-level provenance tracking (source_system_id + timestamp per value).
 
@@ -212,7 +212,7 @@ This keeps the effort **practical and operational**:
 **Intentional non-use of HL7 segment/field names:**
 
 - `semantic_id` **never uses HL7 v2 segment/field identifiers** (`PID-5`, `PV1-2`, etc.).
-- HL7 ADT fields are documented in `hl7_adt_catalog.parquet` and linked to `semantic_id`, but `semantic_id` itself
+- HL7 ADT fields are documented in `ddc-hl7_adt_catalog.parquet` and linked to `semantic_id`, but `semantic_id` itself
   remains **agnostic to message formats**.
 
 **Why this matters:**
@@ -259,8 +259,8 @@ flowchart TB
     end
 
     subgraph Core["CORE PARQUET FILES (project root)"]
-        Catalog["master_patient_catalog.parquet"]
-        Dictionary["master_patient_dictionary.parquet"]
+        Catalog["ddc-master_patient_catalog.parquet"]
+        Dictionary["ddc-master_patient_dictionary.parquet"]
     end
 
     subgraph Mapping["MAPPING SCRIPTS"]
@@ -269,8 +269,12 @@ flowchart TB
     end
 
     subgraph OptionalCatalogs["OPTIONAL MESSAGE FORMAT CATALOGS"]
-        ADT["hl7_adt_catalog.parquet"]
-        CCDA["ccda_catalog.parquet"]
+        ADT["ddc-hl7_adt_catalog.parquet"]
+        CCDA["ddc-ccda_catalog.parquet"]
+    end
+
+    subgraph Availability["SOURCE AVAILABILITY"]
+        Avail["ddc-data_source_availability.parquet"]
     end
 
     subgraph FeedProfiles["FEED PROFILES"]
@@ -279,7 +283,7 @@ flowchart TB
     end
 
     subgraph App["STREAMLIT APP (app.py)"]
-        Streamlit["Pandas in-memory join: catalog + dictionary on semantic_id<br/>Optional: ADT/CCDA for message-format mappings<br/>Discovered: feed segments + event types"]
+        Streamlit["Pandas in-memory join: catalog + dictionary on semantic_id<br/>Optional: ADT/CCDA for message-format mappings<br/>Documentation preview also loads data_source_availability<br/>Discovered: feed segments + event types"]
     end
 
     Excel --> Split
@@ -292,6 +296,7 @@ flowchart TB
     Dictionary --> Streamlit
     ADT --> Streamlit
     CCDA --> Streamlit
+    Avail --> Streamlit
     Segments --> Streamlit
     Events --> Streamlit
 ```
@@ -301,11 +306,11 @@ flowchart TB
 | Location | Content |
 |----------|---------|
 | **Project root** | `app.py`, Parquet files, README, docs |
-| **master_patient_catalog.parquet** | Required. Catalog view. |
-| **master_patient_dictionary.parquet** | Required. Dictionary view. |
-| **hl7_adt_catalog.parquet** | Optional. ADT field mappings. |
-| **ccda_catalog.parquet** | Optional. CCD/CCDA XML mappings. |
-| **data_source_availability.parquet** | Optional. Source-to-semantic_id availability matrix. |
+| **ddc-master_patient_catalog.parquet** | Required. Catalog view. |
+| **ddc-master_patient_dictionary.parquet** | Required. Dictionary view. |
+| **ddc-hl7_adt_catalog.parquet** | Optional. ADT field mappings. |
+| **ddc-ccda_catalog.parquet** | Optional. CCD/CCDA XML mappings. |
+| **ddc-data_source_availability.parquet** | Optional. Source-to-semantic_id availability matrix. |
 | **scripts/** | `split_to_catalog_and_dictionary.py`, `build_adt_catalog_from_mapping.py`, `build_ccda_catalog_from_mapping.py`, `build_data_source_availability.py` |
 | **data/** | Mapping CSVs, feed profiles (segments, event types) |
 | **docs/** | `adding-data-sources.md`, `cmt-adt-feed-and-master-patient.md`, `jupyter-duckdb-parquet-setup.md` |
@@ -323,7 +328,7 @@ flowchart TB
 
 ### 3.1 Core Tables (Required)
 
-#### MASTER_PATIENT_CATALOG (`master_patient_catalog.parquet`)
+#### MASTER_PATIENT_CATALOG (`ddc-master_patient_catalog.parquet`)
 
 **Purpose:** Defines **what elements exist** and how they are grouped. One row per data element. Answers: *What attributes does CHI track?*
 
@@ -333,7 +338,7 @@ flowchart TB
 
 ---
 
-#### MASTER_PATIENT_DICTIONARY (`master_patient_dictionary.parquet`)
+#### MASTER_PATIENT_DICTIONARY (`ddc-master_patient_dictionary.parquet`)
 
 **Purpose:** Defines **what each element means** and **how it is implemented**. Survivorship rules, FHIR mapping, data quality notes. Answers: *How do we determine the golden value? Where does it live in FHIR?*
 
@@ -345,7 +350,7 @@ flowchart TB
 
 ### 3.2 Optional Message-Format Catalogs
 
-#### HL7_ADT_CATALOG (`hl7_adt_catalog.parquet`)
+#### HL7_ADT_CATALOG (`ddc-hl7_adt_catalog.parquet`)
 
 **Purpose:** Maps master patient elements to **HL7 ADT message structure**. Each row describes where a `semantic_id` appears in ADT messages (segment, field, data type, optionality).
 
@@ -355,7 +360,7 @@ flowchart TB
 
 ---
 
-#### CCDA_CATALOG (`ccda_catalog.parquet`)
+#### CCDA_CATALOG (`ddc-ccda_catalog.parquet`)
 
 **Purpose:** Maps master patient elements to **CCD/CCDA XML structure**. Each row describes where a `semantic_id` appears in CCD/CCDA documents (section, entry type, XML path).
 
@@ -528,9 +533,9 @@ flowchart TB
 
 Expected columns (Excel headers; script normalizes and converts to snake_case):
 
-**Catalog:** Semantic ID, USCDI Element, USCDI Description, USCDI Data Class, USCDI Data Element, Classification, Ruleset Category, Privacy/Security
+**Catalog:** Semantic ID, USCDI Element, USCDI Description, USCDI Data Class, USCDI Data Element, Classification, Ruleset Category, Privacy/Security, Domain, Rollup Relationship, Is Rollup, Composite Group, Data Steward, Steward Contact, Approval Status, Schema Version, Last Modified Date, Identifier Type, Identifier Authority, HIPAA Category, FHIR Security Label, Consent Category
 
-**Dictionary:** Semantic ID, SHIE Survivorship Logic, Data Source Rank Reference, Coverage (# PersonIDs), Granularity Level, Innovaccer Survivorship Logic, Data Quality Notes, FHIR R4 Path, FHIR Data Type
+**Dictionary:** Semantic ID, SHIE Survivorship Logic, Data Source Rank Reference, Coverage (# PersonIDs), Granularity Level, Innovaccer Survivorship Logic, Data Quality Notes, FHIR R4 Path, FHIR Data Type, Calculation Grain, Historical Freeze, Recalc Window (Months), FHIR Must Support, FHIR Profile, FHIR Cardinality, Identity Resolution Notes, Tie Breaker Rule, Conflict Detection Enabled, Manual Override Allowed, De-identification Method
 
 ---
 
@@ -559,6 +564,10 @@ The app joins catalog + dictionary on `semantic_id` and derives `fhir_resource`.
 | `coverage_personids` | — | ✓ | — |
 | `granularity_level` | — | ✓ | — |
 | `data_quality_notes` | — | ✓ | — |
+
+**Join behavior:** The app uses an **inner join** on `semantic_id`. Elements that exist in only one of the two master tables are excluded from the main viewer.
+
+**Join sanity check:** The app calculates `only_in_catalog` and `only_in_dictionary` sets and shows a warning if the two master tables do not have the same `semantic_id` coverage.
 
 ### 5.2 Message-Format Mappings (Detail View)
 
@@ -627,7 +636,7 @@ flowchart TB
         DocSpec["Technical Specification (TECH-SPEC.md)"]
         DocSummary["Summary for current filters"]
         DocERD["Data model (ERD) - Mermaid diagram"]
-        DocTables["Table preview - MASTER_PATIENT_CATALOG, DICTIONARY, HL7_ADT, CCDA"]
+        DocTables["Table preview - MASTER_PATIENT_CATALOG, DICTIONARY, HL7_ADT, CCDA, DATA_SOURCE_AVAILABILITY"]
         DocFuture["FUTURE / POST POC ERD"]
         DocSpec --- DocSummary
         DocSummary --- DocERD
@@ -664,7 +673,7 @@ Single, vertically stacked layout (no tabs). Four section blocks with distinct b
 
 | Section | CSS Class | Caption | Fields |
 |---------|-----------|---------|--------|
-| **Catalog** | section-catalog (#f9fafb) | from master_patient_catalog.parquet | Semantic ID, USCDI Data Class, USCDI Data Element, USCDI Element, Description, Classification, Domain, Ruleset Category, Privacy/Security, HIPAA Category, FHIR Security Label, Consent Category, Rollup Relationship, Is Rollup, Composite Group, Identifier Type, Identifier Authority, Data Steward, Steward Contact, Approval Status, Schema Version, Last Modified Date |
+| **Catalog** | section-catalog (#f9fafb) | from ddc-master_patient_catalog.parquet | Semantic ID, USCDI Data Class, USCDI Data Element, USCDI Element, Description, Classification, Domain, Ruleset Category, Privacy/Security, HIPAA Category, FHIR Security Label, Consent Category, Rollup Relationship, Is Rollup, Composite Group, Identifier Type, Identifier Authority, Data Steward, Steward Contact, Approval Status, Schema Version, Last Modified Date |
 | **Dictionary – FHIR Mapping** | section-fhir (#ecfdf5) | Canonical FHIR R4 path & type | Resource, FHIR Path, FHIR Data Type, FHIR Profile, FHIR Cardinality, FHIR Must Support |
 | **Dictionary – Survivorship & Sources** | section-survivorship (#fffbeb) | Business rules and source logic | HIE Survivorship Logic, Tie Breaker Rule, Conflict Detection Enabled, Manual Override Allowed, Innovaccer Survivorship Logic, Data Source Rank Reference, Identity Resolution Notes, Coverage (# PersonIDs), Granularity Level, Calculation Grain, Historical Freeze, Recalc Window (Months) |
 | **Dictionary – Quality & Governance** | section-quality (#f5f3ff) | — | Quality & Governance Notes, De-identification Method |
@@ -672,8 +681,8 @@ Single, vertically stacked layout (no tabs). Four section blocks with distinct b
 Multiline fields (Description, survivorship logic, Data Source Rank Reference, Quality & Governance Notes) use `field-value-multiline` (scrollable, ~3–6 lines).
 
 **Message-format mappings** (conditional): If ADT or CCDA catalog has rows for the selected `semantic_id`, show:
-- **HL7 ADT** block (#eff6ff): Dataframe with message_type, segment_id, field_id, field_name, notes.
-- **CCD / CCDA** block (#f0fdf4): Dataframe with section_name, entry_type, xml_path, notes.
+- **HL7 ADT** block (#eff6ff): Dataframe with semantic_id, message_type, segment_id, field_id, field_name, notes.
+- **CCD / CCDA** block (#f0fdf4): Dataframe with semantic_id, section_name, entry_type, xml_path, notes.
 
 ### 6.5 Documentation Section
 
@@ -683,7 +692,7 @@ The documentation is session-state-driven (not an expander). A button opens the 
 - **Technical Specification:** Full TECH-SPEC.md with Mermaid diagrams (2.1 Data Flow, 6.1 Page Structure) rendered inline.
 - **Summary:** Total elements, distinct FHIR resources, with/without FHIR mapping, missing survivorship, PII count.
 - **ERD:** Mermaid diagram (embedded via components.v1.html or fallback code block).
-- **Table preview:** Raw Parquet preview for all four tables; row limit selector (50, 500, "5 trillion").
+- **Table preview:** Raw Parquet preview for all five tables; row limit selector (50, 500, "5 trillion").
 - **FUTURE / POST POC:** Extended ERD with value-set tables, FHIR catalog, crosswalk.
 - **Return to catalog:** Buttons at top, after Technical Specification, after ERD, and at bottom.
 
@@ -692,8 +701,9 @@ The documentation is session-state-driven (not an expander). A button opens the 
 - **Background:** #f3f4f6 (main), #e5e7eb (sidebar).
 - **Accent:** #047857 / #059669 (medical green).
 - **Typography:** System fonts (-apple-system, Segoe UI, Roboto).
-- **Labels:** 7.5rem min-width, right-aligned; secondary color #4b5563.
+- **Labels:** 15rem width/min-width, right-aligned; secondary color #4b5563. Colons are added in CSS so all rows align consistently.
 - **Value boxes:** White background, 1px #d1d5db border, 4px radius.
+- **Tables:** `st.dataframe` text is styled to match the main page content size (`0.95rem`).
 
 ### 6.7 Data Loading Logic
 
@@ -706,6 +716,7 @@ The documentation is session-state-driven (not an expander). A button opens the 
 ### 6.8 Error Handling
 
 - Missing required Parquet: `FileNotFoundError` → `st.error()` + `st.stop()`.
+- Join mismatch warning: if catalog and dictionary contain different `semantic_id` sets, `st.warning()` explains that only shared elements appear in the viewer.
 - Empty filter result: `st.info("No elements match...")`.
 - Optional catalogs: Graceful absence (ADT/CCDA blocks not shown if no data).
 
@@ -715,16 +726,63 @@ Mermaid diagrams (Data Flow, Page Structure, ERD) are rendered via `st.component
 
 ---
 
+### 6.10 Platform-Neutral Recreation Requirements
+
+If this application is rebuilt in another platform (for example, Airtable), the following behaviors should be preserved:
+
+ 1. **Core data model**
+   - Use `ddc-master_patient_catalog.parquet` and `ddc-master_patient_dictionary.parquet` as the required master tables.
+   - Join them on `semantic_id`.
+   - Treat `ddc-hl7_adt_catalog.parquet`, `ddc-ccda_catalog.parquet`, and `ddc-data_source_availability.parquet` as optional supporting tables.
+
+2. **Primary user workflow**
+   - Left side: searchable/filterable list of elements showing `semantic_id`, `uscdi_element`, and derived `fhir_resource`.
+   - Right side: one selected element shown in a full detail view.
+   - Default behavior: if no row is explicitly selected, show the first row in the filtered result set.
+
+3. **Detail layout**
+   - Preserve the four main detail groups in this order:
+     - Catalog
+     - Dictionary – FHIR Mapping
+     - Dictionary – Survivorship & Sources
+     - Dictionary – Quality & Governance
+   - Preserve the field order within each section, especially the grouping of `uscdi_data_class`, `uscdi_data_element`, and `uscdi_element`.
+
+4. **Search and filters**
+   - Support free-text search across `semantic_id`, `uscdi_element`, `uscdi_description`, `fhir_r4_path`, `domain`, and `composite_group`.
+   - Support multi-select filters for `fhir_resource`, `classification`, `domain`, `ruleset_category`, and `privacy_security`.
+   - Apply filters with AND logic across filter groups.
+
+5. **Optional interoperability views**
+   - For the selected `semantic_id`, show matching HL7 ADT rows and CCDA rows when available.
+   - Include `semantic_id` in those tables so the linkage is visible to users.
+   - Show feed-profile segment and event-type tables separately from message-format mappings.
+
+6. **Documentation / review area**
+   - Include a documentation area that shows:
+     - Technical specification
+     - Filtered summary metrics
+     - ERD / architecture visuals
+     - Raw table previews, including `data_source_availability` when present
+   - This area is part of the user experience, not just internal documentation, because it helps stewards validate the model.
+
+7. **Display conventions**
+   - Show blank or missing values as `—`.
+   - Keep label/value alignment consistent across all sections.
+   - Keep multiline fields readable in bounded boxes or equivalent expandable text areas.
+
+---
+
 ## 7. Pipeline Summary
 
 | Step | Command / Action | Output |
 |------|-----------------|--------|
 | 1. Author | Edit Excel, export combined CSV | `combined_export.csv` |
-| 2. Split | `python scripts/split_to_catalog_and_dictionary.py combined_export.csv` | `master_patient_catalog.parquet`, `master_patient_dictionary.parquet` |
+| 2. Split | `python scripts/split_to_catalog_and_dictionary.py combined_export.csv` | `ddc-master_patient_catalog.parquet`, `ddc-master_patient_dictionary.parquet` |
 | 2b. Upgrade (existing Parquet) | `python scripts/split_to_catalog_and_dictionary.py --upgrade-schema -d .` | Adds HIE alignment columns to existing Parquet |
-| 3. ADT catalog (optional) | `python scripts/build_adt_catalog_from_mapping.py` | `hl7_adt_catalog.parquet` |
-| 4. CCDA catalog (optional) | `python scripts/build_ccda_catalog_from_mapping.py` | `ccda_catalog.parquet` |
-| 5. Data source availability | `python scripts/build_data_source_availability.py` | `data_source_availability.parquet` |
+| 3. ADT catalog (optional) | `python scripts/build_adt_catalog_from_mapping.py` | `ddc-hl7_adt_catalog.parquet` |
+| 4. CCDA catalog (optional) | `python scripts/build_ccda_catalog_from_mapping.py` | `ddc-ccda_catalog.parquet` |
+| 5. Data source availability | `python scripts/build_data_source_availability.py` | `ddc-data_source_availability.parquet` |
 | 6. Run app | `streamlit run app.py` | Local Streamlit UI |
 
 ---

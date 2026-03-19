@@ -3,8 +3,8 @@
 Split a combined metadata CSV into catalog and dictionary Parquet files.
 
 Reads a single CSV (one row per data element with both catalog and dictionary
-columns), splits by column set, and writes master_patient_catalog.parquet and
-master_patient_dictionary.parquet. Both tables include Semantic ID for joining.
+columns), splits by column set, and writes `ddc-master_patient_catalog.parquet` and
+`ddc-master_patient_dictionary.parquet`. Both tables include Semantic ID for joining.
 
 Usage:
   python scripts/split_to_catalog_and_dictionary.py combined_metadata.csv
@@ -12,8 +12,8 @@ Usage:
   python scripts/split_to_catalog_and_dictionary.py --upgrade-schema -d project_root
 
 Output (default: same directory as input):
-  master_patient_catalog.parquet
-  master_patient_dictionary.parquet
+  ddc-master_patient_catalog.parquet
+  ddc-master_patient_dictionary.parquet
 
 Upgrade: Use --upgrade-schema to add HIE alignment columns to existing Parquet
 files without a CSV. Adds governance, identity, security, FHIR compliance, and
@@ -120,13 +120,17 @@ def read_csv(path: Path) -> pd.DataFrame:
 
 def upgrade_parquet_schema(out_dir: Path) -> None:
     """Add HIE alignment columns to existing Parquet files if missing."""
-    cat_path = out_dir / "master_patient_catalog.parquet"
-    dict_path = out_dir / "master_patient_dictionary.parquet"
-    if not cat_path.exists() or not dict_path.exists():
-        print("Error: both master_patient_catalog.parquet and master_patient_dictionary.parquet required.", file=sys.stderr)
+    cat_pref_path = out_dir / "ddc-master_patient_catalog.parquet"
+    dict_pref_path = out_dir / "ddc-master_patient_dictionary.parquet"
+    if not cat_pref_path.exists() or not dict_pref_path.exists():
+        print(
+            "Error: required Parquet files missing. Expected ddc-master_patient_catalog.parquet and ddc-master_patient_dictionary.parquet in the output directory.",
+            file=sys.stderr,
+        )
         sys.exit(1)
-    catalog = pd.read_parquet(cat_path)
-    dictionary = pd.read_parquet(dict_path)
+
+    catalog = pd.read_parquet(cat_pref_path)
+    dictionary = pd.read_parquet(dict_pref_path)
     catalog_snake = {to_snake(c): c for c in CATALOG_COLUMNS}
     dict_snake = {to_snake(c): c for c in DICTIONARY_COLUMNS}
     added = False
@@ -141,8 +145,9 @@ def upgrade_parquet_schema(out_dir: Path) -> None:
             dictionary[col] = ""
             added = True
     if added:
-        catalog.to_parquet(cat_path, index=False)
-        dictionary.to_parquet(dict_path, index=False)
+        # Primary (new) target filenames
+        catalog.to_parquet(cat_pref_path, index=False)
+        dictionary.to_parquet(dict_pref_path, index=False)
         print(f"Upgraded schema in {out_dir}")
     else:
         print("Schema already up to date.")
@@ -195,7 +200,7 @@ def main() -> None:
     catalog = df[catalog_cols].copy()
     # Rename columns to snake_case for Parquet/schema friendliness
     catalog = catalog.rename(columns={c: to_snake(c) for c in catalog.columns})
-    catalog_path = out_dir / "master_patient_catalog.parquet"
+    catalog_path = out_dir / "ddc-master_patient_catalog.parquet"
     catalog.to_parquet(catalog_path, index=False)
     print(f"Wrote catalog: {catalog_path} ({len(catalog)} rows)")
 
@@ -212,7 +217,7 @@ def main() -> None:
     # Historical name fix: SHIE -> HIE in the Parquet schema
     if "shie_survivorship_logic" in dictionary.columns:
         dictionary = dictionary.rename(columns={"shie_survivorship_logic": "hie_survivorship_logic"})
-    dictionary_path = out_dir / "master_patient_dictionary.parquet"
+    dictionary_path = out_dir / "ddc-master_patient_dictionary.parquet"
     dictionary.to_parquet(dictionary_path, index=False)
     print(f"Wrote dictionary: {dictionary_path} ({len(dictionary)} rows)")
 

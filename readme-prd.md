@@ -92,18 +92,18 @@ This mirrors enterprise metadata patterns while remaining simple.
 
 ### Artifacts
 
-*   **master_patient_catalog.parquet** — Master patient catalog (Semantic ID, element name, description, classification, ruleset category, privacy/security).
-*   **master_patient_dictionary.parquet** — Master patient dictionary (Semantic ID plus FHIR paths, survivorship logic, data quality notes, and other definition/rule columns).
+*   **ddc-master_patient_catalog.parquet** — Master patient catalog (Semantic ID, element name, description, classification, ruleset category, privacy/security).
+*   **ddc-master_patient_dictionary.parquet** — Master patient dictionary (Semantic ID plus FHIR paths, survivorship logic, data quality notes, and other definition/rule columns).
 *   Source data is authored in Excel; a single combined export is split into these two Parquet files by the project script (see *Data pipeline* below).
 *   Optional **message-format catalogs** for interoperability demonstrations:
-    *   `hl7_adt_catalog.parquet` — Example HL7 ADT field mappings (PID segment for a few core demographics).
-    *   `ccda_catalog.parquet` — Example CCD/CCDA XML paths for the same master patient elements.
+    *   `ddc-hl7_adt_catalog.parquet` — Example HL7 ADT field mappings (PID segment for a few core demographics).
+    *   `ddc-ccda_catalog.parquet` — Example CCD/CCDA XML paths for the same master patient elements.
 
 ### Data pipeline
 
 1. Author or edit metadata in Excel (one sheet or linked sheets).
 2. Export a single combined CSV (e.g., one row per USCDI element with all catalog and dictionary columns).
-3. Run the project script to split the CSV into **master_patient_catalog.parquet** and **master_patient_dictionary.parquet**:
+3. Run the project script to split the CSV into **ddc-master_patient_catalog.parquet** and **ddc-master_patient_dictionary.parquet**:
    `python scripts/split_to_catalog_and_dictionary.py <combined_export.csv>`
 4. The local viewer reads both Parquet files and joins on Semantic ID to present a record‑centric view.
 5. For querying the Parquet files in Jupyter with DuckDB (Python), see **docs/jupyter-duckdb-parquet-setup.md**.
@@ -154,7 +154,7 @@ For the selected element (joined on `semantic_id` across catalog and dictionary)
 *   **FHIR mapping block**: `fhir_r4_path`, `fhir_data_type`, and derived FHIR resource name, with easy copy‑to‑clipboard behavior.
 *   **Survivorship & sourcing block**: `hie_survivorship_logic`, `innovaccer_survivorship_logic`, `data_source_rank_reference`, `coverage_personids`, `granularity_level`.
 *   **Quality & governance block**: `data_quality_notes`, `privacy_security`, and visual flags for missing critical values (for example, no FHIR mapping or no survivorship logic).
-*   **Message‑format mappings block (optional)**: when `hl7_adt_catalog.parquet` and/or `ccda_catalog.parquet` are present, side‑by‑side tables show how the same master patient element maps into HL7 ADT segments/fields and CCD/CCDA XML paths.
+*   **Message‑format mappings block (optional)**: when `ddc-hl7_adt_catalog.parquet` and/or `ddc-ccda_catalog.parquet` are present, side‑by‑side tables show how the same master patient element maps into HL7 ADT segments/fields and CCD/CCDA XML paths.
 
 The overall experience should let CHI stewards and architects use the app as a **practical management tool**, not just a static viewer.
 

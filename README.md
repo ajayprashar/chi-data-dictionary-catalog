@@ -41,7 +41,7 @@ You can ignore the rest of this README unless you need to install or run the app
 
 5. **Open the viewer notebook (local dev)**:
    - In Cursor/VS Code: open `chi-data-dictionary-catalog.ipynb` and select the `.venv` interpreter.
-   - Run the first cell (`os.chdir(...)`) and the DuckDB query cells to explore `master_patient_catalog.parquet` and `master_patient_dictionary.parquet`.
+   - Run the first cell (`os.chdir(...)`) and the DuckDB query cells to explore `ddc-master_patient_catalog.parquet` and `ddc-master_patient_dictionary.parquet`.
 
 For more detail on Jupyter + DuckDB setup, see `docs/jupyter-duckdb-parquet-setup.md`.
 
@@ -59,8 +59,8 @@ For more detail on Jupyter + DuckDB setup, see `docs/jupyter-duckdb-parquet-setu
    ```
 
 4. The script regenerates:
-   - `master_patient_catalog.parquet` — catalog view (one row per element).
-   - `master_patient_dictionary.parquet` — dictionary view (definition and rules per element).
+   - `ddc-master_patient_catalog.parquet` — catalog view (one row per element).
+   - `ddc-master_patient_dictionary.parquet` — dictionary view (definition and rules per element).
 
 Both files use **snake_case** column names (e.g. `semantic_id`, `uscdi_element`, `hie_survivorship_logic`).
 
@@ -70,9 +70,9 @@ Both files use **snake_case** column names (e.g. `semantic_id`, `uscdi_element`,
    ```
 
 **Optional — rebuild message-format catalogs & source availability:**  
-- ADT: `python scripts/build_adt_catalog_from_mapping.py` → `hl7_adt_catalog.parquet` (from `data/l2_to_semantic_id_mapping.csv`).  
-- CCD/CCDA: `python scripts/build_ccda_catalog_from_mapping.py` → `ccda_catalog.parquet` (from `data/ccd_to_semantic_id_mapping.csv`).  
-- Data source availability: `python scripts/build_data_source_availability.py` → `data_source_availability.parquet` (links sources to semantic IDs).  
+- ADT: `python scripts/build_adt_catalog_from_mapping.py` → `ddc-hl7_adt_catalog.parquet` (from `data/l2_to_semantic_id_mapping.csv`).  
+- CCD/CCDA: `python scripts/build_ccda_catalog_from_mapping.py` → `ddc-ccda_catalog.parquet` (from `data/ccd_to_semantic_id_mapping.csv`).  
+- Data source availability: `python scripts/build_data_source_availability.py` → `ddc-data_source_availability.parquet` (links sources to semantic IDs).  
 See `data/README.md` and `docs/cmt-adt-feed-and-master-patient.md`.
 
 ---
@@ -84,8 +84,10 @@ See `data/README.md` and `docs/cmt-adt-feed-and-master-patient.md`.
 - `TECH-SPEC.md` — Technical specification: architecture strategy, file/table definitions, column schemas, UI layout.
 - `EVALUATION.md` — HIE interoperability best practices evaluation (4.1/5 overall score).
 - `scripts/split_to_catalog_and_dictionary.py` — CSV → Parquet splitter.
-- `master_patient_catalog.parquet` — catalog table.
-- `master_patient_dictionary.parquet` — dictionary table.
-- `data_source_availability.parquet` — source-to-semantic_id availability matrix.
+- `ddc-master_patient_catalog.parquet` — catalog table.
+- `ddc-master_patient_dictionary.parquet` — dictionary table.
+- `ddc-data_source_availability.parquet` — source-to-semantic_id availability matrix.
+- `scripts/upload_parquet_to_airtable.py` — re-runnable Airtable uploader (Question #2), with optional Link/Relation fields.
+- `docs/airtable-setup.md` — Airtable setup notes (Node + MCP), including troubleshooting.
 - `docs/jupyter-duckdb-parquet-setup.md` — full notebook + DuckDB setup instructions.
 

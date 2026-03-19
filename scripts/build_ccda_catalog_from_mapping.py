@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 """
-Build ccda_catalog.parquet from the CCD → semantic_id mapping CSV.
+Build `ddc-ccda_catalog.parquet` from the CCD → semantic_id mapping CSV.
 
-Reads data/ccd_to_semantic_id_mapping.csv and writes project-root
-ccda_catalog.parquet with columns expected by the Streamlit app:
+Reads `data/ccd_to_semantic_id_mapping.csv` and writes project-root
+`ddc-ccda_catalog.parquet` with columns expected by the Streamlit app:
 message_format, section_name, entry_type, xml_path, semantic_id, fhir_r4_path, notes.
 
 Usage:
   python scripts/build_ccda_catalog_from_mapping.py
   python scripts/build_ccda_catalog_from_mapping.py -o path/to/output.parquet
 
-The script overwrites the output file. Default output: ccda_catalog.parquet
+The script overwrites the output file. Default output: ddc-ccda_catalog.parquet
 in the project root (parent of scripts/).
 """
 
@@ -39,7 +39,7 @@ def main() -> None:
         "-o",
         "--output",
         type=Path,
-        default=project_root / "ccda_catalog.parquet",
+        default=project_root / "ddc-ccda_catalog.parquet",
         help="Output Parquet path",
     )
     args = parser.parse_args()

@@ -30,7 +30,7 @@ Choose a short **source_id** (e.g. `sutter_adt`, `whhs_adt`, `welligent_ccd`). T
 
 ### 2. No change to message-format catalogs
 
-- **hl7_adt_catalog.parquet** and **ccda_catalog.parquet** stay source-agnostic. They describe *what* ADT/CCD fields map to which semantic_id, not *which* source sends them.
+- **ddc-hl7_adt_catalog.parquet** and **ddc-ccda_catalog.parquet** stay source-agnostic. They describe *what* ADT/CCD fields map to which semantic_id, not *which* source sends them.
 - If the new source uses the same format (e.g. another ADT feed), the same ADT catalog applies. If you need source-specific notes (e.g. "Sutter sends PID-11, CMT does not"), you can add a **source column** to the mapping later or keep that in the feed profile notes.
 
 ### 3. Optional: source-specific mapping or quality
