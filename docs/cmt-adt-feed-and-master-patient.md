@@ -128,7 +128,7 @@ The CMT report supports Master Patient **governance**:
 | CMT report column        | Catalog / artifact use |
 |--------------------------|-------------------------|
 | Source                   | Tag as CMT ADT in feed profile |
-| Segment                  | `segment_id` in hl7_adt_catalog |
+| Segment                  | `segment_id` in ddc-hl7_adt_catalog |
 | HL7 Field                | Parse to `field_id` (e.g. PID.5.1 → PID-5) |
 | INV Table, Column Name   | L2 schema; Column Name → semantic_id mapping |
 | Display Name, Description| `field_name`, `notes` |

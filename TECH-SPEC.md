@@ -34,13 +34,13 @@ If you only need a high-level understanding, you can stop here and use the app. 
 
 ## HIE Interoperability Maturity
 
-Latest assessment: **2026-03-04** (see **EVALUATION.md** for full domain scoring and rationale).
+Latest assessment: **2026-03-04** (see **docs/archive/EVALUATION.md** for full domain scoring and rationale).
 
 This section is a rolling summary. Re-evaluate when schema, join logic, interoperability mappings, or regulatory baselines change.
 
 **Exemplary areas (5/5):** Master Data Management, Standards Alignment, Roll-Up Strategy, Address Coherence, Three-Domain Separation, Message Format Separation, Race/Ethnicity Interoperability, Backward Compatibility.
 
-**Implemented in POC (addressing EVALUATION.md gaps):**
+**Implemented in POC (addressing docs/archive/EVALUATION.md gaps):**
 - [OK] Stewardship assignment (`data_steward`, `steward_contact`, `approval_status`)
 - [OK] Schema versioning (`schema_version`, `last_modified_date`)
 - [OK] Identity management (`identifier_type`, `identifier_authority`, `identity_resolution_notes`)
@@ -55,7 +55,7 @@ This section is a rolling summary. Re-evaluate when schema, join logic, interope
 - Terminology/value set tables — Domain 3, beyond demographics scope
 - Clinical data elements — beyond current POC scope
 
-See **EVALUATION.md** for detailed scoring, compliance assessment (USCDI v4/v5, FHIR US Core, Carequality, CommonWell), and production roadmap.
+See **docs/archive/EVALUATION.md** for detailed scoring, compliance assessment (USCDI v4/v5, FHIR US Core, Carequality, CommonWell), and production roadmap.
 
 ---
 
@@ -793,7 +793,7 @@ If this application is rebuilt in another platform (for example, Airtable), the 
 |----------|---------|
 | **readme-prd.md** | Executive PRD; problem, scope, success criteria |
 | **README.md** | Quick start, setup, files of interest |
-| **hl7_ccd_fhir_consideration.md** | Strategic analysis: HL7/CCD architecture, L0–L6 flow, crosswalks |
+| **docs/archive/hl7_ccd_fhir_consideration.md** | Strategic analysis: HL7/CCD architecture, L0–L6 flow, crosswalks |
 | **ccd_interface_mapping.md** | CCD → Innovaccer (INV) reference mapping |
 | **data/README.md** | Data artifacts overview |
 | **docs/adding-data-sources.md** | How to add feed profiles |

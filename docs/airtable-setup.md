@@ -201,6 +201,168 @@ Per your request, approval is stored **per `semantic_id`** in `ddc-master_patien
 
 ---
 
+## Field Inventory and Lineage
+
+Use this section to understand which fields are authored (Parquet), computed by the system, or platform artifacts. This supports re-population from real data and clarifies stewardship scope.
+
+**Source:** `mcp_airtable_describe_table` with `detailLevel: "full"` for base `appLZAy0wzE1x3yzU`. Use table IDs (not names): `tblrN3FP4cD2eFHIV`, `tblFGFFXrqhfTF961`, `tbl7tsml6EwPxX5W1`, `tblIcplKHYHZ5IzYO`, `tbluvW7Iu5l0jL861`. Field order and Airtable types are machine-verifiable.
+
+### Lineage type legend
+
+| Type | Meaning | Who populates |
+|------|---------|---------------|
+| **A** | Authoritative | From Parquet; stewards author in Excel/CSV → split → Parquet → sync |
+| **C** | Computed | Derived by upload script from other fields; not stored in Parquet |
+| **W** | Workflow | Steward/reviewer state; currently Airtable-only (can be moved to Parquet) |
+| **L** | Link | Platform relationship; derived from `semantic_id` at sync |
+| **P** | Platform | Airtable/system artifact; not in Parquet |
+
+### ddc-master_patient_catalog
+
+| Field | Lineage | Airtable type | Parquet | Notes |
+|-------|---------|---------------|---------|-------|
+| Name | P | singleLineText | no | Airtable primary field |
+| semantic_id | A | singleLineText | yes | Primary key; join key |
+| uscdi_element | A | singleLineText | yes | |
+| uscdi_description | A | multilineText | yes | |
+| ruleset_category | A | singleLineText | yes | |
+| classification | A | singleLineText | yes | |
+| privacy_security | A | singleLineText | yes | |
+| is_rollup | A | singleLineText | yes | |
+| rollup_relationship | A | singleLineText | yes | |
+| domain | A | singleLineText | yes | |
+| steward_contact | A | singleLineText | yes | |
+| composite_group | A | singleLineText | yes | |
+| approval_status | A | singleLineText | yes | |
+| data_steward | A | singleLineText | yes | |
+| schema_version | A | singleLineText | yes | |
+| last_modified_date | A | singleLineText | yes | |
+| identifier_type | A | singleLineText | yes | |
+| identifier_authority | A | singleLineText | yes | |
+| hipaa_category | A | singleLineText | yes | |
+| fhir_security_label | A | singleLineText | yes | |
+| consent_category | A | singleLineText | yes | |
+| ddc-master_patient_dictionary | L | multipleRecordLinks | — | Reverse link from dictionary |
+| ddc-hl7_adt_catalog | L | multipleRecordLinks | — | Reverse link from ADT |
+| ddc-ccda_catalog | L | multipleRecordLinks | — | Reverse link from CCDA |
+| ddc-data_source_availability | L | multipleRecordLinks | — | Reverse link from availability |
+| reviewer_notes | W | multilineText | no | Airtable-only; reviewer workflow |
+| uscdi_data_class | A | singleLineText | yes | Synced by upload script; created in Airtable if missing |
+| uscdi_data_element | A | singleLineText | yes | Synced by upload script; created in Airtable if missing |
+
+### ddc-master_patient_dictionary
+
+| Field | Lineage | Airtable type | Parquet | Notes |
+|-------|---------|---------------|---------|-------|
+| Name | P | singleLineText | no | Airtable primary field |
+| semantic_id | A | singleLineText | yes | Foreign key; join key |
+| hie_survivorship_logic | A | multilineText | yes | |
+| data_source_rank_reference | A | multilineText | yes | |
+| coverage_personids | A | singleLineText | yes | |
+| granularity_level | A | singleLineText | yes | |
+| data_quality_notes | A | multilineText | yes | |
+| fhir_r4_path | A | singleLineText | yes | Canonical FHIR path |
+| innovaccer_survivorship_logic | A | multilineText | yes | |
+| fhir_data_type | A | singleLineText | yes | |
+| shie_survivorship_logic | A | multilineText | yes | Legacy; maps to hie_survivorship_logic |
+| calculation_grain | A | singleLineText | yes | |
+| historical_freeze | A | singleLineText | yes | |
+| fhir_must_support | A | singleLineText | yes | |
+| fhir_profile | A | singleLineText | yes | |
+| fhir_cardinality | A | singleLineText | yes | |
+| recalc_window_months | A | singleLineText | yes | |
+| conflict_detection_enabled | A | singleLineText | yes | |
+| identity_resolution_notes | A | multilineText | yes | |
+| tie_breaker_rule | A | multilineText | yes | |
+| manual_override_allowed | A | singleLineText | yes | |
+| de_identification_method | A | multilineText | yes | |
+| catalog_element | L | multipleRecordLinks | — | Link to catalog; populated at sync |
+| curation_status | W | singleLineText | no | Airtable-only; steward workflow |
+| steward_assigned_to | W | singleLineText | no | Airtable-only; steward workflow |
+| steward_action_notes | W | multilineText | no | Airtable-only; steward workflow |
+| fhir_r4_mapping_readiness | C | singleLineText | no | Computed by upload script |
+| fhir_r4_mapping_gap_details | C | multilineText | no | Computed by upload script |
+| standards_curation_readiness | C | singleLineText | no | Computed by upload script |
+| standards_curation_gap_details | C | multilineText | no | Computed by upload script |
+
+### ddc-hl7_adt_catalog
+
+| Field | Lineage | Airtable type | Parquet | Notes |
+|-------|---------|---------------|---------|-------|
+| Name | P | singleLineText | no | Airtable primary field |
+| message_format | A | singleLineText | yes | |
+| semantic_id | A | singleLineText | yes | Join key |
+| notes | A | multilineText | yes | |
+| message_type | A | singleLineText | yes | |
+| field_name | A | singleLineText | yes | |
+| field_id | A | singleLineText | yes | |
+| segment_id | A | singleLineText | yes | |
+| data_type | A | singleLineText | yes | |
+| optionality | A | singleLineText | yes | |
+| fhir_r4_path | A | singleLineText | yes | Per-format path |
+| cardinality | A | singleLineText | yes | |
+| catalog_element | L | multipleRecordLinks | — | Link to catalog; populated at sync |
+
+### ddc-ccda_catalog
+
+| Field | Lineage | Airtable type | Parquet | Notes |
+|-------|---------|---------------|---------|-------|
+| Name | P | singleLineText | no | Airtable primary field |
+| notes | A | multilineText | yes | |
+| semantic_id | A | singleLineText | yes | Join key |
+| message_format | A | singleLineText | yes | |
+| fhir_r4_path | A | singleLineText | yes | Per-format path |
+| section_name | A | singleLineText | yes | |
+| entry_type | A | singleLineText | yes | |
+| xml_path | A | singleLineText | yes | |
+| catalog_element | L | multipleRecordLinks | — | Link to catalog; populated at sync |
+
+### ddc-data_source_availability
+
+| Field | Lineage | Airtable type | Parquet | Notes |
+|-------|---------|---------------|---------|-------|
+| Name | P | singleLineText | no | Airtable primary field |
+| availability | A | singleLineText | yes | |
+| semantic_id | A | singleLineText | yes | Join key |
+| notes | A | multilineText | yes | |
+| source_id | A | singleLineText | yes | |
+| timeliness_sla_hours | A | singleLineText | yes | |
+| completeness_pct | A | singleLineText | yes | |
+| catalog_element | L | multipleRecordLinks | — | Link to catalog; populated at sync |
+
+---
+
+### Future: Machine-readable field registry (self-managing)
+
+To make the system **self-managing**, the field inventory can be stored in a Parquet file that scripts and UIs consume at runtime.
+
+**Proposed schema: `ddc-field_registry.parquet`**
+
+| Column | Type | Description |
+|--------|------|-------------|
+| table_name | string | e.g. `ddc-master_patient_catalog` |
+| field_name | string | e.g. `semantic_id` |
+| lineage_type | string | `A` \| `C` \| `W` \| `L` \| `P` |
+| airtable_type | string | From MCP: `singleLineText`, `multilineText`, `multipleRecordLinks`, etc. |
+| in_parquet | string | `yes` \| `no` |
+| computed_by | string | Script name if C (e.g. `upload_parquet_to_airtable.py`) |
+| description | string | Short human-readable note |
+
+**Benefits:**
+- Upload script reads registry to decide which fields to sync vs compute vs skip
+- New UIs (Streamlit, Airtable Interface) can display field metadata
+- Re-population logic can validate Parquet columns against registry
+- Single source of truth for "what is authoritative" vs "what is derived"
+
+**Implementation path:**
+1. Export this markdown inventory to `ddc-field_registry.parquet` (one-time or script).
+2. Update `upload_parquet_to_airtable.py` to optionally read the registry for field lists.
+3. Add a `scripts/validate_schema.py` that checks Parquet columns against the registry.
+
+For the current POC, this markdown section is the authoritative field inventory. The Parquet registry is optional and can be added when you need script-driven behavior.
+
+---
+
 ## Airtable Interface Specification (Implementation-Ready)
 
 Use this section to build the Airtable Interface directly (without inference).
@@ -576,3 +738,53 @@ Success criteria:
 - Related sections remain available for traceability but do not dominate initial view.
 - Steward can select one semantic_id and assess readiness + approval context within 10 seconds.
 ```
+
+---
+
+## UI Schema Export Reality Check (Source of Truth)
+
+### What can be exported (API/MCP-verifiable)
+
+The Airtable metadata API can export base schema as JSON, including:
+
+- Tables and table names
+- Fields, field types, and field configuration
+- Linked-record relationships (schema-level)
+
+Reference endpoint:
+
+- `GET https://api.airtable.com/v0/meta/bases/{baseId}/tables`
+
+Required token scope:
+
+- `schema.bases:read`
+
+Use this as the machine-verifiable source of truth for data model and relationship review.
+
+### What cannot be exported today (manual/screenshot-verifiable)
+
+There is no official Airtable API endpoint to export Interface Designer configuration, including:
+
+- Interface page layout and block arrangement
+- Per-element display configuration
+- Interface-only filtering and interaction behavior
+- Page navigation structure and visual UX composition
+
+Because of this platform limitation, interface review must rely on manual evidence.
+
+### Practical review workflow for this project
+
+For reliable functionality review against this document:
+
+1. Export schema and relationship metadata via API/MCP.
+2. Capture interface screenshots per page/state (including expanded dropdowns and filters).
+3. Optionally capture HAR while loading interface pages for interaction/context evidence.
+4. Compare outputs against:
+   - `Airtable Interface Specification (Implementation-Ready)`
+   - `Acceptance checklist (definition of done)`
+
+### Documentation confidence levels
+
+- **High confidence (machine-verifiable):** tables, fields, links, records, view filters/sorts.
+- **Medium confidence (mixed):** view presentation details that depend on UI context.
+- **Manual-only confidence:** interface page layout, visual hierarchy, and operator UX quality.

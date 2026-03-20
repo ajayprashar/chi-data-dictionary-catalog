@@ -18,7 +18,7 @@ Output:
 
 Schema:
   - source_id: Data source identifier (e.g., "cmt", "sutter")
-  - semantic_id: FK to master_patient_catalog
+  - semantic_id: FK to ddc-master_patient_catalog (semantic key)
   - availability: "full" | "partial" | "none" | "unknown"
   - completeness_pct: Estimated completeness (0.0-100.0)
   - timeliness_sla_hours: Expected freshness SLA in hours

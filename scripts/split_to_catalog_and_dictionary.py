@@ -17,7 +17,7 @@ Output (default: same directory as input):
 
 Upgrade: Use --upgrade-schema to add HIE alignment columns to existing Parquet
 files without a CSV. Adds governance, identity, security, FHIR compliance, and
-survivorship enhancement columns per EVALUATION.md recommendations.
+survivorship enhancement columns per docs/archive/EVALUATION.md recommendations.
 """
 
 import argparse

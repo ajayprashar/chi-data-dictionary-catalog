@@ -1,5 +1,7 @@
 # File Cleanup Summary
 
+> **Status note (historical snapshot):** This file documents a one-time cleanup event. Use `README.md` and `TECH-SPEC.md` for current project structure and active artifacts.
+
 **Date:** March 4, 2026
 
 ---
@@ -87,9 +89,9 @@ python -c "import pandas as pd; cat = pd.read_parquet('ddc-master_patient_catalo
 - `README.md` — Quick start guide
 - `readme-prd.md` — Executive PRD
 - `TECH-SPEC.md` — Technical specification (updated with new schema)
-- `EVALUATION.md` — HIE interoperability evaluation (4.7/5)
-- `GAPS-CLOSED.md` — Implementation summary
-- `hl7_ccd_fhir_consideration.md` — Strategic analysis
+- `docs/archive/EVALUATION.md` — HIE interoperability evaluation (4.7/5)
+- `docs/archive/GAPS-CLOSED.md` — Implementation summary
+- `docs/archive/hl7_ccd_fhir_consideration.md` — Strategic analysis
 - `ccd_interface_mapping.md` — CCD mapping reference
 
 ### Data & Configuration ([OK] Valid)
@@ -112,8 +114,8 @@ python -c "import pandas as pd; cat = pd.read_parquet('ddc-master_patient_catalo
 - scripts/split_to_catalog_and_dictionary.py
 
 **New/Untracked (??):**
-- EVALUATION.md
-- GAPS-CLOSED.md
+- docs/archive/EVALUATION.md
+- docs/archive/GAPS-CLOSED.md
 - ddc-data_source_availability.parquet
 - scripts/build_data_source_availability.py
 
@@ -125,7 +127,7 @@ python -c "import pandas as pd; cat = pd.read_parquet('ddc-master_patient_catalo
 
 1. **Decide on `data_catalog.csv`** (delete, archive, or keep)
 2. **Review uncommitted changes** via `git status` and `git diff`
-3. **Commit when ready** (see GAPS-CLOSED.md for commit message guidance)
+3. **Commit when ready** (see docs/archive/GAPS-CLOSED.md for commit message guidance)
 
 ---
 

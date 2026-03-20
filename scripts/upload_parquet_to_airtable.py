@@ -46,6 +46,8 @@ CATALOG_COLS = [
     "semantic_id",
     "uscdi_element",
     "uscdi_description",
+    "uscdi_data_class",
+    "uscdi_data_element",
     "classification",
     "ruleset_category",
     "privacy_security",
@@ -415,6 +417,56 @@ def airtable_meta_create_relation_field(
     airtable_request(session, "POST", url, json_body=payload)
 
 
+def airtable_meta_create_single_line_field(
+    session: requests.Session,
+    base_id: str,
+    table_id: str,
+    name: str,
+    description: str = "",
+) -> None:
+    """
+    Create a singleLineText field in a table.
+    """
+    url = f"https://api.airtable.com/v0/meta/bases/{base_id}/tables/{table_id}/fields"
+    payload = {"name": name, "type": "singleLineText"}
+    if description:
+        payload["description"] = description
+    airtable_request(session, "POST", url, json_body=payload)
+
+
+def ensure_catalog_fields(
+    session: requests.Session,
+    base_id: str,
+    catalog_table_name: str,
+    required_fields: List[str],
+) -> None:
+    """
+    Create catalog fields (if missing) so Parquet columns align with Airtable.
+    Skips semantic_id and fields that already exist.
+    """
+    tables_meta = airtable_meta_tables(session, base_id)
+    table_id_by_name = {t["name"]: t["id"] for t in tables_meta if "name" in t and "id" in t}
+    table_meta_by_name = {t["name"]: t for t in tables_meta if "name" in t}
+
+    if catalog_table_name not in table_id_by_name:
+        raise RuntimeError(f"Could not find catalog table '{catalog_table_name}' in Airtable meta.")
+
+    catalog_table_id = table_id_by_name[catalog_table_name]
+    fields = (table_meta_by_name.get(catalog_table_name, {}) or {}).get("fields", []) or []
+    existing_names = {f.get("name") for f in fields if f.get("name")}
+
+    for field_name in required_fields:
+        if field_name in existing_names:
+            continue
+        print(f"Creating catalog field: {catalog_table_name}.{field_name}")
+        airtable_meta_create_single_line_field(
+            session=session,
+            base_id=base_id,
+            table_id=catalog_table_id,
+            name=field_name,
+        )
+
+
 def ensure_relation_fields(
     session: requests.Session,
     base_id: str,
@@ -570,6 +622,14 @@ def main():
     )
     dict_has_overall_standards_qa = any(f.get("name") == STANDARDS_READINESS_FIELD for f in dict_fields) and any(
         f.get("name") == STANDARDS_GAP_DETAILS_FIELD for f in dict_fields
+    )
+
+    # Ensure catalog has uscdi_data_class and uscdi_data_element (Parquet alignment).
+    ensure_catalog_fields(
+        session=session,
+        base_id=AIRTABLE_BASE_ID,
+        catalog_table_name="ddc-master_patient_catalog",
+        required_fields=["uscdi_data_class", "uscdi_data_element"],
     )
 
     table_results: List[Dict[str, Any]] = []

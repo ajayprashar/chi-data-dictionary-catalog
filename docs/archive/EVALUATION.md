@@ -1,5 +1,7 @@
 # CHI Metadata Catalog — HIE Interoperability Best Practices Evaluation
 
+> **Status note (historical snapshot):** This document captures a point-in-time evaluation and roadmap context. Treat `README.md`, `TECH-SPEC.md`, and `docs/airtable-setup.md` as the current operational source of truth.
+
 **Evaluation Date:** March 4, 2026
 
 **Evaluated By:** AI Architecture Review (Claude Sonnet 4.5)
@@ -68,7 +70,7 @@ Following the initial evaluation, the following gaps were addressed through **me
 - eCQM/HEDIS quality measure linkage
 - SDOH screening instrument metadata
 
-**Impact:** POC now addresses **all metadata-related Quick Wins** from EVALUATION.md. Remaining gaps are standard "POC to production" operational concerns or clinical scope expansions.
+**Impact:** POC now addresses **all metadata-related Quick Wins** from this evaluation. Remaining gaps are standard "POC to production" operational concerns or clinical scope expansions.
 
 ---
 
@@ -92,7 +94,7 @@ Your architecture demonstrates sophisticated understanding of healthcare data in
 - Recognizes identity attributes as distinct from clinical data (Domain 1 vs Domain 2)
 
 **Gaps:**
-- No explicit documentation of **identity resolution strategy** (Verato is mentioned in `hl7_ccd_fhir_consideration.md` but not in core schema)
+- No explicit documentation of **identity resolution strategy** (Verato is mentioned in `docs/archive/hl7_ccd_fhir_consideration.md` but not in core schema)
 - Missing **identifier type taxonomy** (MRN, SSN, DL, etc.) in schema
 - No **match confidence scoring** or **probabilistic linkage metadata** in dictionary
 
@@ -731,7 +733,7 @@ The architecture would score **highly** in any Carequality, CommonWell, or state
 ## References
 
 - **TECH-SPEC.md** — Section 1.4 HIE Interoperability Alignment
-- **hl7_ccd_fhir_consideration.md** — L0-L6 flow and crosswalk strategy
+- **docs/archive/hl7_ccd_fhir_consideration.md** — L0-L6 flow and crosswalk strategy
 - **USCDI v4** — https://www.healthit.gov/isa/united-states-core-data-interoperability-uscdi
 - **FHIR US Core 6.1.0** — http://hl7.org/fhir/us/core/
 - **Carequality Interoperability Framework** — https://carequality.org/

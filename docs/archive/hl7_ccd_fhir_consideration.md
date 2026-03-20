@@ -2,6 +2,8 @@ LINKS:
 
 # **Problem Statement: Lack of HL7 ADT Message Support in the Current Metadata Architecture**
 
+> **Status note (strategy draft / historical context):** This document mixes current-state notes, proposed future-state artifacts, and external references from earlier design sessions. For current implementation behavior and active file names, use `docs/documentation-map.md`, `README.md`, and `TECH-SPEC.md`.
+
 The current CHI metadata catalog and data dictionary — as implemented in , and described in the PRD — successfully define a **FHIR‑aligned**, USCDI‑anchored model for master demographics and survivorship rules. These artifacts include comprehensive mappings to FHIR R4 paths, detailed source‑ranking logic, privacy classifications, and technical attributes such as coverage counts and granularity levels. [[data_catalog_pipe | Excel]](https://ajayprashar-my.sharepoint.com/personal/ajay_aprashar_com/_layouts/15/Doc.aspx?sourcedoc=%7B598AF102-C343-4655-88CA-EFBB75C8450E%7D&file=data_catalog_pipe.csv&action=default&mobileredirect=true), [[data_dictionary_pipe | Excel]](https://ajayprashar-my.sharepoint.com/personal/ajay_aprashar_com/_layouts/15/Doc.aspx?sourcedoc=%7B8B8C772E-39C0-4230-9AE3-8CE0475231F6%7D&file=data_dictionary_pipe.csv&action=default&mobileredirect=true), [[ajayprasha...epoint.com]](https://ajayprashar-my.sharepoint.com/personal/ajay_aprashar_com/Documents/Microsoft%20Copilot%20Chat%20Files/readme-prd.md)
 
 However, **no components of the current architecture include HL7 v2 or HL7 ADT specifications**. There are:

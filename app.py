@@ -612,7 +612,7 @@ def render_detail(
 # Current POC ERD (aligned with ddc-master_patient_*.parquet, ddc-hl7_adt_catalog.parquet, ddc-ccda_catalog.parquet)
 # FHIR: canonical path/type in MASTER_PATIENT_DICTIONARY; per-format path in ADT/CCDA catalogs. No FHIR resource instance data stored here.
 #
-# Mermaid erDiagram syntax (keep in sync with hl7_ccd_fhir_consideration.md):
+# Mermaid erDiagram syntax (keep in sync with docs/archive/hl7_ccd_fhir_consideration.md):
 # - Attribute keys: only PK, FK, UK are valid. For an attribute that is both PK and FK use "PK, FK"
 #   (comma-separated). Writing "PK_FK" causes "Syntax error in graph" in Mermaid 9.x.
 # - Relationship cardinality: use single braces, e.g. ||--o{ (one-to-many). Double braces ||--o{{
@@ -696,7 +696,7 @@ erDiagram
 """
 
 # Extended ERD for FUTURE / POST POC: value-set/code-system tables and crosswalks (strategically left out of POC)
-# See hl7_ccd_fhir_consideration.md "Value set / code system support (future extension)" and "Key Relationships"
+# See docs/archive/hl7_ccd_fhir_consideration.md "Value set / code system support (future extension)" and "Key Relationships"
 _ERD_FUTURE_MERMAID = """
 erDiagram
     MASTER_PATIENT_CATALOG {
@@ -852,7 +852,7 @@ def _render_erd(streamlit_module: "st") -> None:
     with streamlit_module.expander("Mermaid source (copy to Mermaid Live to edit)", expanded=False):
         streamlit_module.code(mermaid_src, language="mermaid")
     streamlit_module.caption(
-        "Mermaid source: **hl7_ccd_fhir_consideration.md** (Current CHI Metadata Viewer ERD). Copy to [Mermaid Live](https://mermaid.live) to edit. "
+        "Mermaid source: **docs/archive/hl7_ccd_fhir_consideration.md** (Current CHI Metadata Viewer ERD). Copy to [Mermaid Live](https://mermaid.live) to edit. "
         "**FHIR:** Path and type are stored in **MASTER_PATIENT_DICTIONARY** (canonical) and in **HL7_ADT_CATALOG** / **CCDA_CATALOG** (per-format); this POC does not store FHIR resource instance data (that lives in FHIR servers/APIs)."
     )
 
@@ -884,7 +884,7 @@ def _render_erd_future(streamlit_module: "st") -> None:
     streamlit_module.caption(
         "**FUTURE / POST POC:** Value-set/code-system tables (VALUE_SET_DEFINITION, VALUE_SET_MEMBER, SEMANTIC_ID_VALUE_SET), "
         "FHIR_CATALOG, and INTEROPERABILITY_CROSSWALK were strategically left out of the current POC. "
-        "See **hl7_ccd_fhir_consideration.md** → \"Value set / code system support (future extension)\" and \"Key Relationships\"."
+        "See **docs/archive/hl7_ccd_fhir_consideration.md** → \"Value set / code system support (future extension)\" and \"Key Relationships\"."
     )
 
 

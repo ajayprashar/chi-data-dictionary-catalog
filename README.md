@@ -79,10 +79,11 @@ See `data/README.md` and `docs/cmt-adt-feed-and-master-patient.md`.
 
 ### Files of interest
 
+- `docs/documentation-map.md` — canonical vs historical doc index.
 - `readme-prd.md` — 1‑page executive PRD for stakeholders.
 - `README.md` — this technical quick‑start guide.
 - `TECH-SPEC.md` — Technical specification: architecture strategy, file/table definitions, column schemas, UI layout.
-- `EVALUATION.md` — HIE interoperability best practices evaluation (4.1/5 overall score).
+- `docs/archive/EVALUATION.md` — historical interoperability evaluation snapshot and roadmap context.
 - `scripts/split_to_catalog_and_dictionary.py` — CSV → Parquet splitter.
 - `ddc-master_patient_catalog.parquet` — catalog table.
 - `ddc-master_patient_dictionary.parquet` — dictionary table.

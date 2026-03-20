@@ -1,9 +1,11 @@
 # HIE Evaluation Gaps — Implementation Summary
 
+> **Status note (historical snapshot):** This is a completion log from the original gap-closure pass. For current behavior and workflows, use `README.md`, `TECH-SPEC.md`, and `docs/airtable-setup.md`.
+
 **Date:** March 4, 2026  
 **Status:** [OK] **Quick Wins Completed**
 
-Following the HIE Interoperability Best Practices Evaluation (see `EVALUATION.md`), we implemented all **metadata schema enhancements** that improve HIE alignment without expanding the POC scope beyond its demographics focus.
+Following the HIE Interoperability Best Practices Evaluation (see `docs/archive/EVALUATION.md`), we implemented all **metadata schema enhancements** that improve HIE alignment without expanding the POC scope beyond its demographics focus.
 
 ---
 
@@ -133,8 +135,8 @@ Added to `MASTER_PATIENT_DICTIONARY`:
 
 ### Documentation
 8. **`TECH-SPEC.md`** — Added Identity Resolution Strategy (1.4), Security & PHI Handling (1.5), HIE Maturity summary, updated all schema tables (4.1, 4.2, 4.5), updated UI layout (6.4), updated pipeline (7)
-9. **`README.md`** — Updated to reference EVALUATION.md, data source availability build step
-10. **`EVALUATION.md`** — Added Implementation Summary (this section)
+9. **`README.md`** — Updated to reference docs/archive/EVALUATION.md, data source availability build step
+10. **`docs/archive/EVALUATION.md`** — Added Implementation Summary (this section)
 
 ---
 
