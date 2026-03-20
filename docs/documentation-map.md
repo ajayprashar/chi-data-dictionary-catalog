@@ -7,11 +7,11 @@ Use this page as the index for which documents are actively maintained versus ke
 ## Canonical (actively maintained)
 
 - `README.md`
-  - Entry point for setup, pipeline commands, and core files.
+  - Entry point for Airtable-first setup, pipeline commands, and core files.
 - `TECH-SPEC.md`
   - Architecture, data model, and implementation behavior.
 - `docs/airtable-setup.md`
-  - Airtable setup, workflow, interface specification, and verification guidance.
+  - Airtable setup, workflow, interface specification, standards inventories, and verification guidance.
 - `docs/jupyter-duckdb-parquet-setup.md`
   - Notebook and DuckDB execution guidance.
 

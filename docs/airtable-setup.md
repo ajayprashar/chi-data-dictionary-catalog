@@ -119,7 +119,7 @@ Fix:
 This setup ensures the repo has the Node runtime and Airtable SDK dependencies required for an Airtable integration.
 
 It also includes a re-runnable uploader script (Question #2): `scripts/upload_parquet_to_airtable.py`.
-It upserts your local `ddc-*` Parquet into the corresponding `ddc-*` Airtable tables, and it can optionally create/populate Link/Relation fields so navigation mirrors the Streamlit joins.
+It upserts your local `ddc-*` Parquet into the corresponding `ddc-*` Airtable tables, and it can optionally create/populate Link/Relation fields so navigation mirrors canonical `semantic_id` joins.
 
 ---
 
@@ -162,7 +162,29 @@ If you want the script to be portable across machines, set `AIRTABLE_API_KEY` be
 
 ---
 
-## Airtable Curation Workflow (stands in for the Streamlit “detail view”)
+## Airtable Curation Workflow (primary detail view)
+
+### Canonical vs implementation vs reference layers
+
+Use this model when deciding which tables are actively stewarded versus periodically refreshed.
+
+```mermaid
+flowchart LR
+    Catalog["ddc-master_patient_catalog<br/>Canonical concept list<br/>(what exists)"]
+    Dictionary["ddc-master_patient_dictionary<br/>Implementation definition layer<br/>(how implemented)"]
+    RefTables["Reference / periodic refresh tables<br/>ddc-hl7_adt_catalog<br/>ddc-ccda_catalog<br/>ddc-fhir_inventory<br/>ddc-data_source_availability"]
+    Rules["ddc-business_rules<br/>Active governance rule registry"]
+
+    Catalog --> Dictionary
+    Catalog --> RefTables
+    Catalog --> Rules
+```
+
+Operational interpretation:
+- Active governance: `ddc-master_patient_catalog`, `ddc-master_patient_dictionary`, `ddc-business_rules`
+- Reference / periodic refresh: `ddc-hl7_adt_catalog`, `ddc-ccda_catalog`, `ddc-fhir_inventory`, `ddc-data_source_availability`
+
+---
 
 ### What stewards edit (editable group)
 - Standards columns in `ddc-master_patient_dictionary` (for the selected `semantic_id`), such as:
@@ -206,6 +228,35 @@ Per your request, approval is stored **per `semantic_id`** in `ddc-master_patien
 Use this section to understand which fields are authored (Parquet), computed by the system, or platform artifacts. This supports re-population from real data and clarifies stewardship scope.
 
 **Source:** `mcp_airtable_describe_table` with `detailLevel: "full"` for base `appLZAy0wzE1x3yzU`. Use table IDs (not names): `tblrN3FP4cD2eFHIV`, `tblFGFFXrqhfTF961`, `tbl7tsml6EwPxX5W1`, `tblIcplKHYHZ5IzYO`, `tbluvW7Iu5l0jL861`. Field order and Airtable types are machine-verifiable.
+
+### Naming clarity and intended usage
+
+If `ddc-master_patient_catalog` feels confusing, use this mental model:
+
+- `master_patient` = person-centric canonical scope (not an operational EHR patient table)
+- `catalog` = the governed list of canonical data concepts (`semantic_id`)
+
+Use friendly labels in Airtable interface page titles:
+
+- `ddc-master_patient_catalog` -> **Canonical Element Catalog**
+- `ddc-master_patient_dictionary` -> **Element Definition Dictionary**
+- `ddc-hl7_adt_catalog` -> **ADT Mapping Catalog**
+- `ddc-ccda_catalog` -> **CCDA Mapping Catalog**
+- `ddc-data_source_availability` -> **Source Coverage Matrix**
+- `ddc-fhir_inventory` -> **FHIR Standards Inventory**
+- `ddc-business_rules` -> **Business Rules Registry**
+
+### Table purpose and update cadence
+
+| Table | Purpose | Cadence | Mode |
+|---|---|---|---|
+| `ddc-master_patient_catalog` | Canonical `semantic_id` inventory | As approved concepts change | Active governance |
+| `ddc-master_patient_dictionary` | FHIR/survivorship/definition details | As implementation changes | Active governance |
+| `ddc-business_rules` | Organization rules and exceptions | Frequent (weekly/biweekly) | Active governance |
+| `ddc-data_source_availability` | Source coverage/completeness/timeliness | Periodic snapshot refresh | Operational |
+| `ddc-fhir_inventory` | Standards inventory for mapping review | Release- or mapping-driven | Reference + steward queue |
+| `ddc-hl7_adt_catalog` | ADT field mapping reference | Interface-change driven | Reference |
+| `ddc-ccda_catalog` | CCDA path mapping reference | Interface-change driven | Reference |
 
 ### Lineage type legend
 
@@ -301,6 +352,9 @@ Use this section to understand which fields are authored (Parquet), computed by 
 | optionality | A | singleLineText | yes | |
 | fhir_r4_path | A | singleLineText | yes | Per-format path |
 | cardinality | A | singleLineText | yes | |
+| mapping_status | A | singleLineText | yes | Promoted governance field |
+| business_rule_required | A | singleLineText | yes | Promoted governance field |
+| business_rule_notes | A | multilineText | yes | Promoted governance field |
 | catalog_element | L | multipleRecordLinks | — | Link to catalog; populated at sync |
 
 ### ddc-ccda_catalog
@@ -315,6 +369,9 @@ Use this section to understand which fields are authored (Parquet), computed by 
 | section_name | A | singleLineText | yes | |
 | entry_type | A | singleLineText | yes | |
 | xml_path | A | singleLineText | yes | |
+| mapping_status | A | singleLineText | yes | Promoted governance field |
+| business_rule_required | A | singleLineText | yes | Promoted governance field |
+| business_rule_notes | A | multilineText | yes | Promoted governance field |
 | catalog_element | L | multipleRecordLinks | — | Link to catalog; populated at sync |
 
 ### ddc-data_source_availability
@@ -350,7 +407,7 @@ To make the system **self-managing**, the field inventory can be stored in a Par
 
 **Benefits:**
 - Upload script reads registry to decide which fields to sync vs compute vs skip
-- New UIs (Streamlit, Airtable Interface) can display field metadata
+- Airtable interfaces can display field metadata
 - Re-population logic can validate Parquet columns against registry
 - Single source of truth for "what is authoritative" vs "what is derived"
 
@@ -395,6 +452,8 @@ The following relation must exist and be populated:
   - `ddc-hl7_adt_catalog` (optional)
   - `ddc-ccda_catalog` (optional)
   - `ddc-data_source_availability`
+  - `ddc-fhir_inventory` (optional)
+  - `ddc-business_rules` (optional)
 - Target table: `ddc-master_patient_catalog`
 - Linking key: `semantic_id` (performed by `scripts/upload_parquet_to_airtable.py --add-relations`)
 
@@ -788,3 +847,31 @@ For reliable functionality review against this document:
 - **High confidence (machine-verifiable):** tables, fields, links, records, view filters/sorts.
 - **Medium confidence (mixed):** view presentation details that depend on UI context.
 - **Manual-only confidence:** interface page layout, visual hierarchy, and operator UX quality.
+
+---
+
+## Next Phase: Standards Inventories (FHIR + ADT + CCD)
+
+To avoid destabilizing the current steward workflow, standards enrichment is implemented as companion tables first.
+
+### Companion tables to add in Airtable
+
+- `ddc-fhir_inventory`
+- `ddc-business_rules`
+
+### Parquet generation command
+
+```powershell
+python scripts/build_standards_inventories.py -d .
+```
+
+Generated artifacts:
+- `ddc-fhir_inventory.parquet`
+- `ddc-business_rules.parquet`
+
+### Operating model
+
+1. Generate inventory parquet from canonical tables.
+2. Load inventory tables into Airtable for steward review.
+3. Mark mapping status and rule needs in inventory/rules tables.
+4. Promote only approved, high-value fields/rules into core schemas.

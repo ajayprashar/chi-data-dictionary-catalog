@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """
-Build `ddc-hl7_adt_catalog.parquet` from the L2 → semantic_id mapping CSV.
+Build `ddc-hl7_adt_catalog.parquet` from the L2-to-semantic_id mapping CSV.
 
-Reads `data/l2_to_semantic_id_mapping.csv` and writes project-root
-`ddc-hl7_adt_catalog.parquet` with columns expected by the Streamlit app:
+Reads mapping CSV (default `data/l2_to_semantic_id_mapping.csv`; archive fallback supported)
+and writes project-root `ddc-hl7_adt_catalog.parquet` with columns expected by the Airtable-first pipeline:
 message_format, message_type, segment_id, field_id, field_name, data_type,
-optionality, cardinality, semantic_id, fhir_r4_path, notes.
+optionality, cardinality, semantic_id, fhir_r4_path, notes, mapping_status,
+business_rule_required, business_rule_notes.
 
 Usage:
   python scripts/build_adt_catalog_from_mapping.py
@@ -22,12 +23,22 @@ from pathlib import Path
 import pandas as pd
 
 
+def _resolve_mapping_path(candidate: Path, project_root: Path) -> Path:
+    """Resolve mapping path with archive fallback when active data path is archived."""
+    if candidate.is_file():
+        return candidate
+    archive_fallback = project_root / "data" / "archive" / "2026-03-04" / candidate.name
+    if archive_fallback.is_file():
+        return archive_fallback
+    return candidate
+
+
 def main() -> None:
     script_dir = Path(__file__).resolve().parent
     project_root = script_dir.parent
 
     parser = argparse.ArgumentParser(
-        description="Build ADT catalog Parquet from L2→semantic_id mapping CSV."
+        description="Build ADT catalog Parquet from L2-to-semantic_id mapping CSV."
     )
     parser.add_argument(
         "-m",
@@ -45,7 +56,7 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    mapping_path = args.mapping.resolve()
+    mapping_path = _resolve_mapping_path(args.mapping.resolve(), project_root)
     if not mapping_path.is_file():
         raise FileNotFoundError(f"Mapping file not found: {mapping_path}")
 
@@ -69,6 +80,10 @@ def main() -> None:
                 "semantic_id": (r.get("semantic_id") or "").strip(),
                 "fhir_r4_path": (r.get("fhir_r4_path") or "").strip(),
                 "notes": (r.get("notes") or "").strip(),
+                # Governance fields are now promoted into canonical ADT catalog.
+                "mapping_status": "mapped" if (r.get("semantic_id") or "").strip() else "needs_new_semantic",
+                "business_rule_required": "",
+                "business_rule_notes": (r.get("notes") or "").strip(),
             })
 
     df = pd.DataFrame(rows)

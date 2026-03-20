@@ -11,7 +11,7 @@ Usage:
 
 Inputs:
   - ddc-master_patient_catalog.parquet (required)
-  - data/*_feed_segments.csv (feed profiles)
+  - data/*_feed_segments.csv (feed profiles; archive fallback supported)
 
 Output:
   - ddc-data_source_availability.parquet
@@ -37,17 +37,22 @@ PROJECT_ROOT = Path(__file__).parent.parent
 
 
 def discover_sources() -> list[str]:
-    """Discover source IDs from data/*_feed_segments.csv files."""
+    """Discover source IDs from active data path or dated archive fallback."""
     data_dir = PROJECT_ROOT / "data"
-    if not data_dir.is_dir():
-        return []
-    pattern = str(data_dir / "*_feed_segments.csv")
-    sources = []
-    for path in sorted(glob.glob(pattern)):
-        base = Path(path).name
-        source_id = base.replace("_feed_segments.csv", "")
-        if source_id:
-            sources.append(source_id)
+    archive_dir = data_dir / "archive" / "2026-03-04"
+    candidate_dirs = [data_dir, archive_dir]
+    sources: list[str] = []
+    for dir_path in candidate_dirs:
+        if not dir_path.is_dir():
+            continue
+        pattern = str(dir_path / "*_feed_segments.csv")
+        for path in sorted(glob.glob(pattern)):
+            base = Path(path).name
+            source_id = base.replace("_feed_segments.csv", "")
+            if source_id:
+                sources.append(source_id)
+        if sources:
+            break
     return sources
 
 

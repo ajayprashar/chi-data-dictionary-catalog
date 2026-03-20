@@ -42,6 +42,19 @@ TABLES = [
     },
 ]
 
+INVENTORY_TABLES = [
+    {
+        "name": "ddc-fhir_inventory",
+        "parquet_path": os.path.join(BASE_DIR, "ddc-fhir_inventory.parquet"),
+        "type": "fhir_inventory",
+    },
+    {
+        "name": "ddc-business_rules",
+        "parquet_path": os.path.join(BASE_DIR, "ddc-business_rules.parquet"),
+        "type": "business_rules",
+    },
+]
+
 CATALOG_COLS = [
     "semantic_id",
     "uscdi_element",
@@ -103,9 +116,23 @@ ADT_COLS = [
     "semantic_id",
     "fhir_r4_path",
     "notes",
+    "mapping_status",
+    "business_rule_required",
+    "business_rule_notes",
 ]
 
-CCDA_COLS = ["message_format", "section_name", "entry_type", "xml_path", "semantic_id", "fhir_r4_path", "notes"]
+CCDA_COLS = [
+    "message_format",
+    "section_name",
+    "entry_type",
+    "xml_path",
+    "semantic_id",
+    "fhir_r4_path",
+    "notes",
+    "mapping_status",
+    "business_rule_required",
+    "business_rule_notes",
+]
 
 AVAILABILITY_COLS = [
     "source_id",
@@ -113,6 +140,37 @@ AVAILABILITY_COLS = [
     "availability",
     "completeness_pct",
     "timeliness_sla_hours",
+    "notes",
+]
+
+FHIR_INVENTORY_COLS = [
+    "inventory_scope",
+    "fhir_version",
+    "fhir_resource",
+    "fhir_path",
+    "fhir_data_type",
+    "fhir_cardinality",
+    "fhir_must_support",
+    "fhir_profile",
+    "fhir_definition",
+    "standard_reference_url",
+    "semantic_id",
+    "mapping_status",
+    "business_rule_required",
+    "business_rule_notes",
+]
+
+BUSINESS_RULE_COLS = [
+    "rule_id",
+    "semantic_id",
+    "standard_scope",
+    "rule_name",
+    "rule_type",
+    "rule_expression",
+    "severity",
+    "active",
+    "owner",
+    "approval_status",
     "notes",
 ]
 
@@ -216,6 +274,10 @@ def get_expected_cols(table_type: str) -> List[str]:
         return CCDA_COLS
     if table_type == "availability":
         return AVAILABILITY_COLS
+    if table_type == "fhir_inventory":
+        return FHIR_INVENTORY_COLS
+    if table_type == "business_rules":
+        return BUSINESS_RULE_COLS
     raise ValueError(f"Unknown table_type={table_type}")
 
 
@@ -244,6 +306,10 @@ def compute_upsert_key(table_type: str, row_fields: Dict[str, str]) -> str:
         )
     if table_type == "availability":
         return "|".join([row_fields["source_id"], row_fields["semantic_id"]])
+    if table_type == "fhir_inventory":
+        return "|".join([row_fields["semantic_id"], row_fields["fhir_path"]])
+    if table_type == "business_rules":
+        return "|".join([row_fields["semantic_id"], row_fields["rule_id"], row_fields["rule_name"]])
     raise ValueError(f"Unknown table_type={table_type}")
 
 
@@ -434,6 +500,26 @@ def airtable_meta_create_single_line_field(
     airtable_request(session, "POST", url, json_body=payload)
 
 
+def airtable_meta_create_text_field(
+    session: requests.Session,
+    base_id: str,
+    table_id: str,
+    name: str,
+    field_type: str,
+    description: str = "",
+) -> None:
+    """
+    Create a text field (singleLineText or multilineText) in a table.
+    """
+    if field_type not in {"singleLineText", "multilineText"}:
+        raise ValueError(f"Unsupported field_type={field_type}")
+    url = f"https://api.airtable.com/v0/meta/bases/{base_id}/tables/{table_id}/fields"
+    payload = {"name": name, "type": field_type}
+    if description:
+        payload["description"] = description
+    airtable_request(session, "POST", url, json_body=payload)
+
+
 def ensure_catalog_fields(
     session: requests.Session,
     base_id: str,
@@ -467,6 +553,42 @@ def ensure_catalog_fields(
         )
 
 
+def ensure_text_fields_for_table(
+    session: requests.Session,
+    base_id: str,
+    table_name: str,
+    field_names: List[str],
+    multiline_fields: set[str] | None = None,
+) -> None:
+    """
+    Ensure a table has the requested text fields; create missing as text fields.
+    """
+    multiline_fields = multiline_fields or set()
+    tables_meta = airtable_meta_tables(session, base_id)
+    table_id_by_name = {t["name"]: t["id"] for t in tables_meta if "name" in t and "id" in t}
+    table_meta_by_name = {t["name"]: t for t in tables_meta if "name" in t}
+
+    if table_name not in table_id_by_name:
+        raise RuntimeError(f"Could not find table '{table_name}' in Airtable meta.")
+
+    table_id = table_id_by_name[table_name]
+    fields = (table_meta_by_name.get(table_name, {}) or {}).get("fields", []) or []
+    existing_names = {f.get("name") for f in fields if f.get("name")}
+
+    for field_name in field_names:
+        if field_name in existing_names or field_name == "Name":
+            continue
+        field_type = "multilineText" if field_name in multiline_fields else "singleLineText"
+        print(f"Creating field: {table_name}.{field_name} ({field_type})")
+        airtable_meta_create_text_field(
+            session=session,
+            base_id=base_id,
+            table_id=table_id,
+            name=field_name,
+            field_type=field_type,
+        )
+
+
 def ensure_relation_fields(
     session: requests.Session,
     base_id: str,
@@ -474,11 +596,14 @@ def ensure_relation_fields(
     relation_field_name: str,
 ) -> None:
     """
-    Create relation field (if missing) in:
+    Create relation field (if missing) in core non-catalog tables and
+    standards tables (if present):
       - ddc-master_patient_dictionary
       - ddc-hl7_adt_catalog
       - ddc-ccda_catalog
       - ddc-data_source_availability
+      - ddc-fhir_inventory (optional)
+      - ddc-business_rules (optional)
 
     All relations point to the catalog table row via semantic_id.
     """
@@ -491,14 +616,18 @@ def ensure_relation_fields(
 
     catalog_table_id = table_id_by_name[catalog_table_name]
 
-    target_table_names = [
+    required_target_table_names = [
         "ddc-master_patient_dictionary",
         "ddc-hl7_adt_catalog",
         "ddc-ccda_catalog",
         "ddc-data_source_availability",
     ]
+    optional_target_table_names = [
+        "ddc-fhir_inventory",
+        "ddc-business_rules",
+    ]
 
-    for table_name in target_table_names:
+    for table_name in required_target_table_names:
         if table_name not in table_id_by_name:
             raise RuntimeError(f"Could not find table '{table_name}' in Airtable meta.")
         table_id = table_id_by_name[table_name]
@@ -508,6 +637,23 @@ def ensure_relation_fields(
             print(f"Relation field already exists: {table_name}.{relation_field_name}")
             continue
 
+        print(f"Creating relation field: {table_name}.{relation_field_name} -> {catalog_table_name}")
+        airtable_meta_create_relation_field(
+            session=session,
+            base_id=base_id,
+            table_id=table_id,
+            name=relation_field_name,
+            linked_table_id=catalog_table_id,
+        )
+
+    for table_name in optional_target_table_names:
+        if table_name not in table_id_by_name:
+            continue
+        table_id = table_id_by_name[table_name]
+        fields = (table_meta_by_name.get(table_name, {}) or {}).get("fields", []) or []
+        if any(f.get("name") == relation_field_name for f in fields):
+            print(f"Relation field already exists: {table_name}.{relation_field_name}")
+            continue
         print(f"Creating relation field: {table_name}.{relation_field_name} -> {catalog_table_name}")
         airtable_meta_create_relation_field(
             session=session,
@@ -571,6 +717,16 @@ def populate_relation_fields(
     patch_table("ddc-ccda_catalog")
     patch_table("ddc-data_source_availability")
 
+    # Standards tables are optional in some environments.
+    for optional_table in ("ddc-fhir_inventory", "ddc-business_rules"):
+        try:
+            patch_table(optional_table)
+        except Exception as e:
+            if "Airtable list error 404" in str(e):
+                print(f"Skipping optional relation population (table missing): {optional_table}")
+            else:
+                raise
+
 
 def main():
     global AIRTABLE_BASE_ID
@@ -604,6 +760,11 @@ def main():
         default="keep_first",
         help="What to do if Airtable already contains multiple rows with the same upsert key.",
     )
+    parser.add_argument(
+        "--include-standards-inventories",
+        action="store_true",
+        help="Also upload ddc-fhir_inventory and ddc-business_rules tables.",
+    )
     args = parser.parse_args()
 
     AIRTABLE_BASE_ID = args.base_id
@@ -631,10 +792,43 @@ def main():
         catalog_table_name="ddc-master_patient_catalog",
         required_fields=["uscdi_data_class", "uscdi_data_element"],
     )
+    # Ensure promoted ADT/CCDA governance columns exist in canonical tables.
+    ensure_text_fields_for_table(
+        session=session,
+        base_id=AIRTABLE_BASE_ID,
+        table_name="ddc-hl7_adt_catalog",
+        field_names=["Name"] + ADT_COLS,
+        multiline_fields={"notes", "business_rule_notes"},
+    )
+    ensure_text_fields_for_table(
+        session=session,
+        base_id=AIRTABLE_BASE_ID,
+        table_name="ddc-ccda_catalog",
+        field_names=["Name"] + CCDA_COLS,
+        multiline_fields={"notes", "business_rule_notes"},
+    )
 
     table_results: List[Dict[str, Any]] = []
 
-    for t in TABLES:
+    tables_to_process = list(TABLES)
+    if args.include_standards_inventories:
+        tables_to_process.extend(INVENTORY_TABLES)
+        ensure_text_fields_for_table(
+            session=session,
+            base_id=AIRTABLE_BASE_ID,
+            table_name="ddc-fhir_inventory",
+            field_names=["Name"] + FHIR_INVENTORY_COLS,
+            multiline_fields={"fhir_definition", "business_rule_notes"},
+        )
+        ensure_text_fields_for_table(
+            session=session,
+            base_id=AIRTABLE_BASE_ID,
+            table_name="ddc-business_rules",
+            field_names=["Name"] + BUSINESS_RULE_COLS,
+            multiline_fields={"rule_expression", "notes"},
+        )
+
+    for t in tables_to_process:
         table_name = t["name"]
         parquet_path = t["parquet_path"]
         table_type = t["type"]

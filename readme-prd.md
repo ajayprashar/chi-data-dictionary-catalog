@@ -118,14 +118,14 @@ This mirrors enterprise metadata patterns while remaining simple.
 *   **Reproducible setup**:
     *   Create a local virtual environment in the project folder.
     *   Install dependencies from `requirements.txt`.
-    *   Open either the Streamlit app (`streamlit run app.py`) or the Jupyter notebook `chi-data-dictionary-catalog.ipynb` and point it at the Parquet files in this folder.
+    *   Build parquet artifacts and sync to Airtable (or use the Jupyter notebook `chi-data-dictionary-catalog.ipynb`) from this folder.
 *   **Mobility requirement**: A user can move the POC to a new machine by copying the folder, recreating the virtual environment, and reinstalling from `requirements.txt`—no additional configuration files, registries, or services.
 
 ***
 
-## Viewer UX (Streamlit POC)
+## Viewer UX (Airtable-first POC)
 
-The viewer is a **Streamlit app** that presents the catalog and dictionary as a management tool for the **Community Health Insights (CHI)** data model.
+The primary viewer is Airtable interfaces and views that present catalog and dictionary metadata as a management tool for the **Community Health Insights (CHI)** data model.
 
 ### Key user workflows
 

@@ -225,6 +225,30 @@ This keeps the effort **practical and operational**:
   - Change how an element is rendered in ADT, CCDA, or FHIR **without renaming the semantic_id**.
   - Support multiple message formats in parallel without leaking format-specific details into the core model.
 
+### 1.8.1 Semantic ID Governance Rules
+
+To prevent drift and broken joins, apply these operating rules:
+
+- Treat `semantic_id` as a **business key for meaning**, not a row identifier.
+- Keep `semantic_id` values human-readable and stable; do not repurpose them for environment-specific IDs.
+- A hash/UUID key is allowed as an additional technical key, but **not as a replacement** for readable `semantic_id`.
+- Any row in mapping/inventory/rules tables that cannot resolve to catalog must be explicitly classified:
+  - `mapping_status = needs_new_semantic` when concept should be added to catalog.
+  - `mapping_status = out_of_scope` when intentionally not modeled in CHI catalog.
+  - `mapping_status = mapped` only when `semantic_id` exists in catalog.
+- Avoid silent orphan rows: every table with `semantic_id` should also carry `catalog_element` link in Airtable where possible.
+
+### 1.8.2 Unlinked Rows and Missing Semantic IDs
+
+Best practice for unlinked rows is **queue + disposition**, not deletion:
+
+1. Detect unlinked records (`semantic_id` present but no `catalog_element`).
+2. Classify each row using `mapping_status` and steward notes.
+3. Promote missing concepts into `ddc-master_patient_catalog` when needed.
+4. Re-run sync with relations to resolve links.
+
+For this project, `ddc-fhir_inventory` and `ddc-business_rules` are expected to link to catalog via `semantic_id` when resolvable.
+
 ---
 
 ### 1.9 Standards references (quick links)
@@ -282,8 +306,9 @@ flowchart TB
         Events["*_feed_event_types.csv"]
     end
 
-    subgraph App["STREAMLIT APP (app.py)"]
-        Streamlit["Pandas in-memory join: catalog + dictionary on semantic_id<br/>Optional: ADT/CCDA for message-format mappings<br/>Documentation preview also loads data_source_availability<br/>Discovered: feed segments + event types"]
+    subgraph AirtableOps["AIRTABLE-FIRST OPERATIONS"]
+        AirtableSync["upload_parquet_to_airtable.py upserts core + optional inventory tables"]
+        AirtableReview["Steward review in Airtable interfaces/views"]
     end
 
     Excel --> Split
@@ -292,20 +317,21 @@ flowchart TB
     DataCSV --> Build
     Build --> ADT
     Build --> CCDA
-    Catalog --> Streamlit
-    Dictionary --> Streamlit
-    ADT --> Streamlit
-    CCDA --> Streamlit
-    Avail --> Streamlit
-    Segments --> Streamlit
-    Events --> Streamlit
+    Catalog --> AirtableSync
+    Dictionary --> AirtableSync
+    ADT --> AirtableSync
+    CCDA --> AirtableSync
+    Avail --> AirtableSync
+    Segments --> AirtableReview
+    Events --> AirtableReview
+    AirtableSync --> AirtableReview
 ```
 
 ### 2.2 File and Directory Layout
 
 | Location | Content |
 |----------|---------|
-| **Project root** | `app.py`, Parquet files, README, docs |
+| **Project root** | Parquet files, README, docs |
 | **ddc-master_patient_catalog.parquet** | Required. Catalog view. |
 | **ddc-master_patient_dictionary.parquet** | Required. Dictionary view. |
 | **ddc-hl7_adt_catalog.parquet** | Optional. ADT field mappings. |
@@ -315,12 +341,130 @@ flowchart TB
 | **data/** | Mapping CSVs, feed profiles (segments, event types) |
 | **docs/** | `adding-data-sources.md`, `cmt-adt-feed-and-master-patient.md`, `jupyter-duckdb-parquet-setup.md` |
 
+### 2.2.1 Table Naming Guide (plain language)
+
+To reduce confusion, treat the physical table/file names as stable technical IDs and use friendly labels in Airtable interfaces and documentation.
+
+| Technical name | Friendly label | Why this name exists |
+|---|---|---|
+| `ddc-master_patient_catalog` | Canonical Element Catalog | Canonical list of *what* CHI tracks; one row per `semantic_id`. |
+| `ddc-master_patient_dictionary` | Element Definition Dictionary | Defines *how* each element is implemented (FHIR path, survivorship, governance details). |
+| `ddc-hl7_adt_catalog` | ADT Mapping Catalog | HL7 v2 ADT placement for each `semantic_id`. |
+| `ddc-ccda_catalog` | CCDA Mapping Catalog | C-CDA/CCD XML placement for each `semantic_id`. |
+| `ddc-data_source_availability` | Source Coverage Matrix | Which source can provide which `semantic_id`, plus completeness/timeliness context. |
+| `ddc-fhir_inventory` | FHIR Standards Inventory | Standards-facing inventory for FHIR element mapping and steward disposition. |
+| `ddc-business_rules` | Business Rules Registry | Organization-specific rule registry tied to `semantic_id`. |
+
+Interpretation tip: in `ddc-master_patient_catalog`, "master_patient" means *person-centric canonical scope* (not a patient table from an EHR), and "catalog" means *list of governed concepts*.
+
+### 2.2.2 Update cadence and stewardship model
+
+| Table | Primary purpose | Expected update cadence | Stewarding mode |
+|---|---|---|---|
+| `ddc-master_patient_catalog` | Canonical concept inventory | As new concepts are approved | Active governance |
+| `ddc-master_patient_dictionary` | Implementation and survivorship definitions | As mapping/rules evolve | Active governance |
+| `ddc-business_rules` | Organization-specific rule lifecycle | Frequent (weekly/biweekly) | Active governance |
+| `ddc-data_source_availability` | Source coverage and quality signals | Periodic refresh (e.g., monthly) | Operational snapshot |
+| `ddc-fhir_inventory` | FHIR standards inventory | Release- or mapping-driven | Reference + steward disposition |
+| `ddc-hl7_adt_catalog` | ADT format mapping | Interface-change driven | Reference mapping |
+| `ddc-ccda_catalog` | CCDA format mapping | Interface-change driven | Reference mapping |
+
 ### 2.3 Entity-Relationship (POC)
 
 - **MASTER_PATIENT_CATALOG** ↔ **MASTER_PATIENT_DICTIONARY**: 1:1 on `semantic_id`
 - **MASTER_PATIENT_CATALOG** → **HL7_ADT_CATALOG**: 1:many (one element can map to multiple ADT fields)
 - **MASTER_PATIENT_CATALOG** → **CCDA_CATALOG**: 1:many (one element can map to multiple CCD/CCDA locations)
 - **MASTER_PATIENT_CATALOG** → **DATA_SOURCE_AVAILABILITY**: 1:many (one element can be provided by multiple sources)
+- **MASTER_PATIENT_CATALOG** → **FHIR_INVENTORY**: 1:many by `semantic_id` when mapped
+- **MASTER_PATIENT_CATALOG** → **BUSINESS_RULES**: 1:many by `semantic_id` when mapped
+
+Current canonical ERD (Airtable-first):
+
+```mermaid
+erDiagram
+    MASTER_PATIENT_CATALOG {
+        string semantic_id PK
+        string uscdi_element
+        string uscdi_description
+        string uscdi_data_class
+        string uscdi_data_element
+        string classification
+        string domain
+        string ruleset_category
+        string privacy_security
+        string approval_status
+    }
+
+    MASTER_PATIENT_DICTIONARY {
+        string semantic_id PK, FK
+        string fhir_r4_path
+        string fhir_data_type
+        string hie_survivorship_logic
+        string data_source_rank_reference
+        string catalog_element FK
+    }
+
+    HL7_ADT_CATALOG {
+        string semantic_id FK
+        string message_type
+        string segment_id
+        string field_id
+        string fhir_r4_path
+        string mapping_status
+        string business_rule_required
+        string business_rule_notes
+        string catalog_element FK
+    }
+
+    CCDA_CATALOG {
+        string semantic_id FK
+        string section_name
+        string entry_type
+        string xml_path
+        string fhir_r4_path
+        string mapping_status
+        string business_rule_required
+        string business_rule_notes
+        string catalog_element FK
+    }
+
+    DATA_SOURCE_AVAILABILITY {
+        string source_id
+        string semantic_id FK
+        string availability
+        string completeness_pct
+        string timeliness_sla_hours
+        string catalog_element FK
+    }
+
+    FHIR_INVENTORY {
+        string semantic_id FK
+        string fhir_path
+        string fhir_resource
+        string mapping_status
+        string business_rule_required
+        string business_rule_notes
+        string catalog_element FK
+    }
+
+    BUSINESS_RULES {
+        string semantic_id FK
+        string rule_id
+        string rule_name
+        string rule_type
+        string approval_status
+        string catalog_element FK
+    }
+
+    MASTER_PATIENT_CATALOG ||--|| MASTER_PATIENT_DICTIONARY : semantic_id
+    MASTER_PATIENT_CATALOG ||--o{ HL7_ADT_CATALOG : semantic_id
+    MASTER_PATIENT_CATALOG ||--o{ CCDA_CATALOG : semantic_id
+    MASTER_PATIENT_CATALOG ||--o{ DATA_SOURCE_AVAILABILITY : semantic_id
+    MASTER_PATIENT_CATALOG ||--o{ FHIR_INVENTORY : semantic_id
+    MASTER_PATIENT_CATALOG ||--o{ BUSINESS_RULES : semantic_id
+```
+
+Note: historical Streamlit-era ERD variants are archived in `docs/archive/hl7_ccd_fhir_consideration.md` and are not the source of truth.
 
 ---
 
@@ -356,7 +500,7 @@ flowchart TB
 
 **Grain:** One row per (segment_id, field_id, semantic_id) combination. One semantic_id can have multiple rows (e.g., PID-5.1 and PID-5.2 both map to name elements).
 
-**Source:** Built by `scripts/build_adt_catalog_from_mapping.py` from `data/l2_to_semantic_id_mapping.csv`.
+**Source:** Built by `scripts/build_adt_catalog_from_mapping.py` from mapping CSV (default `data/l2_to_semantic_id_mapping.csv`, with archive fallback support).
 
 ---
 
@@ -366,7 +510,7 @@ flowchart TB
 
 **Grain:** One row per (section_name, entry_type, xml_path, semantic_id) combination.
 
-**Source:** Built by `scripts/build_ccda_catalog_from_mapping.py` from `data/ccd_to_semantic_id_mapping.csv`.
+**Source:** Built by `scripts/build_ccda_catalog_from_mapping.py` from mapping CSV (default `data/ccd_to_semantic_id_mapping.csv`, with archive fallback support).
 
 ---
 
@@ -376,15 +520,15 @@ flowchart TB
 
 | File | Purpose | Consumed By |
 |------|---------|-------------|
-| **data/l2_to_semantic_id_mapping.csv** | L2 column → semantic_id, FHIR path; HL7 segment/field | `build_adt_catalog_from_mapping.py` |
-| **data/ccd_to_semantic_id_mapping.csv** | CCD section, entry type, XML path → semantic_id | `build_ccda_catalog_from_mapping.py` |
+| **data/l2_to_semantic_id_mapping.csv** | L2 column to semantic_id, FHIR path; HL7 segment/field (archive fallback supported) | `build_adt_catalog_from_mapping.py` |
+| **data/ccd_to_semantic_id_mapping.csv** | CCD section, entry type, XML path to semantic_id (archive fallback supported) | `build_ccda_catalog_from_mapping.py` |
 
 #### Feed Profiles (source-specific, not message-format)
 
 | Pattern | Purpose | Consumed By |
 |---------|---------|-------------|
-| **data/&lt;source_id&gt;_feed_segments.csv** | Segment availability for a data source (e.g., CMT ADT) | App discovers via `*_feed_segments.csv` |
-| **data/&lt;source_id&gt;_feed_event_types.csv** | Event type distribution (A01, A03, A08, etc.) | Same discovery |
+| **data/&lt;source_id&gt;_feed_segments.csv** | Segment availability for a data source (e.g., CMT ADT) | Availability build script discovers via `*_feed_segments.csv` |
+| **data/&lt;source_id&gt;_feed_event_types.csv** | Event type distribution (A01, A03, A08, etc.) | Documentation/reference profile data |
 | **data/datasource_counts_by_account.csv** | Record counts by account/period | Reference only; no UI yet |
 
 ---
@@ -707,22 +851,22 @@ The documentation is session-state-driven (not an expander). A button opens the 
 
 ### 6.7 Data Loading Logic
 
-1. `load_data()`: Pandas-based merge of catalog + dictionary on `semantic_id`, with schema tolerance for HIE alignment columns. Cached (`@lru_cache(maxsize=1)`).
-2. `load_message_catalogs()`: Optional ADT and CCDA Parquet. Cached.
-3. `load_all_feed_profiles()`: Discovers `data/*_feed_segments.csv`, derives source_id, loads matching `*_feed_event_types.csv`. Cached.
-4. `load_five_tables_for_review()`: Loads all tables (catalog, dictionary, ADT, CCDA, data source availability) for documentation preview. Cached.
-5. Filters applied in `apply_filters(df)`; filtered dataframe drives list and detail.
+1. Build/rebuild canonical parquet via split and mapping scripts.
+2. Build standards inventory parquet via `build_standards_inventories.py`.
+3. Upsert parquet into Airtable via `upload_parquet_to_airtable.py`.
+4. Airtable tables provide filtering, stewardship workflow, and review views.
+5. `semantic_id` remains the canonical join key across all standards layers.
 
 ### 6.8 Error Handling
 
-- Missing required Parquet: `FileNotFoundError` → `st.error()` + `st.stop()`.
-- Join mismatch warning: if catalog and dictionary contain different `semantic_id` sets, `st.warning()` explains that only shared elements appear in the viewer.
-- Empty filter result: `st.info("No elements match...")`.
-- Optional catalogs: Graceful absence (ADT/CCDA blocks not shown if no data).
+- Missing required parquet files raise `FileNotFoundError` in build/upload scripts and fail fast.
+- Join mismatch risk is handled by preserving `semantic_id` as the canonical key and validating generated inventories before sync.
+- Optional artifacts (ADT/CCDA inventories, business rules) can be absent without blocking core catalog/dictionary sync.
+- Airtable schema drift is mitigated by metadata API field-creation logic in the upload script.
 
-### 6.9 Mermaid Diagram Rendering (Streamlit Cloud)
+### 6.9 Diagram Rendering
 
-Mermaid diagrams (Data Flow, Page Structure, ERD) are rendered via `st.components.v1.html()` with mermaid.js. **Do not place Mermaid content inside nested or collapsed expanders.** On Streamlit Cloud, iframes for diagram content that are lazily rendered (e.g., inside `st.expander(..., expanded=False)`) can fail to initialize mermaid properly. Keep all Mermaid diagrams in the same DOM context as the main Documentation content — i.e., render them directly in the flow, not inside a second-level expander. This constraint was discovered when TECH-SPEC diagrams inside a "View full TECH-SPEC.md" expander failed to render; removing the nested expander resolved it.
+Mermaid diagrams are documented as markdown source-of-truth and can be rendered in tools like Mermaid Live or documentation platforms that support Mermaid syntax. Keep diagrams simple, portable, and platform-agnostic.
 
 ---
 
@@ -783,11 +927,80 @@ If this application is rebuilt in another platform (for example, Airtable), the 
 | 3. ADT catalog (optional) | `python scripts/build_adt_catalog_from_mapping.py` | `ddc-hl7_adt_catalog.parquet` |
 | 4. CCDA catalog (optional) | `python scripts/build_ccda_catalog_from_mapping.py` | `ddc-ccda_catalog.parquet` |
 | 5. Data source availability | `python scripts/build_data_source_availability.py` | `ddc-data_source_availability.parquet` |
-| 6. Run app | `streamlit run app.py` | Local Streamlit UI |
+| 6. Standards inventories | `python scripts/build_standards_inventories.py -d .` | `ddc-fhir_inventory.parquet`, `ddc-business_rules.parquet` |
+| 7. Sync to Airtable | `python scripts/upload_parquet_to_airtable.py --include-standards-inventories` | Airtable tables populated/updated |
 
 ---
 
-## 8. Related Documents
+## 8. Standards Inventory Plan (FHIR + ADT + CCD)
+
+This section defines the centralized plan for standards-aligned enrichment while keeping the original five-table model stable.
+
+### 8.1 Scope and guardrails
+
+- Keep current five tables as canonical (`ddc-master_patient_catalog`, `ddc-master_patient_dictionary`, `ddc-hl7_adt_catalog`, `ddc-ccda_catalog`, `ddc-data_source_availability`).
+- Add companion inventory tables for standard metadata and mapping quality, rather than overloading core tables.
+- Use `semantic_id` as the cross-standard join key.
+- Implement in phases so stewards can review diffs before any promotion into core schemas.
+
+### 8.2 New companion artifacts
+
+| Artifact | Purpose | Join key |
+|----------|---------|----------|
+| `ddc-fhir_inventory.parquet` | FHIR element inventory with mapping status and business-rule placeholders | `semantic_id`, `fhir_path` |
+| `ddc-business_rules.parquet` | Rule registry for organization-specific constraints and transformations | `semantic_id`, `rule_id` |
+
+### 8.3 Delivery phases
+
+1. **Phase A (implemented):** Inventory scaffold generation from existing parquet tables using `scripts/build_standards_inventories.py`.
+2. **Phase B:** Steward mapping review (`mapped`, `needs_new_semantic`, `out_of_scope`) in Airtable.
+3. **Phase C:** Rule authoring in `ddc-business_rules.parquet`; only approved rules are promoted into runtime logic.
+4. **Phase D:** Optional schema promotion into core tables for high-value fields only (avoid broad denormalization).
+
+### 8.4 FHIR source strategy
+
+- Current implementation uses existing dictionary FHIR metadata (`fhir_r4_path`, `fhir_data_type`, `fhir_cardinality`, `fhir_profile`, `fhir_must_support`) as the baseline inventory.
+- Linked folder `fhir_release_5` now contains machine-readable R5 bundles and is used for enrichment.
+- Key files in `fhir_release_5`:
+  - `profiles-resources.json` — canonical StructureDefinition bundle for resource elements (primary inventory source).
+  - `profiles-types.json` and `profiles-others.json` — datatype and additional profile metadata.
+  - `dataelements.json` — element-level metadata support.
+  - `conceptmaps.json` — mapping artifacts, including useful links to HL7 v2 and CDA-oriented concepts.
+  - `valuesets.json` — value-set definitions and binding context.
+  - `search-parameters.json` — search metadata (secondary for catalog use cases).
+  - `fhir.schema.json` — JSON schema reference.
+  - `version.info` — confirms `FhirVersion=5.0.0`.
+- Prioritized Administration resources: `Patient`, `Practitioner`, `CareTeam`, `Device`, `Organization`, `Location`, `HealthcareService`.
+
+### 8.5 Airtable alignment plan
+
+- Recommended new Airtable tables mirroring parquet artifacts:
+  - `ddc-fhir_inventory`
+  - `ddc-business_rules`
+- Keep core table sync unchanged until steward validation confirms promotion candidates.
+
+### 8.6 ADT/CCDA de-dup migration plan
+
+Implementation status: **Phase D in progress and partially implemented**.
+
+- Canonical ADT and CCDA catalogs now include promoted governance fields:
+  - `mapping_status`
+  - `business_rule_required`
+  - `business_rule_notes`
+- Build scripts now materialize these fields directly in:
+  - `ddc-hl7_adt_catalog.parquet`
+  - `ddc-ccda_catalog.parquet`
+- Upload script now ensures these fields exist in Airtable canonical tables before sync.
+
+Remaining de-dup completion step:
+
+1. Steward-validate parity and then archive/deprecate `ddc-hl7_adt_inventory` and `ddc-ccda_inventory` Airtable tables.
+
+This preserves data fidelity while reducing long-term table count.
+
+---
+
+## 9. Related Documents
 
 | Document | Purpose |
 |----------|---------|

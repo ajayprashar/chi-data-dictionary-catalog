@@ -6,11 +6,11 @@ This document is a **CCD (Continuity of Care Document) interface mapping** orien
 
 ## How this helps the chi-data-dictionary-catalog effort
 
-- **Same L2 vocabulary**: INV columns (e.g. `fn`, `ln`, `psa1`, `efdt`, `eid`, `et`, `pd`, `inpid`) align with **data/l2_to_semantic_id_mapping.csv** and CMT ADT. That lets you:
+- **Same L2 vocabulary**: INV columns (e.g. `fn`, `ln`, `psa1`, `efdt`, `eid`, `et`, `pd`, `inpid`) align with the ADT mapping input (`data/l2_to_semantic_id_mapping.csv`, with archive fallback) and CMT ADT. That lets you:
   - Extend **ddc-ccda_catalog.parquet** with more CCD section/XPath → semantic_id rows.
   - Cross-check CCD coverage vs. ADT and master patient elements.
 - **CCD section coverage**: The mapping covers Participants (contacts), Encounters, Problems, Medications, Allergies, Immunizations, Results, Vitals, Procedures, Social/Family History, and Insurance. Use it to decide which CCD sections to add to the catalog and to document expected INV (L2) targets.
-- **Reference only**: This is reference material. To drive the app or exports, add chosen rows into **ddc-ccda_catalog.parquet** (and optionally the master catalog) via script or manual curation.
+- **Reference only**: This is reference material. To drive the Airtable-first pipeline, add chosen rows into **ddc-ccda_catalog.parquet** (and optionally the master catalog) via script or manual curation.
 
 ---
 
@@ -221,4 +221,4 @@ Many **INV COLUMN** values match the L2 columns and semantic_ids already in this
 - **Insurance**: inpid, inpn, inpfdt, inpldt, ptsid, infn, inmn, inln → Coverage.identifier, plan name, dates, subscriber.
 - **PCP / providers**: pcpid, pcpidt → Encounter.participant / PCP.
 
-You can use this mapping to add rows to **ddc-ccda_catalog.parquet** (CCD XPath → semantic_id or INV COLUMN → semantic_id) so the Streamlit app shows CCD mappings alongside ADT for the same elements.
+You can use this mapping to add rows to **ddc-ccda_catalog.parquet** (CCD XPath → semantic_id or INV COLUMN → semantic_id) so Airtable tables and review interfaces show CCD mappings alongside ADT for the same elements.
