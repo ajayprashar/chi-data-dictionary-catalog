@@ -24,3 +24,6 @@ build/
 
 # Browser capture (HAR) — transient debug artifact
 *.har
+
+# Local junction to external FHIR release docs
+fhir_release_5/
