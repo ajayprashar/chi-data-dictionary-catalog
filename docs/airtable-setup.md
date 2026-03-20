@@ -135,6 +135,8 @@ The script upserts these local Parquet files (project root) into your Airtable B
 
 All table names are `ddc-*` (no `.parquet` suffix), matching what you created in Airtable.
 
+**Display vs sync identity (1.0):** The uploader sets **`Name`** to a human-readable label and writes **`upsert_key`** with the stable composite key used for matching. Upsert logic still keys off the underlying columns (not `Name`). Catalog links use **`semantic_id`**. See **TECH-SPEC.md §6.7.1**.
+
 ### How to run it
 From the repo root (`C:\AI\chi-data-dictionary-catalog`):
 

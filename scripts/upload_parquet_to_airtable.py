@@ -175,6 +175,7 @@ BUSINESS_RULE_COLS = [
 ]
 
 CATALOG_LINK_FIELD_NAME = "catalog_element"
+UPSERT_KEY_FIELD = "upsert_key"
 
 FHIR_QA_READINESS_FIELD = "fhir_r4_mapping_readiness"
 FHIR_QA_DETAILS_FIELD = "fhir_r4_mapping_gap_details"
@@ -313,12 +314,54 @@ def compute_upsert_key(table_type: str, row_fields: Dict[str, str]) -> str:
     raise ValueError(f"Unknown table_type={table_type}")
 
 
+def build_display_name(table_type: str, row_fields: Dict[str, str], upsert_key: str) -> str:
+    """
+    Human-friendly Name value for Airtable views/interfaces.
+    The upsert_key remains the technical identity for synchronization.
+    """
+    semantic_id = (row_fields.get("semantic_id") or "").strip()
+    if table_type in ("catalog", "dictionary"):
+        return semantic_id or upsert_key
+    if table_type == "adt":
+        message_type = (row_fields.get("message_type") or "").strip()
+        segment_id = (row_fields.get("segment_id") or "").strip()
+        field_id = (row_fields.get("field_id") or "").strip()
+        fhir_r4_path = (row_fields.get("fhir_r4_path") or "").strip()
+        return " | ".join(
+            [
+                p
+                for p in [
+                    semantic_id,
+                    " ".join([p for p in [message_type, segment_id, field_id] if p]),
+                    fhir_r4_path,
+                ]
+                if p
+            ]
+        ) or upsert_key
+    if table_type == "ccda":
+        section_name = (row_fields.get("section_name") or "").strip()
+        entry_type = (row_fields.get("entry_type") or "").strip()
+        xml_path = (row_fields.get("xml_path") or "").strip()
+        return " | ".join([p for p in [semantic_id, section_name, entry_type, xml_path] if p]) or upsert_key
+    if table_type == "availability":
+        source_id = (row_fields.get("source_id") or "").strip()
+        availability = (row_fields.get("availability") or "").strip()
+        return " | ".join([p for p in [source_id, semantic_id, availability] if p]) or upsert_key
+    if table_type == "fhir_inventory":
+        fhir_resource = (row_fields.get("fhir_resource") or "").strip()
+        fhir_path = (row_fields.get("fhir_path") or "").strip()
+        return " | ".join([p for p in [semantic_id, fhir_resource, fhir_path] if p]) or upsert_key
+    if table_type == "business_rules":
+        rule_id = (row_fields.get("rule_id") or "").strip()
+        rule_name = (row_fields.get("rule_name") or "").strip()
+        return " | ".join([p for p in [semantic_id, rule_id, rule_name] if p]) or upsert_key
+    return upsert_key
+
+
 def build_fields_payload(table_type: str, expected_cols: List[str], row: Dict[str, Any], upsert_key: str) -> Dict[str, str]:
     fields = {c: str(row.get(c, "")) for c in expected_cols}
-    if table_type in ("catalog", "dictionary"):
-        fields["Name"] = row.get("semantic_id", "") or ""
-    else:
-        fields["Name"] = upsert_key
+    fields[UPSERT_KEY_FIELD] = upsert_key
+    fields["Name"] = build_display_name(table_type, row, upsert_key)
     return fields
 
 
@@ -792,20 +835,39 @@ def main():
         catalog_table_name="ddc-master_patient_catalog",
         required_fields=["uscdi_data_class", "uscdi_data_element"],
     )
+    ensure_text_fields_for_table(
+        session=session,
+        base_id=AIRTABLE_BASE_ID,
+        table_name="ddc-master_patient_catalog",
+        field_names=["Name", UPSERT_KEY_FIELD] + CATALOG_COLS,
+    )
+    ensure_text_fields_for_table(
+        session=session,
+        base_id=AIRTABLE_BASE_ID,
+        table_name="ddc-master_patient_dictionary",
+        field_names=["Name", UPSERT_KEY_FIELD] + DICTIONARY_COLS,
+    )
     # Ensure promoted ADT/CCDA governance columns exist in canonical tables.
     ensure_text_fields_for_table(
         session=session,
         base_id=AIRTABLE_BASE_ID,
         table_name="ddc-hl7_adt_catalog",
-        field_names=["Name"] + ADT_COLS,
+        field_names=["Name", UPSERT_KEY_FIELD] + ADT_COLS,
         multiline_fields={"notes", "business_rule_notes"},
     )
     ensure_text_fields_for_table(
         session=session,
         base_id=AIRTABLE_BASE_ID,
         table_name="ddc-ccda_catalog",
-        field_names=["Name"] + CCDA_COLS,
+        field_names=["Name", UPSERT_KEY_FIELD] + CCDA_COLS,
         multiline_fields={"notes", "business_rule_notes"},
+    )
+    ensure_text_fields_for_table(
+        session=session,
+        base_id=AIRTABLE_BASE_ID,
+        table_name="ddc-data_source_availability",
+        field_names=["Name", UPSERT_KEY_FIELD] + AVAILABILITY_COLS,
+        multiline_fields={"notes"},
     )
 
     table_results: List[Dict[str, Any]] = []
@@ -817,14 +879,14 @@ def main():
             session=session,
             base_id=AIRTABLE_BASE_ID,
             table_name="ddc-fhir_inventory",
-            field_names=["Name"] + FHIR_INVENTORY_COLS,
+            field_names=["Name", UPSERT_KEY_FIELD] + FHIR_INVENTORY_COLS,
             multiline_fields={"fhir_definition", "business_rule_notes"},
         )
         ensure_text_fields_for_table(
             session=session,
             base_id=AIRTABLE_BASE_ID,
             table_name="ddc-business_rules",
-            field_names=["Name"] + BUSINESS_RULE_COLS,
+            field_names=["Name", UPSERT_KEY_FIELD] + BUSINESS_RULE_COLS,
             multiline_fields={"rule_expression", "notes"},
         )
 

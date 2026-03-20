@@ -357,6 +357,8 @@ To reduce confusion, treat the physical table/file names as stable technical IDs
 
 Interpretation tip: in `ddc-master_patient_catalog`, "master_patient" means *person-centric canonical scope* (not a patient table from an EHR), and "catalog" means *list of governed concepts*.
 
+**Airtable row labels (1.0):** In synced tables, **`Name`** is the friendly primary label; **`upsert_key`** holds the stable sync identity. See **§6.7.1**. Joins to the catalog still use **`semantic_id`** (and the `catalog_element` link where populated)—not `Name`.
+
 ### 2.2.2 Update cadence and stewardship model
 
 | Table | Primary purpose | Expected update cadence | Stewarding mode |
@@ -856,6 +858,23 @@ The documentation is session-state-driven (not an expander). A button opens the 
 3. Upsert parquet into Airtable via `upload_parquet_to_airtable.py`.
 4. Airtable tables provide filtering, stewardship workflow, and review views.
 5. `semantic_id` remains the canonical join key across all standards layers.
+
+### 6.7.1 Airtable: display `Name` vs technical `upsert_key` (1.0)
+
+The upload script (`scripts/upload_parquet_to_airtable.py`) separates **what humans see** from **what the pipeline uses to match rows**:
+
+| Field | Role | Steward / UI guidance |
+|-------|------|------------------------|
+| **`Name`** | Primary field; **human-readable label** for grids, interfaces, and quick scanning. | Prefer showing this (or key facets like `semantic_id`) in Interfaces; safe to treat as display text. |
+| **`upsert_key`** | **Stable technical row identity** for sync; written on every uploaded table and kept aligned with `compute_upsert_key()`. | Treat as read-only in normal stewardship; use for troubleshooting duplicate-key issues or cross-checking ETL. |
+
+**Upsert matching (unchanged):** The script builds `existing_map` and matches creates/updates using `compute_upsert_key(table_type, row_fields)` from the **same parquet/Airtable columns as today** (e.g. for ADT: `semantic_id`, `message_type`, `segment_id`, `field_id`, `fhir_r4_path`). It does **not** key off `Name`. Changing a display `Name` in Airtable does not break row identity for the next sync.
+
+**`upsert_key` composition (by table type):** Mirrors the prior pipe-concatenated primary labels—now stored explicitly—e.g. catalog/dictionary = `semantic_id`; ADT = those five fields joined with `|`; CCDA, availability, FHIR inventory, and business rules use their respective composite keys as implemented in the script.
+
+**Referential integrity:** `catalog_element` (and any future links) continue to resolve via **`semantic_id`** and catalog record IDs, independent of `Name` / `upsert_key` formatting.
+
+**Interface best practice:** Surface **`semantic_id`** plus context columns (e.g. ADT `segment_id` / `field_id`) in list/detail views; use **`Name`** as the row title when helpful; keep **`upsert_key`** available in an admin or “technical” view only if needed.
 
 ### 6.8 Error Handling
 
