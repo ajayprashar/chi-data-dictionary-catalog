@@ -634,7 +634,7 @@ erDiagram
 
     MASTER_PATIENT_DICTIONARY {
         string semantic_id PK, FK
-        string hie_survivorship_logic
+        string chi_survivorship_logic
         string data_source_rank_reference
         string coverage_personids
         string granularity_level

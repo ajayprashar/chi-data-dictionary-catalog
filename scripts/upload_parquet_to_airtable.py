@@ -2,42 +2,43 @@ import json
 import os
 import argparse
 import re
+from pathlib import Path
 from typing import Any, Dict, Iterable, List, Tuple
 
 import pandas as pd
 import requests
 
 
-BASE_DIR = r"C:\AI\chi-data-dictionary-catalog"
+DEFAULT_BASE_DIR = Path(__file__).resolve().parent.parent
+DEFAULT_AIRTABLE_BASE_ID = os.getenv("AIRTABLE_BASE_ID", "appLZAy0wzE1x3yzU")
 
 # Airtable base and table names/IDs.
 # Note: Airtable REST endpoints use table NAME (not table ID) in the URL path.
-AIRTABLE_BASE_ID = "appLZAy0wzE1x3yzU"
-
+# The base acts as the steward workspace over the governed parquet model.
 TABLES = [
     {
         "name": "ddc-master_patient_catalog",
-        "parquet_path": os.path.join(BASE_DIR, "ddc-master_patient_catalog.parquet"),
+        "parquet_filename": "ddc-master_patient_catalog.parquet",
         "type": "catalog",
     },
     {
         "name": "ddc-master_patient_dictionary",
-        "parquet_path": os.path.join(BASE_DIR, "ddc-master_patient_dictionary.parquet"),
+        "parquet_filename": "ddc-master_patient_dictionary.parquet",
         "type": "dictionary",
     },
     {
         "name": "ddc-hl7_adt_catalog",
-        "parquet_path": os.path.join(BASE_DIR, "ddc-hl7_adt_catalog.parquet"),
+        "parquet_filename": "ddc-hl7_adt_catalog.parquet",
         "type": "adt",
     },
     {
         "name": "ddc-ccda_catalog",
-        "parquet_path": os.path.join(BASE_DIR, "ddc-ccda_catalog.parquet"),
+        "parquet_filename": "ddc-ccda_catalog.parquet",
         "type": "ccda",
     },
     {
         "name": "ddc-data_source_availability",
-        "parquet_path": os.path.join(BASE_DIR, "ddc-data_source_availability.parquet"),
+        "parquet_filename": "ddc-data_source_availability.parquet",
         "type": "availability",
     },
 ]
@@ -45,12 +46,12 @@ TABLES = [
 INVENTORY_TABLES = [
     {
         "name": "ddc-fhir_inventory",
-        "parquet_path": os.path.join(BASE_DIR, "ddc-fhir_inventory.parquet"),
+        "parquet_filename": "ddc-fhir_inventory.parquet",
         "type": "fhir_inventory",
     },
     {
         "name": "ddc-business_rules",
-        "parquet_path": os.path.join(BASE_DIR, "ddc-business_rules.parquet"),
+        "parquet_filename": "ddc-business_rules.parquet",
         "type": "business_rules",
     },
 ]
@@ -82,7 +83,7 @@ CATALOG_COLS = [
 
 DICTIONARY_COLS = [
     "semantic_id",
-    "hie_survivorship_logic",
+    "chi_survivorship_logic",
     "data_source_rank_reference",
     "coverage_personids",
     "granularity_level",
@@ -90,7 +91,6 @@ DICTIONARY_COLS = [
     "data_quality_notes",
     "fhir_r4_path",
     "fhir_data_type",
-    "shie_survivorship_logic",
     "calculation_grain",
     "historical_freeze",
     "recalc_window_months",
@@ -183,7 +183,7 @@ STANDARDS_READINESS_FIELD = "standards_curation_readiness"
 STANDARDS_GAP_DETAILS_FIELD = "standards_curation_gap_details"
 
 
-def load_airtable_token() -> str:
+def load_airtable_token(mcp_config_path: Path | None = None) -> str:
     """
     Loads Airtable API token.
 
@@ -194,8 +194,14 @@ def load_airtable_token() -> str:
     if env_token:
         return env_token
 
-    mcp_path = r"C:\Users\apras\.cursor\mcp.json"
-    with open(mcp_path, "r", encoding="utf-8") as f:
+    resolved_mcp_path = mcp_config_path or (Path.home() / ".cursor" / "mcp.json")
+    if not resolved_mcp_path.is_file():
+        raise RuntimeError(
+            "AIRTABLE_API_KEY is not set and no Cursor MCP config was found at "
+            f"{resolved_mcp_path}. Set AIRTABLE_API_KEY or pass a valid Cursor MCP config."
+        )
+
+    with open(resolved_mcp_path, "r", encoding="utf-8") as f:
         mcp = json.load(f)
     return mcp["mcpServers"]["airtable"]["env"]["AIRTABLE_API_KEY"]
 
@@ -225,43 +231,67 @@ def airtable_request(
     return resp
 
 
+def airtable_table_url(base_id: str, table_name: str) -> str:
+    return f"https://api.airtable.com/v0/{base_id}/{table_name}"
+
+
 def list_existing_records(
     session: requests.Session,
+    base_id: str,
     table_name: str,
-    max_records: int = 500,
+    max_records: int | None = None,
+    page_size: int = 100,
 ) -> List[Dict[str, Any]]:
     """
-    Returns Airtable records up to max_records, with pagination (up to Airtable's offset behavior).
+    Returns Airtable records with pagination.
+    If max_records is None, all available records are returned.
     """
-    url = f"https://api.airtable.com/v0/{AIRTABLE_BASE_ID}/{table_name}"
-    params: Dict[str, Any] = {"maxRecords": max_records}
+    url = airtable_table_url(base_id, table_name)
+    params: Dict[str, Any] = {"pageSize": page_size}
+    if max_records is not None:
+        params["maxRecords"] = max_records
 
-    # Airtable supports offset pagination; we loop only if the server returns offset.
     all_records: List[Dict[str, Any]] = []
     offset = None
 
     while True:
         if offset:
             params["offset"] = offset
-        resp = session.get(url, params=params, timeout=60, headers={"Authorization": f"Bearer {session.headers['AuthorizationToken']}"})
-        if resp.status_code >= 400:
-            try:
-                payload = resp.json()
-            except Exception:
-                payload = {"raw": resp.text}
-            raise RuntimeError(f"Airtable list error {resp.status_code}: {payload}")
+        resp = airtable_request(session, "GET", url, params=params)
         data = resp.json()
         records = data.get("records", [])
         all_records.extend(records)
         offset = data.get("offset")
-        if not offset or len(all_records) >= max_records:
+        if not offset or (max_records is not None and len(all_records) >= max_records):
             break
-    return all_records[:max_records]
+    if max_records is not None:
+        return all_records[:max_records]
+    return all_records
 
 
 def normalize_df(df: pd.DataFrame) -> pd.DataFrame:
     # Ensure all values are strings; convert NaN/None -> empty string.
     return df.fillna("").astype(str)
+
+
+def normalize_dictionary_schema(df: pd.DataFrame) -> pd.DataFrame:
+    """Collapse legacy survivorship column names into the canonical CHI field."""
+    if "chi_survivorship_logic" not in df.columns:
+        df["chi_survivorship_logic"] = ""
+
+    canonical_values = df["chi_survivorship_logic"].fillna("").astype(str)
+    for legacy_col in ("hie_survivorship_logic", "shie_survivorship_logic"):
+        if legacy_col not in df.columns:
+            continue
+        legacy_values = df[legacy_col].fillna("").astype(str)
+        empty_mask = canonical_values.str.strip() == ""
+        canonical_values = canonical_values.where(~empty_mask, legacy_values)
+
+    df["chi_survivorship_logic"] = canonical_values
+    drop_cols = [c for c in ("hie_survivorship_logic", "shie_survivorship_logic") if c in df.columns]
+    if drop_cols:
+        df = df.drop(columns=drop_cols)
+    return df
 
 
 def get_expected_cols(table_type: str) -> List[str]:
@@ -323,21 +353,10 @@ def build_display_name(table_type: str, row_fields: Dict[str, str], upsert_key: 
     if table_type in ("catalog", "dictionary"):
         return semantic_id or upsert_key
     if table_type == "adt":
-        message_type = (row_fields.get("message_type") or "").strip()
-        segment_id = (row_fields.get("segment_id") or "").strip()
         field_id = (row_fields.get("field_id") or "").strip()
-        fhir_r4_path = (row_fields.get("fhir_r4_path") or "").strip()
-        return " | ".join(
-            [
-                p
-                for p in [
-                    semantic_id,
-                    " ".join([p for p in [message_type, segment_id, field_id] if p]),
-                    fhir_r4_path,
-                ]
-                if p
-            ]
-        ) or upsert_key
+        # Keep the primary label short for steward scanning; the full identity
+        # still lives in explicit columns plus the stable upsert_key.
+        return " | ".join([p for p in [field_id, semantic_id] if p]) or upsert_key
     if table_type == "ccda":
         section_name = (row_fields.get("section_name") or "").strip()
         entry_type = (row_fields.get("entry_type") or "").strip()
@@ -405,7 +424,7 @@ def compute_overall_standards_curation_qa(row_fields: Dict[str, str]) -> tuple[s
     """
     Compute an overall steward queue signal that combines:
     - FHIR R4 mapping readiness (derived from existing FHIR columns)
-    - HIE survivorship logic presence
+    - CHI survivorship logic presence
     - Identity/de-identification governance presence (FHIR-adjacent governance)
     """
     fhir_readiness, _ = compute_fhir_r4_mapping_qa(row_fields)
@@ -413,12 +432,12 @@ def compute_overall_standards_curation_qa(row_fields: Dict[str, str]) -> tuple[s
     gaps: List[str] = []
 
     # Survivorship & sourcing (standards domain for golden value determination)
-    hie_logic = (row_fields.get("hie_survivorship_logic") or "").strip()
+    chi_logic = (row_fields.get("chi_survivorship_logic") or "").strip()
     data_source_rank_ref = (row_fields.get("data_source_rank_reference") or "").strip()
     granularity = (row_fields.get("granularity_level") or "").strip()
 
-    if not hie_logic:
-        gaps.append("Missing HIE survivorship logic (hie_survivorship_logic)")
+    if not chi_logic:
+        gaps.append("Missing CHI survivorship logic (chi_survivorship_logic)")
     if not data_source_rank_ref:
         gaps.append("Missing source rank reference (data_source_rank_reference)")
     if not granularity:
@@ -445,44 +464,22 @@ def compute_overall_standards_curation_qa(row_fields: Dict[str, str]) -> tuple[s
     return "Needs Standards QA", "; ".join(gaps)
 
 
-def batch_patch_records(session: requests.Session, table_name: str, records: List[Dict[str, Any]]):
+def batch_patch_records(session: requests.Session, base_id: str, table_name: str, records: List[Dict[str, Any]]):
     """
     Batch update up to 10 records with PATCH.
     """
-    url = f"https://api.airtable.com/v0/{AIRTABLE_BASE_ID}/{table_name}"
+    url = airtable_table_url(base_id, table_name)
     payload = {"records": records}
-    resp = session.patch(
-        url,
-        headers={"Authorization": f"Bearer {session.headers['AuthorizationToken']}", "Content-Type": "application/json"},
-        json=payload,
-        timeout=60,
-    )
-    if resp.status_code >= 400:
-        try:
-            payload = resp.json()
-        except Exception:
-            payload = {"raw": resp.text}
-        raise RuntimeError(f"Batch PATCH error {resp.status_code}: {payload}")
+    airtable_request(session, "PATCH", url, json_body=payload)
 
 
-def batch_post_records(session: requests.Session, table_name: str, records: List[Dict[str, Any]]):
+def batch_post_records(session: requests.Session, base_id: str, table_name: str, records: List[Dict[str, Any]]):
     """
     Batch create up to 10 records with POST.
     """
-    url = f"https://api.airtable.com/v0/{AIRTABLE_BASE_ID}/{table_name}"
+    url = airtable_table_url(base_id, table_name)
     payload = {"records": records}
-    resp = session.post(
-        url,
-        headers={"Authorization": f"Bearer {session.headers['AuthorizationToken']}", "Content-Type": "application/json"},
-        json=payload,
-        timeout=60,
-    )
-    if resp.status_code >= 400:
-        try:
-            payload = resp.json()
-        except Exception:
-            payload = {"raw": resp.text}
-        raise RuntimeError(f"Batch POST error {resp.status_code}: {payload}")
+    airtable_request(session, "POST", url, json_body=payload)
 
 
 def airtable_meta_tables(session: requests.Session, base_id: str) -> List[Dict[str, Any]]:
@@ -709,7 +706,7 @@ def ensure_relation_fields(
 
 def populate_relation_fields(
     session: requests.Session,
-    _base_id: str,
+    base_id: str,
     catalog_table_name: str,
     relation_field_name: str,
 ) -> None:
@@ -718,7 +715,7 @@ def populate_relation_fields(
     """
     print("\n== Populating relation fields ==")
 
-    catalog_records = list_existing_records(session, table_name=catalog_table_name, max_records=1000)
+    catalog_records = list_existing_records(session, base_id=base_id, table_name=catalog_table_name)
     catalog_id_by_semantic: Dict[str, str] = {}
     for rec in catalog_records:
         rec_fields = rec.get("fields", {}) or {}
@@ -728,10 +725,26 @@ def populate_relation_fields(
         catalog_id_by_semantic[sem] = rec["id"]
 
     def patch_table(table_name: str) -> None:
-        records = list_existing_records(session, table_name=table_name, max_records=1000)
+        records = list_existing_records(session, base_id=base_id, table_name=table_name)
         updates: List[Dict[str, Any]] = []
         for rec in records:
             rec_fields = rec.get("fields", {}) or {}
+            if (
+                table_name == "ddc-hl7_adt_catalog"
+                and str(rec_fields.get("mapping_status", "") or "").strip() == "legacy_duplicate"
+            ):
+                if rec_fields.get(relation_field_name):
+                    # Keep legacy duplicate rows for audit/history, but clear the
+                    # steward-navigation link so they do not compete with the active row.
+                    updates.append(
+                        {
+                            "id": rec["id"],
+                            "fields": {
+                                relation_field_name: [],
+                            },
+                        }
+                    )
+                continue
             sem = str(rec_fields.get("semantic_id", "") or "").strip()
             cat_id = catalog_id_by_semantic.get(sem)
             if not cat_id:
@@ -753,7 +766,7 @@ def populate_relation_fields(
 
         print(f"Patching {table_name}: {len(updates)} row(s)")
         for batch in chunked(updates, 10):
-            batch_patch_records(session, table_name=table_name, records=batch)
+            batch_patch_records(session, base_id=base_id, table_name=table_name, records=batch)
 
     patch_table("ddc-master_patient_dictionary")
     patch_table("ddc-hl7_adt_catalog")
@@ -772,20 +785,23 @@ def populate_relation_fields(
 
 
 def main():
-    global AIRTABLE_BASE_ID
-
     parser = argparse.ArgumentParser(
-        description="Upload CHI Parquet tables to Airtable (upsert + optional Link/Relation population)."
+        description="Upload governed CHI Parquet tables into the Airtable steward workspace (upsert + optional Link/Relation population)."
+    )
+    parser.add_argument(
+        "--base-dir",
+        default=str(DEFAULT_BASE_DIR),
+        help="Project root containing the parquet artifacts (defaults to the repo root next to scripts/).",
     )
     parser.add_argument(
         "--base-id",
-        default=AIRTABLE_BASE_ID,
+        default=DEFAULT_AIRTABLE_BASE_ID,
         help="Airtable Base ID (e.g. appXXXXXXXXXXXXXX).",
     )
     parser.add_argument(
         "--add-relations",
         action="store_true",
-        help="Create/populate Link/Relation fields using semantic_id joins.",
+        help="Create/populate steward-navigation Link/Relation fields using semantic_id joins.",
     )
     parser.add_argument(
         "--relation-field-name",
@@ -808,16 +824,27 @@ def main():
         action="store_true",
         help="Also upload ddc-fhir_inventory and ddc-business_rules tables.",
     )
+    parser.add_argument(
+        "--mcp-config-path",
+        default="",
+        help="Optional path to Cursor mcp.json when AIRTABLE_API_KEY is not set.",
+    )
     args = parser.parse_args()
 
-    AIRTABLE_BASE_ID = args.base_id
+    base_dir = Path(args.base_dir).resolve()
+    if not base_dir.is_dir():
+        raise RuntimeError(f"Base directory does not exist: {base_dir}")
+    base_id = args.base_id.strip()
+    if not base_id:
+        raise RuntimeError("Airtable base ID is required. Pass --base-id or set AIRTABLE_BASE_ID.")
 
-    token = load_airtable_token()
+    mcp_config_path = Path(args.mcp_config_path).resolve() if args.mcp_config_path else None
+    token = load_airtable_token(mcp_config_path=mcp_config_path)
     session = requests.Session()
     session.headers["AuthorizationToken"] = token  # internal-only
 
     # Discover which QA fields exist so we don't attempt to write fields that aren't present.
-    tables_meta = airtable_meta_tables(session=session, base_id=AIRTABLE_BASE_ID)
+    tables_meta = airtable_meta_tables(session=session, base_id=base_id)
     table_meta_by_name = {t.get("name"): t for t in tables_meta if isinstance(t, dict) and t.get("name")}
     dict_meta = table_meta_by_name.get("ddc-master_patient_dictionary") or {}
     dict_fields = dict_meta.get("fields") or []
@@ -831,40 +858,40 @@ def main():
     # Ensure catalog has uscdi_data_class and uscdi_data_element (Parquet alignment).
     ensure_catalog_fields(
         session=session,
-        base_id=AIRTABLE_BASE_ID,
+        base_id=base_id,
         catalog_table_name="ddc-master_patient_catalog",
         required_fields=["uscdi_data_class", "uscdi_data_element"],
     )
     ensure_text_fields_for_table(
         session=session,
-        base_id=AIRTABLE_BASE_ID,
+        base_id=base_id,
         table_name="ddc-master_patient_catalog",
         field_names=["Name", UPSERT_KEY_FIELD] + CATALOG_COLS,
     )
     ensure_text_fields_for_table(
         session=session,
-        base_id=AIRTABLE_BASE_ID,
+        base_id=base_id,
         table_name="ddc-master_patient_dictionary",
         field_names=["Name", UPSERT_KEY_FIELD] + DICTIONARY_COLS,
     )
     # Ensure promoted ADT/CCDA governance columns exist in canonical tables.
     ensure_text_fields_for_table(
         session=session,
-        base_id=AIRTABLE_BASE_ID,
+        base_id=base_id,
         table_name="ddc-hl7_adt_catalog",
         field_names=["Name", UPSERT_KEY_FIELD] + ADT_COLS,
         multiline_fields={"notes", "business_rule_notes"},
     )
     ensure_text_fields_for_table(
         session=session,
-        base_id=AIRTABLE_BASE_ID,
+        base_id=base_id,
         table_name="ddc-ccda_catalog",
         field_names=["Name", UPSERT_KEY_FIELD] + CCDA_COLS,
         multiline_fields={"notes", "business_rule_notes"},
     )
     ensure_text_fields_for_table(
         session=session,
-        base_id=AIRTABLE_BASE_ID,
+        base_id=base_id,
         table_name="ddc-data_source_availability",
         field_names=["Name", UPSERT_KEY_FIELD] + AVAILABILITY_COLS,
         multiline_fields={"notes"},
@@ -877,14 +904,14 @@ def main():
         tables_to_process.extend(INVENTORY_TABLES)
         ensure_text_fields_for_table(
             session=session,
-            base_id=AIRTABLE_BASE_ID,
+            base_id=base_id,
             table_name="ddc-fhir_inventory",
             field_names=["Name", UPSERT_KEY_FIELD] + FHIR_INVENTORY_COLS,
             multiline_fields={"fhir_definition", "business_rule_notes"},
         )
         ensure_text_fields_for_table(
             session=session,
-            base_id=AIRTABLE_BASE_ID,
+            base_id=base_id,
             table_name="ddc-business_rules",
             field_names=["Name", UPSERT_KEY_FIELD] + BUSINESS_RULE_COLS,
             multiline_fields={"rule_expression", "notes"},
@@ -892,27 +919,35 @@ def main():
 
     for t in tables_to_process:
         table_name = t["name"]
-        parquet_path = t["parquet_path"]
+        parquet_path = base_dir / t["parquet_filename"]
         table_type = t["type"]
 
         expected_cols = get_expected_cols(table_type)
         print(f"\n== {table_name} ==")
         print(f"Loading parquet: {parquet_path}")
+        if not parquet_path.is_file():
+            raise RuntimeError(f"Parquet file not found for {table_name}: {parquet_path}")
 
         df = pd.read_parquet(parquet_path)
         df = normalize_df(df)
+        if table_type == "dictionary":
+            df = normalize_dictionary_schema(df)
 
         missing_cols = [c for c in expected_cols if c not in df.columns]
         if missing_cols:
             raise RuntimeError(f"Missing columns in parquet for {table_name}: {missing_cols}")
 
-        existing = list_existing_records(session, table_name=table_name, max_records=500)
+        existing = list_existing_records(session, base_id=base_id, table_name=table_name)
         existing_map: Dict[str, str] = {}
 
         # Build key map from Airtable records.
         for rec in existing:
             rec_id = rec["id"]
             rec_fields = rec.get("fields", {}) or {}
+            if table_type == "adt" and str(rec_fields.get("mapping_status", "") or "").strip() == "legacy_duplicate":
+                # Preserve legacy rows in Airtable for steward history, but do not
+                # let them participate in upsert matching for the active catalog.
+                continue
             # Normalize missing values to empty string for key computation.
             row_fields = {c: str(rec_fields.get(c, "") or "") for c in expected_cols}
             key = compute_upsert_key(table_type, row_fields)
@@ -967,10 +1002,10 @@ def main():
         # Apply updates first, then creates.
         try:
             for batch in chunked(to_update, 10):
-                batch_patch_records(session, table_name=table_name, records=batch)
+                batch_patch_records(session, base_id=base_id, table_name=table_name, records=batch)
                 updated += len(batch)
             for batch in chunked(to_create, 10):
-                batch_post_records(session, table_name=table_name, records=batch)
+                batch_post_records(session, base_id=base_id, table_name=table_name, records=batch)
                 created += len(batch)
         except Exception as e:
             # Best-effort: include counts and a generic message; Airtable response is inside exception.
@@ -992,13 +1027,13 @@ def main():
     if args.add_relations:
         ensure_relation_fields(
             session=session,
-            base_id=AIRTABLE_BASE_ID,
+            base_id=base_id,
             catalog_table_name=args.catalog_table_name,
             relation_field_name=args.relation_field_name,
         )
         populate_relation_fields(
             session=session,
-            _base_id=AIRTABLE_BASE_ID,
+            base_id=base_id,
             catalog_table_name=args.catalog_table_name,
             relation_field_name=args.relation_field_name,
         )

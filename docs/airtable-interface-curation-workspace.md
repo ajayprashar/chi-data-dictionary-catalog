@@ -1,146 +1,371 @@
-# Airtable Interface: HIE Data Dictionary & Curation Workspace
+# Airtable Interface Build Guide (Fast Path Style)
 
-This guide aligns with **TECH-SPEC.md** (canonical `semantic_id`, catalog ↔ dictionary 1:1, message catalogs 1:many, **`Name` vs `upsert_key`** in §6.7.1). Use it to build a **reference** Interface stewards and interface engineers can use daily—not only as a one-off AI layout.
+This version uses the same format you preferred: short, step-by-step, click-by-click.
 
----
+## Before You Start (2 minutes)
 
-## Custom Interface vs Airtable Omni AI
-
-| Approach | Best for | Risk |
-|----------|----------|------|
-| **Custom Interface (recommended baseline)** | Predictable “reference” UX, correct links (`catalog_element`), filters that match your columns, steward training | Upfront design time |
-| **Omni AI prompt** | Quick first draft, exploring layouts | Often mis-wires hierarchy, wrong primary field, or 3-level nesting you find confusing; may ignore `semantic_id` vs HL7 rules in §1.8 |
-| **Hybrid** | You hand-build **pages + data sources**, then use Omni only for cosmetic tweaks (spacing, copy)—**not** as the source of truth for table links | Medium |
-
-**Recommendation:** Treat **custom Interface** as the **1.0 reference**. Optionally keep a **short Omni “spec prompt”** (appendix below) to regenerate *alternative* drafts in a sandbox Interface, then copy ideas manually into the reference.
-
----
-
-## Goals the Interface should satisfy
-
-1. **Standards-aligned curation** — Surface USCDI/catalog fields, dictionary FHIR R4 mapping, and QA fields (`fhir_r4_mapping_readiness`, `standards_curation_readiness`, etc.) per TECH-SPEC.
-2. **Lookup by concept** — Find an element by `semantic_id`, domain, USCDI label, or readiness.
-3. **Lookup by wire format** — Find what a **segment/field** (e.g. `PID-5`, `PV1-2`) maps to; HL7 lives in **`ddc-hl7_adt_catalog`**, not inside `semantic_id` (see TECH-SPEC §1.8: semantic IDs are format-independent).
-4. **Stable identity** — Teach users: **`semantic_id`** + links = truth; **`Name`** is display; **`upsert_key`** is technical sync key (ADT/CCDA rows).
-
----
-
-## Information architecture (suggested pages)
-
-Create **one Interface** with **4 pages** (tabs). Avoid a single 3-level hierarchy unless you truly need drill-down—many teams find **flat list + record detail** clearer.
-
-### Page A — **Semantic hub** (primary)
-
-**Purpose:** “I know the element (or USCDI concept) and want governance + FHIR.”
-
-- **Data source:** `ddc-master_patient_catalog` (or start from `ddc-master_patient_dictionary` if curation columns are the hero—see note below).
-- **Layout:**
-  - **Top:** Short text / description (static) linking to this doc + TECH-SPEC §1.8.
-  - **Filter bar (Interface filters):** e.g. `domain`, `classification`, `approval_status`, `uscdi_data_class` (multi-select where useful).
-  - **Main list:** Columns at minimum: `semantic_id`, `uscdi_element`, `approval_status`, `data_steward` (add `uscdi_description` if space).
-  - **Record detail (sidebar or full detail):** Linked **`ddc-master_patient_dictionary`** fields via lookup or **linked record** if you model explicit links; if you only have `catalog_element` from catalog side, open dictionary by **filtering a second list** where `semantic_id` matches selected row (see “Synced selection” below).
-
-**Note:** If dictionary holds most QA fields, you can make **dictionary** the primary list and **lookup** catalog columns—but then emphasize `semantic_id` in the list so joins stay obvious.
-
-### Page B — **HL7 ADT lookup** (wire-format search)
-
-**Purpose:** “I have `PID-5` / `DG1-3` / message type **A08**—what is the semantic element?”
-
-- **Data source:** `ddc-hl7_adt_catalog`.
-- **Columns:** `segment_id`, `field_id`, `message_type`, `semantic_id`, `fhir_r4_path`, `mapping_status`, `Name` (display), `upsert_key` (optional; hide in steward view, show in “Technical” section).
-- **Filters:**
-  - **Segment** (`segment_id` = PID, PV1, …)
-  - **Field** — use **contains** on `field_id` for values like `PID-5` (your data uses `field_id` such as `PID-5`; free-text “PID#” maps to filtering **PID** + **field**).
-- **Detail:** Show linked **catalog** (via `catalog_element`) and a compact **dictionary** summary (FHIR path, readiness) via linked fields or secondary list filtered by `semantic_id`.
-
-### Page C — **CCDA / XML lookup** (optional but parallel to B)
-
-- **Data source:** `ddc-ccda_catalog`.
-- **Filters:** `section_name`, `entry_type`; text filter on `xml_path` for path fragments.
-
-### Page D — **Queues & hygiene**
-
-**Purpose:** Steward backlog, not browsing.
-
-- **Lists filtered to:** `fhir_r4_mapping_readiness` ≠ Complete, `standards_curation_readiness` ≠ Complete, `mapping_status` = `needs_new_semantic`, or **empty `catalog_element`** on ADT/CCDA (unlinked queue per TECH-SPEC §1.8.2).
-
----
-
-## Selection list + “free text” behavior in Interfaces
-
-Airtable Interfaces do **not** replicate a single global “Google-style” search across all tables. Practical patterns:
-
-### 1. **Picker / single select**
-
-- Add a **Filter** element bound to the list: **single select** on `semantic_id` (if cardinality is acceptable) or on `domain` / `classification` first, then narrow.
-
-### 2. **Free text on HL7 “PID#” style**
-
-- **Preferred:** Filter **`field_id`** with condition **contains** `PID-5` (or `5` with segment = PID). Train users: the canonical HL7 locator in data is **`segment_id` + `field_id`**, not `semantic_id`.
-- **Optional data improvement:** Add a **formula field** in Airtable (not in Parquet unless you extend the pipeline), e.g. `hl7_locator` = `{segment_id} & "-" & SUBSTITUTE({field_id}, segment & "-", "")` — only if your `field_id` format is consistent. Otherwise filters on `field_id` **contains** are enough.
-
-### 3. **Free text on concept names**
-
-- Use a **Filter** on **`semantic_id`** or **`uscdi_element`** with **contains** (case behavior depends on Airtable field type).
-- For richer search across many columns, maintain a **single long text** or **formula** “search blob” field synced from scripts (future enhancement)—Interfaces filter one field reliably.
-
-### 4. **Synced selection across components**
-
-- Use **Interface** patterns that apply **one filter or selected record** to multiple lists (same page): e.g. selecting a catalog row sets a **filter** on child lists (ADT rows where `semantic_id` = selected). Exact mechanics depend on your Airtable plan/UI; if native “sync” is limited, use **Record picker** + **filtered list** linked by `semantic_id`.
-
----
-
-## Effective list configuration (less confusion than 3-level hierarchy)
-
-Your earlier **3-level** stack (ADT → catalog → dictionary) is **valid** but easy to over-nest.
-
-**Simpler reference pattern:**
-
-1. **One primary list** (catalog *or* dictionary).
-2. **Record detail** for the full field set.
-3. **Separate linked list** on the same page: “Related ADT mappings” filtered by `semantic_id` = current record (or via `catalog_element` from ADT side).
-
-This preserves **referential clarity** without deep trees.
-
-**When to use 2 levels:** ADT page only—parent list = ADT rows, child = linked catalog row (single expansion).
-
-**When to use 3 levels:** Rare; only if you need ADT → catalog → dictionary **visible at once** without opening record detail.
-
----
-
-## Field visibility checklist (stewards vs engineers)
-
-| Audience | Emphasize | De-emphasize |
-|----------|-----------|----------------|
-| **Steward** | `semantic_id`, USCDI, approval, QA readiness, dictionary FHIR columns | `upsert_key`, internal table names |
-| **Interface engineer** | ADT `segment_id`, `field_id`, `message_type`, `fhir_r4_path`, `mapping_status` | Long duplicate `Name` if redundant with columns |
-
----
-
-## Appendix: Short Omni AI spec prompt (optional, sandbox only)
-
-Paste into Omni **only** after you have tables synced; ask it to **not invent fields**. Example:
-
-```text
-Build an Airtable Interface for a healthcare data dictionary base with these tables:
-- ddc-master_patient_catalog (one row per semantic_id; USCDI and governance)
-- ddc-master_patient_dictionary (one row per semantic_id; FHIR R4 mapping and QA fields)
-- ddc-hl7_adt_catalog (many rows per semantic_id; HL7 segment_id, field_id, message_type, fhir_r4_path)
-Links: catalog_element from child tables to catalog. Do not use Name as join key; use semantic_id and links.
-
-Pages:
-1) Semantic hub: catalog list with filters domain, approval_status; record detail shows dictionary fields.
-2) HL7 ADT lookup: list from ddc-hl7_adt_catalog with filters on segment_id and field_id contains; show semantic_id and link to catalog.
-3) Queues: filtered lists for non-Complete fhir_r4_mapping_readiness.
-
-Avoid 3-level nested hierarchies; use record detail + filtered related lists instead.
+1) Confirm latest sync (optional but recommended)
+- Run:
+```powershell
+python scripts\upload_parquet_to_airtable.py --include-standards-inventories --add-relations
 ```
 
-Review every link and filter Omni creates; **promote to production** only after manual verification.
+2) Build these pages in order
+- Page A: Semantic Hub
+- Page B: HL7 ADT Lookup
+- Page C: CCDA Lookup
+- Page D: Curation Queues
+
+3) Ground rules
+- `semantic_id` is your core key for meaning.
+- `Name` is display only; in `ddc-hl7_adt_catalog` keep it compact for steward scanning.
+- `upsert_key` is technical (hide for stewards).
+- This interface guide assumes partner intake stays outside the steward base.
+- Build these pages over the curated `ddc-*` governance and lookup tables only.
+
+4) Table groups in the current base
+- Core governance:
+  - `ddc-master_patient_catalog`
+  - `ddc-master_patient_dictionary`
+  - `ddc-business_rules`
+- Interoperability lookup/reference:
+  - `ddc-hl7_adt_catalog`
+  - `ddc-ccda_catalog`
+  - `ddc-fhir_inventory`
+- Operational reference:
+  - `ddc-data_source_availability`
 
 ---
 
-## References
+## Page A: Semantic Hub (click-by-click)
 
-- **TECH-SPEC.md** — §1.8 semantic_id governance, §2.2.1 table names, §6.7.1 `Name` vs `upsert_key`
-- **docs/airtable-setup.md** — upload and `catalog_element` population
+Title: `Semantic hub`  
+Purpose: Steward governed concepts by `semantic_id`, review implementation detail, and jump to related catalog context.  
+Data source: `ddc-master_patient_dictionary` (primary) + related `ddc-master_patient_catalog`.
+
+Build order (fast path)
+
+1) Page shell
+- Open your Interface page `Semantic hub`.
+- Keep the top Text block.
+- Title it: `Semantic Hub`.
+- Add one sentence:
+  - `Browse canonical elements and open full dictionary/FHIR curation detail by semantic_id.`
+
+2) Main element list (dictionary primary)
+- Click `Add element` -> `List`.
+- Source: `ddc-master_patient_dictionary`.
+- Element title: `Find an Element (Dictionary)`.
+- In list settings:
+  - Sort: `semantic_id` ascending.
+  - Group: none.
+  - Show fields/columns (in this order):
+    - `semantic_id`
+    - `fhir_r4_mapping_readiness`
+    - `standards_curation_readiness`
+    - `fhir_r4_path`
+    - `fhir_profile`
+- Turn on `Click into record details` (or equivalent open-on-click).
+
+3) Add user filters (top of list)
+- Source: `ddc-master_patient_dictionary` (the main list on Page A).
+- In the same list’s filter controls, add:
+  - `fhir_r4_mapping_readiness`
+  - `standards_curation_readiness`
+  - Text filter: `semantic_id` contains
+  - Text filter: `fhir_r4_path` contains
+- Keep these as user-adjustable controls, not hard-coded conditions.
+
+4) Record detail panel for dictionary
+- In list/detail settings, show:
+  - `semantic_id`, `fhir_r4_path`, `fhir_data_type`, `fhir_profile`
+  - `fhir_cardinality`, `fhir_must_support`
+  - `chi_survivorship_logic`, `data_source_rank_reference`
+  - `fhir_r4_mapping_readiness`, `fhir_r4_mapping_gap_details`
+  - `standards_curation_readiness`, `standards_curation_gap_details`
+- Hide technical fields not needed for stewards (`upsert_key`).
+
+5) Wire Grid 1 -> Grid 2 context (required)
+- Goal: selecting a row in Grid 1 (`ddc-master_patient_dictionary`) automatically scopes Grid 2 (`ddc-master_patient_catalog`).
+- This only works when Grid 1 exposes a `Selected record` context variable.
+
+Pattern A (recommended): selected-record variable filter
+- Select Grid 1 and confirm row click sets selection:
+  - In right panel, enable the behavior equivalent to `Select record on click`.
+  - Keep `semantic_id` visible in Grid 1.
+- Add Grid 2 as a `List` or `Record list`.
+- Source: `ddc-master_patient_catalog`.
+- Select Grid 2 -> right panel -> `Data` -> `Filter` -> `Add condition`.
+- Configure condition:
+  - Field: `semantic_id`
+  - Operator: `is` / `equals`
+  - Value: `Insert variable` -> `Selected record from <Grid 1>` -> `semantic_id`
+- Expected result: Grid 2 instantly updates when a different Grid 1 row is selected.
+- Show catalog fields:
+  - `semantic_id`, `uscdi_element`, `uscdi_description`
+  - `uscdi_data_class`, `uscdi_data_element`
+  - `approval_status`, `data_steward`, `domain`
+
+Pattern B (more reliable in newer Interface layouts): record review + related data
+- Add a `Record review` (or detail) element for `ddc-master_patient_dictionary`.
+- Set the page context to `Selected record`.
+- Add a second element tied to related catalog context using that selected record:
+  - either a filtered `List` of `ddc-master_patient_catalog` with `semantic_id = selected semantic_id`
+  - or a related-record element if link fields are available in your base
+- This pattern is usually the most stable when list-to-list variable filters are not exposed.
+
+Pattern C (fallback): manual semantic_id filter
+- Keep Grid 2 as an independent list with `semantic_id contains` filter control.
+- Use when your Airtable plan/UI version does not expose `Insert variable` from Grid 1.
+
+Quick troubleshooting when auto-context does not work
+- Confirm you are in `Interface` edit mode (not base grid view).
+- Confirm both elements are on the same page and not inside incompatible containers.
+- Reopen Grid 2 `Data` panel and verify the filter value is a variable token, not typed text.
+- Test by clicking 2-3 different Grid 1 rows and watching Grid 2 row count change.
+- If no change, switch to Pattern B on the same page.
+
+6) Visual clarity
+- Rename sections:
+  - `Find an Element (Dictionary)`
+  - `Catalog Governance Context`
+- Keep row density medium; cap visible fields to reduce clutter.
+- Do not nest hierarchy levels on Page A.
+
+7) Save this as your 1.0 page contract
+- Page A should answer:
+  - `What is this element?`
+  - `What’s its governance status?`
+  - `What is its FHIR/dictionary curation state?`
+  - `Can I move quickly to the canonical catalog record for approval context?`
+
+What not to include on Page A
+- HL7 locator search (`PID-5`, `DG1-3`) - put this on Page B (`ddc-hl7_adt_catalog`).
+- `upsert_key` column for normal stewards.
+- 3-level hierarchy nesting.
+
+2-minute validation checklist
+- Can you type `Condition.code` and find it quickly?
+- Can you filter readiness fields and narrow quickly?
+- When selecting one dictionary row, does Grid 2 update automatically without manual typing?
+- Is `semantic_id` always visible?
+
+---
+
+## Page B: HL7 ADT Lookup (PID-5 style search)
+
+Title: `HL7 ADT Lookup`  
+Purpose: Find semantic mappings from HL7 locators (`PID-5`, `DG1-3`, `PV1-2`) and review linked context.  
+Data source: `ddc-hl7_adt_catalog`.
+
+Build order (fast path)
+
+1) Page shell
+- Create/open page `HL7 ADT Lookup`.
+- Add text:
+  - `Find semantic mapping from HL7 locators like PID-5, DG1-3, PV1-2.`
+
+2) Main ADT list
+- Click `Add element` -> `List`.
+- Source: `ddc-hl7_adt_catalog`.
+- In list settings:
+  - Sorts (in order):
+    1. `semantic_id` ascending
+    2. `message_type` ascending
+    3. `segment_id` ascending
+    4. `field_id` ascending
+  - Show fields:
+    - `segment_id`
+    - `field_id`
+    - `message_type`
+    - `semantic_id`
+    - `fhir_r4_path`
+    - `mapping_status`
+    - `Name`
+- Keep `upsert_key` hidden on steward view.
+
+3) Add user filters
+- Source: `ddc-hl7_adt_catalog` (the main list on Page B).
+- Add one fixed filter condition first:
+  - `mapping_status` is not `legacy_duplicate`
+- Add:
+  - `segment_id` equals
+  - `message_type` equals/contains
+  - Text filter: `field_id` contains (for `PID-5`)
+  - Text filter: `semantic_id` contains
+  - `mapping_status` equals
+
+4) Add linked catalog detail
+- Add detail/list for linked `catalog_element` (catalog row).
+- Show:
+  - `semantic_id`
+  - `uscdi_element`
+  - `approval_status`
+  - `data_steward`
+  - `domain`
+
+5) Add dictionary summary
+- Add list/detail from `ddc-master_patient_dictionary`.
+- Filter by selected ADT row `semantic_id`.
+- Show:
+  - `fhir_r4_path`
+  - `fhir_data_type`
+  - `fhir_profile`
+  - `fhir_r4_mapping_readiness`
+  - `standards_curation_readiness`
+
+6) Validation
+- Can you find `PID-5` via `field_id contains PID-5`?
+- Does selecting ADT row show catalog + dictionary context?
+- Is `upsert_key` hidden for non-technical users?
+
+---
+
+## Page C: CCDA Lookup (section + XML path)
+
+Title: `CCDA Lookup`  
+Purpose: Find semantic mappings from CCDA section, entry type, and XML path.  
+Data source: `ddc-ccda_catalog`.
+
+Build order (fast path)
+
+1) Page shell
+- Create/open page `CCDA Lookup`.
+- Add text:
+  - `Find semantic mapping from CCDA section, entry type, and XML path.`
+
+2) Main CCDA list
+- Add `List`.
+- Source: `ddc-ccda_catalog`.
+- In list settings:
+  - Sort: `semantic_id`, `section_name`, `entry_type`.
+  - Show fields:
+    - `section_name`
+    - `entry_type`
+    - `xml_path`
+    - `semantic_id`
+    - `fhir_r4_path`
+    - `mapping_status`
+    - `Name`
+
+3) Add filters
+- Source: `ddc-ccda_catalog` (the main list on Page C).
+- `section_name` equals
+- `entry_type` equals
+- Text filter: `xml_path` contains
+- Text filter: `semantic_id` contains
+- `mapping_status` equals
+
+4) Add linked catalog detail
+- Use `catalog_element`.
+- Show:
+  - `semantic_id`
+  - `uscdi_element`
+  - `approval_status`
+  - `data_steward`
+
+5) Add dictionary summary
+- Filter dictionary by selected CCDA row `semantic_id`.
+- Show readiness + key FHIR fields.
+
+6) Validation
+- Can you locate by XML path fragment?
+- Does selected row show catalog + dictionary context?
+
+---
+
+## Page D: Curation Queues (action page)
+
+Title: `Curation Queues`  
+Purpose: Triage actionable standards-curation and linkage gaps.  
+Data source: `ddc-master_patient_dictionary` (readiness queues) + `ddc-hl7_adt_catalog` (mapping/linkage queues).
+
+Build order (fast path)
+
+1) Page shell
+- Create/open page `Curation Queues`.
+- Add text:
+  - `Actionable queues only. Use this page for triage and follow-up.`
+
+2) Queue 1 - FHIR mapping incomplete
+- Add `List`.
+- Source: `ddc-master_patient_dictionary`.
+- Filter: `fhir_r4_mapping_readiness` is not `Complete`.
+- Fields:
+  - `semantic_id`
+  - `fhir_r4_mapping_readiness`
+  - `fhir_r4_mapping_gap_details`
+  - `steward_contact`
+
+3) Queue 2 - Standards curation incomplete
+- Add `List`.
+- Source: `ddc-master_patient_dictionary`.
+- Filter: `standards_curation_readiness` is not `Complete`.
+- Fields:
+  - `semantic_id`
+  - `standards_curation_readiness`
+  - `standards_curation_gap_details`
+  - `steward_contact`
+
+4) Queue 3 - Needs new semantic
+- Add `List`.
+- Source: `ddc-hl7_adt_catalog`.
+- Filter: `mapping_status = needs_new_semantic`.
+- Fields:
+  - `segment_id`
+  - `field_id`
+  - `message_type`
+  - `semantic_id`
+  - `mapping_status`
+  - `notes`
+
+5) Queue 4 - Potential unlinked rows
+- Add `List`.
+- Source: `ddc-hl7_adt_catalog` (optional second block for CCDA).
+- Filter: `catalog_element` is empty.
+- Fields:
+  - `segment_id`
+  - `field_id`
+  - `semantic_id`
+  - `mapping_status`
+  - `notes`
+
+6) Optional Queue 5 - Rules needing authoring/review
+- Add `List`.
+- Source: `ddc-business_rules`.
+- Add fixed filters:
+  - `active` is `true`
+  - `approval_status` is not `approved`
+  - `approval_status` is not `deprecated`
+- Fields:
+  - `semantic_id`
+  - `rule_id`
+  - `rule_name`
+  - `rule_type`
+  - `approval_status`
+  - `owner`
+
+7) Validation
+- Are queues actionable and not noisy?
+- Can steward see owner/contact context quickly?
+
+---
+
+## Cross-page behavior (important)
+
+- Airtable pages do not reliably carry selected record context page-to-page.
+- Treat each page as independently usable.
+- Repeat critical filters on each page.
+
+---
+
+## Optional Omni prompt (sandbox only)
+
+```text
+Build a 4-page Airtable Interface for this base:
+- Page A Semantic hub: source ddc-master_patient_catalog with filters domain, approval_status, semantic_id contains, uscdi_element contains; show dictionary detail by matching semantic_id.
+- Page B HL7 ADT lookup: source ddc-hl7_adt_catalog with filters segment_id, message_type, field_id contains; show linked catalog_element and dictionary summary by semantic_id.
+- Page C CCDA lookup: source ddc-ccda_catalog with filters section_name, entry_type, xml_path contains; show linked catalog and dictionary summary.
+- Page D Curation queues: dictionary rows where readiness fields are not Complete; ADT rows with mapping_status=needs_new_semantic; rows with empty catalog_element.
+Use semantic_id and catalog_element links for relationships. Do not treat Name as join key.
+```

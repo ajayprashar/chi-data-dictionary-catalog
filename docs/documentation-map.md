@@ -7,11 +7,15 @@ Use this page as the index for which documents are actively maintained versus ke
 ## Canonical (actively maintained)
 
 - `README.md`
-  - Entry point for Airtable-first setup, pipeline commands, and core files.
+  - Entry point for the 3-layer operating model, pipeline commands, and core files.
 - `TECH-SPEC.md`
   - Architecture, data model, and implementation behavior.
 - `docs/airtable-setup.md`
-  - Airtable setup, workflow, interface specification, standards inventories, and verification guidance.
+  - Airtable steward workspace setup, workflow, interface specification, standards inventories, and verification guidance.
+- `docs/airtable-interface-curation-workspace.md`
+  - Full click-by-click interface build guide for the steward workspace.
+- `docs/airtable-interface-click-checklist.md`
+  - One-pass checklist for applying the live Airtable Interface edits.
 - `docs/jupyter-duckdb-parquet-setup.md`
   - Notebook and DuckDB execution guidance.
 
@@ -38,3 +42,5 @@ Use this page as the index for which documents are actively maintained versus ke
   - Point-in-time cleanup event summary.
 
 When content conflicts, prefer the canonical set first.
+
+Notion pages are treated as planning/reference input. The repo's canonical documents above are the source-controlled implementation contract.

@@ -3,7 +3,8 @@
 Build `ddc-ccda_catalog.parquet` from the CCD-to-semantic_id mapping CSV.
 
 Reads mapping CSV (default `data/ccd_to_semantic_id_mapping.csv`; archive fallback supported)
-and writes project-root `ddc-ccda_catalog.parquet` with columns expected by the Airtable-first pipeline:
+and writes project-root `ddc-ccda_catalog.parquet` with columns expected by the
+current steward-workspace pipeline:
 message_format, section_name, entry_type, xml_path, semantic_id, fhir_r4_path, notes,
 mapping_status, business_rule_required, business_rule_notes.
 

@@ -135,10 +135,10 @@ The script upserts these local Parquet files (project root) into your Airtable B
 
 All table names are `ddc-*` (no `.parquet` suffix), matching what you created in Airtable.
 
-**Display vs sync identity (1.0):** The uploader sets **`Name`** to a human-readable label and writes **`upsert_key`** with the stable composite key used for matching. Upsert logic still keys off the underlying columns (not `Name`). Catalog links use **`semantic_id`**. See **TECH-SPEC.md §6.7.1**.
+**Display vs sync identity (1.0):** The uploader sets **`Name`** to a human-readable label and writes **`upsert_key`** with the stable composite key used for matching. For `ddc-hl7_adt_catalog`, `Name` is intentionally compact (`field_id | semantic_id`) so stewards can scan HL7 locators quickly. Upsert logic still keys off the underlying columns (not `Name`). Catalog links use **`semantic_id`**. See **TECH-SPEC.md §6.7.1**.
 
 ### How to run it
-From the repo root (`C:\AI\chi-data-dictionary-catalog`):
+From the repo root:
 
 ```powershell
 .venv\Scripts\activate
@@ -158,9 +158,31 @@ Relation field created/populated:
 ### Token / environment
 The script reads `AIRTABLE_API_KEY` from:
 - environment variable `AIRTABLE_API_KEY` (recommended), or
-- Cursor MCP config (`C:\Users\apras\.cursor\mcp.json`) as a fallback.
+- Cursor MCP config (`~/.cursor/mcp.json`) as a fallback.
 
-If you want the script to be portable across machines, set `AIRTABLE_API_KEY` before running.
+Optional portability settings:
+- `AIRTABLE_BASE_ID` can be set in the environment instead of passing `--base-id`.
+- `--base-dir` can be used if the parquet artifacts are not in the repo root next to `scripts/`.
+- `--mcp-config-path` can be used when the fallback MCP config is stored outside the default Cursor location.
+
+If you want the script to be portable across machines, set `AIRTABLE_API_KEY` explicitly before running.
+
+---
+
+## Airtable Steward Workflow
+
+### Airtable's role in the operating model
+
+Use the current implementation as a **3-layer model**:
+
+- **Layer 1: partner intake** stays outside the steward base.
+  - Source inventories, local code capture, and relationship notes should be collected in intake workbooks or equivalent source documents.
+- **Layer 2: CHI governance** is the controlled semantic layer.
+  - Parquet artifacts and the synced `ddc-*` governance tables hold the curated semantic model.
+- **Layer 3: Airtable stewardship** is the working interface.
+  - Airtable is where stewards browse, triage, review, and manage readiness over the governed model.
+
+This means the current base is intentionally **not** trying to be the partner intake workbook and should not be treated as the only place where semantic logic lives.
 
 ---
 
@@ -174,8 +196,8 @@ Use this model when deciding which tables are actively stewarded versus periodic
 flowchart LR
     Catalog["ddc-master_patient_catalog<br/>Canonical concept list<br/>(what exists)"]
     Dictionary["ddc-master_patient_dictionary<br/>Implementation definition layer<br/>(how implemented)"]
-    RefTables["Reference / periodic refresh tables<br/>ddc-hl7_adt_catalog<br/>ddc-ccda_catalog<br/>ddc-fhir_inventory<br/>ddc-data_source_availability"]
-    Rules["ddc-business_rules<br/>Active governance rule registry"]
+    RefTables["Lookup and reference tables<br/>ddc-hl7_adt_catalog<br/>ddc-ccda_catalog<br/>ddc-fhir_inventory<br/>ddc-data_source_availability"]
+    Rules["ddc-business_rules<br/>Core governance rule registry"]
 
     Catalog --> Dictionary
     Catalog --> RefTables
@@ -183,16 +205,20 @@ flowchart LR
 ```
 
 Operational interpretation:
-- Active governance: `ddc-master_patient_catalog`, `ddc-master_patient_dictionary`, `ddc-business_rules`
-- Reference / periodic refresh: `ddc-hl7_adt_catalog`, `ddc-ccda_catalog`, `ddc-fhir_inventory`, `ddc-data_source_availability`
+- Core governance: `ddc-master_patient_catalog`, `ddc-master_patient_dictionary`, `ddc-business_rules`
+- Interoperability lookup/reference: `ddc-hl7_adt_catalog`, `ddc-ccda_catalog`, `ddc-fhir_inventory`
+- Operational reference: `ddc-data_source_availability`
 
 ---
 
 ### What stewards edit (editable group)
-- Standards columns in `ddc-master_patient_dictionary` (for the selected `semantic_id`), such as:
+- Governance fields in `ddc-master_patient_catalog` for the selected `semantic_id`, such as:
+  - `approval_status`, `reviewer_notes`, `data_steward`, `steward_contact`
+- Implementation and standards fields in `ddc-master_patient_dictionary` (for the selected `semantic_id`), such as:
   - `fhir_r4_path`, `fhir_data_type`, `fhir_profile`, `fhir_must_support`
-  - `hie_survivorship_logic`, `tie_breaker_rule`, `conflict_detection_enabled`
+  - `chi_survivorship_logic`, `tie_breaker_rule`, `conflict_detection_enabled`
   - `identity_resolution_notes`, `de_identification_method`
+- Rule records in `ddc-business_rules` when organization-specific logic needs explicit rule lifecycle tracking.
 - Steward workflow fields:
   - `curation_status` (string; e.g. `Needs Action`, `In Progress`, `Ready for Review`)
   - `steward_assigned_to`
@@ -221,7 +247,7 @@ Per your request, approval is stored **per `semantic_id`** in `ddc-master_patien
 
 ### Navigation constraint
 - The Link/Relation field `catalog_element` (in `ddc-master_patient_dictionary`, plus the optional `ddc-hl7_adt_catalog`, `ddc-ccda_catalog`, and `ddc-data_source_availability`) is populated by the uploader based on `semantic_id`.
-- This lets a steward start at a dictionary row and jump to the canonical catalog element (and its linked optional mappings + source availability).
+- This lets a steward start at a dictionary or mapping row and jump back to the canonical catalog element (and its linked rules, optional mappings, and source availability).
 
 ---
 
@@ -252,13 +278,13 @@ Use friendly labels in Airtable interface page titles:
 
 | Table | Purpose | Cadence | Mode |
 |---|---|---|---|
-| `ddc-master_patient_catalog` | Canonical `semantic_id` inventory | As approved concepts change | Active governance |
-| `ddc-master_patient_dictionary` | FHIR/survivorship/definition details | As implementation changes | Active governance |
-| `ddc-business_rules` | Organization rules and exceptions | Frequent (weekly/biweekly) | Active governance |
-| `ddc-data_source_availability` | Source coverage/completeness/timeliness | Periodic snapshot refresh | Operational |
-| `ddc-fhir_inventory` | Standards inventory for mapping review | Release- or mapping-driven | Reference + steward queue |
-| `ddc-hl7_adt_catalog` | ADT field mapping reference | Interface-change driven | Reference |
-| `ddc-ccda_catalog` | CCDA path mapping reference | Interface-change driven | Reference |
+| `ddc-master_patient_catalog` | Canonical `semantic_id` inventory | As approved concepts change | Core governance |
+| `ddc-master_patient_dictionary` | FHIR/survivorship/definition details | As implementation changes | Core governance |
+| `ddc-business_rules` | Organization rules and exceptions | Frequent (weekly/biweekly) | Core governance |
+| `ddc-data_source_availability` | Source coverage/completeness/timeliness | Periodic snapshot refresh | Operational reference |
+| `ddc-fhir_inventory` | Standards inventory for mapping review | Release- or mapping-driven | Interoperability lookup/reference |
+| `ddc-hl7_adt_catalog` | ADT field mapping reference | Interface-change driven | Interoperability lookup/reference |
+| `ddc-ccda_catalog` | CCDA path mapping reference | Interface-change driven | Interoperability lookup/reference |
 
 ### Lineage type legend
 
@@ -295,13 +321,15 @@ Use friendly labels in Airtable interface page titles:
 | hipaa_category | A | singleLineText | yes | |
 | fhir_security_label | A | singleLineText | yes | |
 | consent_category | A | singleLineText | yes | |
-| ddc-master_patient_dictionary | L | multipleRecordLinks | — | Reverse link from dictionary |
-| ddc-hl7_adt_catalog | L | multipleRecordLinks | — | Reverse link from ADT |
-| ddc-ccda_catalog | L | multipleRecordLinks | — | Reverse link from CCDA |
-| ddc-data_source_availability | L | multipleRecordLinks | — | Reverse link from availability |
+| implementation_records | L | multipleRecordLinks | — | Reverse link from dictionary |
+| hl7_adt_mappings | L | multipleRecordLinks | — | Reverse link from ADT |
+| ccda_mappings | L | multipleRecordLinks | — | Reverse link from CCDA |
+| source_availability_records | L | multipleRecordLinks | — | Reverse link from availability |
 | reviewer_notes | W | multilineText | no | Airtable-only; reviewer workflow |
 | uscdi_data_class | A | singleLineText | yes | Synced by upload script; created in Airtable if missing |
 | uscdi_data_element | A | singleLineText | yes | Synced by upload script; created in Airtable if missing |
+| fhir_inventory_records | L | multipleRecordLinks | — | Reverse link from FHIR inventory |
+| business_rule_records | L | multipleRecordLinks | — | Reverse link from business rules |
 
 ### ddc-master_patient_dictionary
 
@@ -309,7 +337,7 @@ Use friendly labels in Airtable interface page titles:
 |-------|---------|---------------|---------|-------|
 | Name | P | singleLineText | no | Airtable primary field |
 | semantic_id | A | singleLineText | yes | Foreign key; join key |
-| hie_survivorship_logic | A | multilineText | yes | |
+| chi_survivorship_logic | A | multilineText | yes | Canonical CHI survivorship field |
 | data_source_rank_reference | A | multilineText | yes | |
 | coverage_personids | A | singleLineText | yes | |
 | granularity_level | A | singleLineText | yes | |
@@ -317,7 +345,6 @@ Use friendly labels in Airtable interface page titles:
 | fhir_r4_path | A | singleLineText | yes | Canonical FHIR path |
 | innovaccer_survivorship_logic | A | multilineText | yes | |
 | fhir_data_type | A | singleLineText | yes | |
-| shie_survivorship_logic | A | multilineText | yes | Legacy; maps to hie_survivorship_logic |
 | calculation_grain | A | singleLineText | yes | |
 | historical_freeze | A | singleLineText | yes | |
 | fhir_must_support | A | singleLineText | yes | |
@@ -493,7 +520,7 @@ Create these views in `ddc-master_patient_dictionary`:
      - `curation_status`
      - `steward_assigned_to`
      - `steward_action_notes`
-     - `hie_survivorship_logic`
+     - `chi_survivorship_logic`
      - `data_source_rank_reference`
      - `identity_resolution_notes`
      - `tie_breaker_rule`
@@ -682,7 +709,7 @@ Create these dictionary views exactly:
 2) Queue - Needs Standards QA
    Filter: standards_curation_readiness = "Needs Standards QA"
    Sort: steward_assigned_to asc, semantic_id asc
-   Fields: semantic_id, catalog_element, standards_curation_readiness, standards_curation_gap_details, curation_status, steward_assigned_to, steward_action_notes, hie_survivorship_logic, data_source_rank_reference, identity_resolution_notes, tie_breaker_rule, de_identification_method
+   Fields: semantic_id, catalog_element, standards_curation_readiness, standards_curation_gap_details, curation_status, steward_assigned_to, steward_action_notes, chi_survivorship_logic, data_source_rank_reference, identity_resolution_notes, tie_breaker_rule, de_identification_method
 
 3) Queue - In Progress
    Filter: curation_status = "In Progress"
@@ -730,7 +757,7 @@ Requirements (must all be satisfied):
 2) Use ddc-master_patient_dictionary as the primary source.
 3) Build a 3-column single-screen layout:
    - Left column: record list for semantic_id with quick fields curation_status, fhir_r4_mapping_readiness, standards_curation_readiness.
-   - Middle column: dictionary detail focused on FHIR + standards fields (fhir_r4_path, fhir_data_type, fhir_profile, fhir_must_support, fhir_cardinality, hie_survivorship_logic, data_source_rank_reference, identity_resolution_notes, tie_breaker_rule, de_identification_method, steward_action_notes, curation_status, steward_assigned_to).
+   - Middle column: dictionary detail focused on FHIR + standards fields (fhir_r4_path, fhir_data_type, fhir_profile, fhir_must_support, fhir_cardinality, chi_survivorship_logic, data_source_rank_reference, identity_resolution_notes, tie_breaker_rule, de_identification_method, steward_action_notes, curation_status, steward_assigned_to).
    - Right column: linked catalog detail from catalog_element (show semantic_id, uscdi_element, uscdi_data_class, uscdi_data_element, approval_status, reviewer_notes, data_steward, steward_contact, last_modified_date).
 4) On the same page, add related-record sections filtered to the selected semantic_id for:
    - ddc-hl7_adt_catalog
@@ -772,7 +799,7 @@ Apply all changes below without renaming tables or fields:
 - Dictionary overview default columns:
   semantic_id, curation_status, fhir_r4_mapping_readiness, standards_curation_readiness
 - Dictionary detail default columns:
-  fhir_r4_path, fhir_data_type, fhir_profile, fhir_must_support, fhir_cardinality, hie_survivorship_logic, data_source_rank_reference, identity_resolution_notes
+  fhir_r4_path, fhir_data_type, fhir_profile, fhir_must_support, fhir_cardinality, chi_survivorship_logic, data_source_rank_reference, identity_resolution_notes
 - Linked catalog detail default columns:
   semantic_id, uscdi_element, approval_status, reviewer_notes, last_modified_date
 

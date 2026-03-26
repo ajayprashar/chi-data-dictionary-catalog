@@ -32,6 +32,29 @@ If you only need a high-level understanding, you can stop here and use the app. 
 
 ---
 
+## Operating Model Alignment
+
+This repo implements the CHI workflow as a **3-layer model**:
+
+1. **Partner intake** stays outside the steward base.
+   - External/source-system field inventories, code sets, and context notes belong in Excel or intake workbooks, not in the core `ddc-*` Airtable tables.
+2. **CHI governance** is the controlled semantic layer.
+   - The governed model is represented in parquet and synchronized into the core Airtable tables.
+   - `ddc-master_patient_catalog`, `ddc-master_patient_dictionary`, and `ddc-business_rules` are the primary governance tables.
+3. **Airtable stewardship** is the working UI over the governed model.
+   - Airtable is used for lookup, curation, approval workflow, and queue management.
+   - It is not the only source of truth for semantic logic.
+
+For implementation purposes, the current Airtable base is grouped as:
+
+- **Core governance**: `ddc-master_patient_catalog`, `ddc-master_patient_dictionary`, `ddc-business_rules`
+- **Interoperability lookup/reference**: `ddc-hl7_adt_catalog`, `ddc-ccda_catalog`, `ddc-fhir_inventory`
+- **Operational reference**: `ddc-data_source_availability`
+
+This keeps partner intake concerns separate from steward operations while preserving `semantic_id` as the stable join key across all governed artifacts.
+
+---
+
 ## HIE Interoperability Maturity
 
 Latest assessment: **2026-03-04** (see **docs/archive/EVALUATION.md** for full domain scoring and rationale).
@@ -140,11 +163,11 @@ The catalog schema aligns with Health Information Exchange (HIE) interoperabilit
 
 | Domain | Scope | Catalog Support |
 |--------|-------|-----------------|
-| **Domain 1: Master Demographics** | Identity attributes, survivorship rules | `classification`, `domain`, `hie_survivorship_logic`, `data_source_rank_reference` |
+| **Domain 1: Master Demographics** | Identity attributes, survivorship rules | `classification`, `domain`, `chi_survivorship_logic`, `data_source_rank_reference` |
 | **Domain 2: Master Patient Attributes** | Calculated fields (AF/AG housing status), temporal grain | `calculation_grain`, `historical_freeze`, `recalc_window_months`, `granularity_level` |
 | **Domain 3: Clinical Governance** | Terminology mapping, value sets | `fhir_r4_path`, `fhir_data_type`; value-set tables (future). USCDI v4 is the design baseline for data classes and elements referenced in `uscdi_*` columns, while USCDI v3 remains the current certification baseline. |
 
-**Additional HIE alignment:**
+**Additional CHI alignment:**
 
 - **Roll-up vs. detail** — `rollup_relationship`, `is_rollup` for race, ethnicity, language, etc. (detailed elements point to rollup parent).
 - **Address coherence** — `composite_group` ensures street, city, zip are selected as a set from one source at one timestamp.
@@ -363,9 +386,9 @@ Interpretation tip: in `ddc-master_patient_catalog`, "master_patient" means *per
 
 | Table | Primary purpose | Expected update cadence | Stewarding mode |
 |---|---|---|---|
-| `ddc-master_patient_catalog` | Canonical concept inventory | As new concepts are approved | Active governance |
-| `ddc-master_patient_dictionary` | Implementation and survivorship definitions | As mapping/rules evolve | Active governance |
-| `ddc-business_rules` | Organization-specific rule lifecycle | Frequent (weekly/biweekly) | Active governance |
+| `ddc-master_patient_catalog` | Canonical concept inventory | As new concepts are approved | Core governance |
+| `ddc-master_patient_dictionary` | Implementation and survivorship definitions | As mapping/rules evolve | Core governance |
+| `ddc-business_rules` | Organization-specific rule lifecycle | Frequent (weekly/biweekly) | Core governance |
 | `ddc-data_source_availability` | Source coverage and quality signals | Periodic refresh (e.g., monthly) | Operational snapshot |
 | `ddc-fhir_inventory` | FHIR standards inventory | Release- or mapping-driven | Reference + steward disposition |
 | `ddc-hl7_adt_catalog` | ADT format mapping | Interface-change driven | Reference mapping |
@@ -380,7 +403,7 @@ Interpretation tip: in `ddc-master_patient_catalog`, "master_patient" means *per
 - **MASTER_PATIENT_CATALOG** → **FHIR_INVENTORY**: 1:many by `semantic_id` when mapped
 - **MASTER_PATIENT_CATALOG** → **BUSINESS_RULES**: 1:many by `semantic_id` when mapped
 
-Current canonical ERD (Airtable-first):
+Current canonical ERD (steward workspace):
 
 ```mermaid
 erDiagram
@@ -401,7 +424,7 @@ erDiagram
         string semantic_id PK, FK
         string fhir_r4_path
         string fhir_data_type
-        string hie_survivorship_logic
+        string chi_survivorship_logic
         string data_source_rank_reference
         string catalog_element FK
     }
@@ -490,7 +513,7 @@ Note: historical Streamlit-era ERD variants are archived in `docs/archive/hl7_cc
 
 **Grain:** One row per `semantic_id` (foreign key to catalog).
 
-**Source:** Same split script. Historical note: Excel column "SHIE Survivorship Logic" becomes `hie_survivorship_logic` in Parquet.
+**Source:** Same split script. Historical note: intake headers such as "SHIE Survivorship Logic" and "HIE Survivorship Logic" are normalized to the canonical Parquet field `chi_survivorship_logic`.
 
 ---
 
@@ -579,7 +602,7 @@ Note: historical Streamlit-era ERD variants are archived in `docs/archive/hl7_cc
 | Column | Type | Description |
 |--------|------|-------------|
 | `semantic_id` | string | Primary key, FK to catalog. |
-| `hie_survivorship_logic` | string | HIE survivorship rule text. |
+| `chi_survivorship_logic` | string | CHI survivorship rule text. |
 | `tie_breaker_rule` | string | **Survivorship enhancement.** Tie-breaker when sources have equal rank: "most_recent" \| "most_complete" \| "source_reliability_score". |
 | `conflict_detection_enabled` | string | **Survivorship enhancement.** "true" \| "false" for logging when sources disagree. |
 | `manual_override_allowed` | string | **Survivorship enhancement.** "true" \| "false" for steward intervention capability. |
@@ -681,7 +704,7 @@ Expected columns (Excel headers; script normalizes and converts to snake_case):
 
 **Catalog:** Semantic ID, USCDI Element, USCDI Description, USCDI Data Class, USCDI Data Element, Classification, Ruleset Category, Privacy/Security, Domain, Rollup Relationship, Is Rollup, Composite Group, Data Steward, Steward Contact, Approval Status, Schema Version, Last Modified Date, Identifier Type, Identifier Authority, HIPAA Category, FHIR Security Label, Consent Category
 
-**Dictionary:** Semantic ID, SHIE Survivorship Logic, Data Source Rank Reference, Coverage (# PersonIDs), Granularity Level, Innovaccer Survivorship Logic, Data Quality Notes, FHIR R4 Path, FHIR Data Type, Calculation Grain, Historical Freeze, Recalc Window (Months), FHIR Must Support, FHIR Profile, FHIR Cardinality, Identity Resolution Notes, Tie Breaker Rule, Conflict Detection Enabled, Manual Override Allowed, De-identification Method
+**Dictionary:** Semantic ID, CHI Survivorship Logic, Data Source Rank Reference, Coverage (# PersonIDs), Granularity Level, Innovaccer Survivorship Logic, Data Quality Notes, FHIR R4 Path, FHIR Data Type, Calculation Grain, Historical Freeze, Recalc Window (Months), FHIR Must Support, FHIR Profile, FHIR Cardinality, Identity Resolution Notes, Tie Breaker Rule, Conflict Detection Enabled, Manual Override Allowed, De-identification Method
 
 ---
 
@@ -704,7 +727,7 @@ The app joins catalog + dictionary on `semantic_id` and derives `fhir_resource`.
 | `privacy_security` | — | ✓ | Multiselect |
 | `fhir_r4_path` | — | ✓ | Search |
 | `fhir_data_type` | — | ✓ | — |
-| `hie_survivorship_logic` | — | ✓ | — |
+| `chi_survivorship_logic` | — | ✓ | — |
 | `innovaccer_survivorship_logic` | — | ✓ | — |
 | `data_source_rank_reference` | — | ✓ | — |
 | `coverage_personids` | — | ✓ | — |
@@ -942,7 +965,7 @@ If this application is rebuilt in another platform (for example, Airtable), the 
 |------|-----------------|--------|
 | 1. Author | Edit Excel, export combined CSV | `combined_export.csv` |
 | 2. Split | `python scripts/split_to_catalog_and_dictionary.py combined_export.csv` | `ddc-master_patient_catalog.parquet`, `ddc-master_patient_dictionary.parquet` |
-| 2b. Upgrade (existing Parquet) | `python scripts/split_to_catalog_and_dictionary.py --upgrade-schema -d .` | Adds HIE alignment columns to existing Parquet |
+| 2b. Upgrade (existing Parquet) | `python scripts/split_to_catalog_and_dictionary.py --upgrade-schema -d .` | Adds CHI alignment columns to existing Parquet |
 | 3. ADT catalog (optional) | `python scripts/build_adt_catalog_from_mapping.py` | `ddc-hl7_adt_catalog.parquet` |
 | 4. CCDA catalog (optional) | `python scripts/build_ccda_catalog_from_mapping.py` | `ddc-ccda_catalog.parquet` |
 | 5. Data source availability | `python scripts/build_data_source_availability.py` | `ddc-data_source_availability.parquet` |

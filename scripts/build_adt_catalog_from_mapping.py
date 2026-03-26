@@ -3,7 +3,8 @@
 Build `ddc-hl7_adt_catalog.parquet` from the L2-to-semantic_id mapping CSV.
 
 Reads mapping CSV (default `data/l2_to_semantic_id_mapping.csv`; archive fallback supported)
-and writes project-root `ddc-hl7_adt_catalog.parquet` with columns expected by the Airtable-first pipeline:
+and writes project-root `ddc-hl7_adt_catalog.parquet` with columns expected by the
+current steward-workspace pipeline:
 message_format, message_type, segment_id, field_id, field_name, data_type,
 optionality, cardinality, semantic_id, fhir_r4_path, notes, mapping_status,
 business_rule_required, business_rule_notes.
