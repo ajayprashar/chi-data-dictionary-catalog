@@ -6,7 +6,7 @@ Reads mapping CSV (default `data/ccd_to_semantic_id_mapping.csv`; archive fallba
 and writes project-root `ddc-ccda_catalog.parquet` with columns expected by the
 current steward-workspace pipeline:
 message_format, section_name, entry_type, xml_path, semantic_id, fhir_r4_path, notes,
-mapping_status, business_rule_required, business_rule_notes.
+mapping_status.
 
 Usage:
   python scripts/build_ccda_catalog_from_mapping.py
@@ -74,8 +74,6 @@ def main() -> None:
                 "notes": (r.get("notes") or "").strip(),
                 # Governance fields are now promoted into canonical CCDA catalog.
                 "mapping_status": "mapped" if (r.get("semantic_id") or "").strip() else "needs_new_semantic",
-                "business_rule_required": "",
-                "business_rule_notes": (r.get("notes") or "").strip(),
             })
 
     df = pd.DataFrame(rows)

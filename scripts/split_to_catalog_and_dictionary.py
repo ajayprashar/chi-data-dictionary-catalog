@@ -47,7 +47,6 @@ CATALOG_COLUMNS = [
     "USCDI Data Element",
     "Classification",
     "Ruleset Category",
-    "Privacy/Security",
     "Domain",
     "Rollup Relationship",
     "Is Rollup",
@@ -85,8 +84,6 @@ DICTIONARY_COLUMNS = [
     "Semantic ID",
     CANONICAL_SURVIVORSHIP_HEADER,
     "Data Source Rank Reference",
-    "Coverage (# PersonIDs)",
-    "Granularity Level",
     "Innovaccer Survivorship Logic",
     "Data Quality Notes",
     "FHIR R4 Path",
@@ -115,8 +112,8 @@ def to_snake(name: str) -> str:
 
     Examples:
       "Semantic ID" -> "semantic_id"
-      "Coverage (# PersonIDs)" -> "coverage_personids"
       "FHIR R4 Path" -> "fhir_r4_path"
+      "USCDI Data Class" -> "uscdi_data_class"
     """
     # Replace any run of non-alphanumeric characters with underscore
     s = re.sub(r"[^0-9A-Za-z]+", "_", name.strip())

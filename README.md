@@ -109,7 +109,7 @@ Legacy intake headers such as `SHIE Survivorship Logic` and `HIE Survivorship Lo
 - CCD/CCDA: `python scripts/build_ccda_catalog_from_mapping.py` → `ddc-ccda_catalog.parquet` (mapping input defaults to `data/ccd_to_semantic_id_mapping.csv`; archive fallback is supported).
 - Data source availability: `python scripts/build_data_source_availability.py` → `ddc-data_source_availability.parquet` (links sources to semantic IDs).
 - Standards inventories and rules: `python scripts/build_standards_inventories.py -d .` → `ddc-fhir_inventory.parquet`, `ddc-business_rules.parquet`.
-- ADT/CCDA governance fields are now promoted into canonical catalogs (`ddc-hl7_adt_catalog.parquet`, `ddc-ccda_catalog.parquet`): `mapping_status`, `business_rule_required`, `business_rule_notes`.
+- ADT/CCDA governance includes canonical `mapping_status` in promoted catalogs (`ddc-hl7_adt_catalog.parquet`, `ddc-ccda_catalog.parquet`).
 
 **Airtable sync:**
 - Core + inventories: `python scripts/upload_parquet_to_airtable.py --include-standards-inventories`

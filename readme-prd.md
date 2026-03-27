@@ -92,7 +92,7 @@ This mirrors enterprise metadata patterns while remaining simple.
 
 ### Artifacts
 
-*   **ddc-master_patient_catalog.parquet** — Master patient catalog (Semantic ID, element name, description, classification, ruleset category, privacy/security).
+*   **ddc-master_patient_catalog.parquet** — Master patient catalog (Semantic ID, element name, description, classification, ruleset category, HIPAA/FHIR/consent governance tags).
 *   **ddc-master_patient_dictionary.parquet** — Master patient dictionary (Semantic ID plus FHIR paths, survivorship logic, data quality notes, and other definition/rule columns).
 *   Source data is authored in Excel; a single combined export is split into these two Parquet files by the project script (see *Data pipeline* below).
 *   Optional **message-format catalogs** for interoperability demonstrations:
@@ -141,7 +141,7 @@ The primary viewer is Airtable interfaces and views that present catalog and dic
     *   FHIR resource (derived from `fhir_r4_path`, e.g., `Patient`, `Observation`, `Encounter`).
     *   `classification` (e.g., Master Demographics, SDOH).
     *   `ruleset_category` (e.g., Static Identity, Dynamic Identity).
-    *   `privacy_security` (e.g., PII / Sensitive).
+    *   `hipaa_category`, `fhir_security_label`, and `consent_category`.
 *   **Two‑pane layout**:
     *   Left: search + filters + a scrollable list/table of matching elements (with a clear “N results” indicator).
     *   Right: a detail view for the currently selected element.
@@ -152,8 +152,8 @@ For the selected element (joined on `semantic_id` across catalog and dictionary)
 
 *   **Identity & catalog block**: `semantic_id`, `uscdi_element`, `uscdi_description`, `classification`, `ruleset_category`.
 *   **FHIR mapping block**: `fhir_r4_path`, `fhir_data_type`, and derived FHIR resource name, with easy copy‑to‑clipboard behavior.
-*   **Survivorship & sourcing block**: `chi_survivorship_logic`, `innovaccer_survivorship_logic`, `data_source_rank_reference`, `coverage_personids`, `granularity_level`.
-*   **Quality & governance block**: `data_quality_notes`, `privacy_security`, and visual flags for missing critical values (for example, no FHIR mapping or no survivorship logic).
+*   **Survivorship & sourcing block**: `chi_survivorship_logic`, `innovaccer_survivorship_logic`, `data_source_rank_reference`.
+*   **Quality & governance block**: `data_quality_notes`, `hipaa_category`, `fhir_security_label`, `consent_category`, and visual flags for missing critical values (for example, no FHIR mapping or no survivorship logic).
 *   **Message‑format mappings block (optional)**: when `ddc-hl7_adt_catalog.parquet` and/or `ddc-ccda_catalog.parquet` are present, side‑by‑side tables show how the same master patient element maps into HL7 ADT segments/fields and CCD/CCDA XML paths.
 
 The overall experience should let CHI stewards and architects use the app as a **practical management tool**, not just a static viewer.

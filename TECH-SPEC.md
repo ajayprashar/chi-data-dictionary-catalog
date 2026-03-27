@@ -139,7 +139,6 @@ The CHI Master Demographics layer (L3) implements **probabilistic identity resol
 The catalog implements **attribute-level security classification** to support HIPAA compliance, 42 CFR Part 2 (substance use disorder), and FHIR security labeling:
 
 **Security and Privacy Columns:**
-- `privacy_security` — Legacy PII/Sensitive classification
 - `hipaa_category` — HIPAA-specific: "PII" | "PHI" | "SUD_Part2" | "" for regulatory compliance
 - `fhir_security_label` — FHIR security labels: "N" (normal), "R" (restricted), "V" (very restricted)
 - `consent_category` — Consent requirements: "general" | "research" | "sensitive" for opt-in/opt-out directives
@@ -164,7 +163,7 @@ The catalog schema aligns with Health Information Exchange (HIE) interoperabilit
 | Domain | Scope | Catalog Support |
 |--------|-------|-----------------|
 | **Domain 1: Master Demographics** | Identity attributes, survivorship rules | `classification`, `domain`, `chi_survivorship_logic`, `data_source_rank_reference` |
-| **Domain 2: Master Patient Attributes** | Calculated fields (AF/AG housing status), temporal grain | `calculation_grain`, `historical_freeze`, `recalc_window_months`, `granularity_level` |
+| **Domain 2: Master Patient Attributes** | Calculated fields (AF/AG housing status), temporal grain | `calculation_grain`, `historical_freeze`, `recalc_window_months` |
 | **Domain 3: Clinical Governance** | Terminology mapping, value sets | `fhir_r4_path`, `fhir_data_type`; value-set tables (future). USCDI v4 is the design baseline for data classes and elements referenced in `uscdi_*` columns, while USCDI v3 remains the current certification baseline. |
 
 **Additional CHI alignment:**
@@ -416,7 +415,6 @@ erDiagram
         string classification
         string domain
         string ruleset_category
-        string privacy_security
         string approval_status
     }
 
@@ -436,8 +434,6 @@ erDiagram
         string field_id
         string fhir_r4_path
         string mapping_status
-        string business_rule_required
-        string business_rule_notes
         string catalog_element FK
     }
 
@@ -448,8 +444,6 @@ erDiagram
         string xml_path
         string fhir_r4_path
         string mapping_status
-        string business_rule_required
-        string business_rule_notes
         string catalog_element FK
     }
 
@@ -467,8 +461,6 @@ erDiagram
         string fhir_path
         string fhir_resource
         string mapping_status
-        string business_rule_required
-        string business_rule_notes
         string catalog_element FK
     }
 
@@ -572,7 +564,6 @@ Note: historical Streamlit-era ERD variants are archived in `docs/archive/hl7_cc
 | `classification` | string | Grouping (e.g., "Master Demographics", "SDOH"). |
 | `domain` | string | **HIE Three-Domain Separation.** Governance boundary: "Domain 1: Master Demographics" \| "Domain 2: Master Patient Attributes" \| "Domain 3: Clinical Governance". |
 | `ruleset_category` | string | Ruleset (e.g., "Static Identity", "Dynamic Identity"). |
-| `privacy_security` | string | PII/Sensitive flags if applicable. |
 | `hipaa_category` | string | **HIPAA classification.** "PII" \| "PHI" \| "SUD_Part2" \| "" for HIPAA/42 CFR Part 2 compliance. |
 | `fhir_security_label` | string | **FHIR security label.** "N" (normal), "R" (restricted), "V" (very restricted) per FHIR security labeling. |
 | `consent_category` | string | **Consent requirement.** "general" \| "research" \| "sensitive" for consent directive mapping. |
@@ -608,8 +599,6 @@ Note: historical Streamlit-era ERD variants are archived in `docs/archive/hl7_cc
 | `manual_override_allowed` | string | **Survivorship enhancement.** "true" \| "false" for steward intervention capability. |
 | `data_source_rank_reference` | string | Source hierarchy / rank reference. Attribute-specific rules can use structured text: "For address: HMIS > Hospital. For legal name: Hospital > HMIS." |
 | `identity_resolution_notes` | string | **Identity management.** Match logic transparency: probabilistic linkage strategy, confidence thresholds, match/no-match rules. |
-| `coverage_personids` | string | Coverage metric (e.g., # of person IDs). |
-| `granularity_level` | string | Granularity of the element. |
 | `calculation_grain` | string | **HIE temporal (Domain 2).** "monthly" \| "daily" \| "real-time" for calculated attributes (e.g., AF/AG housing status). |
 | `historical_freeze` | string | **HIE temporal (Domain 2).** "true" if past values are immutable (e.g., Jan 2023 stays frozen). |
 | `recalc_window_months` | string | **HIE temporal (Domain 2).** Rolling recalculation window (e.g., "3" for last 3 months). NULL for static attributes. |
@@ -704,7 +693,7 @@ Expected columns (Excel headers; script normalizes and converts to snake_case):
 
 **Catalog:** Semantic ID, USCDI Element, USCDI Description, USCDI Data Class, USCDI Data Element, Classification, Ruleset Category, Privacy/Security, Domain, Rollup Relationship, Is Rollup, Composite Group, Data Steward, Steward Contact, Approval Status, Schema Version, Last Modified Date, Identifier Type, Identifier Authority, HIPAA Category, FHIR Security Label, Consent Category
 
-**Dictionary:** Semantic ID, CHI Survivorship Logic, Data Source Rank Reference, Coverage (# PersonIDs), Granularity Level, Innovaccer Survivorship Logic, Data Quality Notes, FHIR R4 Path, FHIR Data Type, Calculation Grain, Historical Freeze, Recalc Window (Months), FHIR Must Support, FHIR Profile, FHIR Cardinality, Identity Resolution Notes, Tie Breaker Rule, Conflict Detection Enabled, Manual Override Allowed, De-identification Method
+**Dictionary:** Semantic ID, CHI Survivorship Logic, Data Source Rank Reference, Innovaccer Survivorship Logic, Data Quality Notes, FHIR R4 Path, FHIR Data Type, Calculation Grain, Historical Freeze, Recalc Window (Months), FHIR Must Support, FHIR Profile, FHIR Cardinality, Identity Resolution Notes, Tie Breaker Rule, Conflict Detection Enabled, Manual Override Allowed, De-identification Method
 
 ---
 
@@ -724,14 +713,11 @@ The app joins catalog + dictionary on `semantic_id` and derives `fhir_resource`.
 | `uscdi_data_element` | — | ✓ | — |
 | `classification` | — | ✓ | Multiselect |
 | `ruleset_category` | — | ✓ | Multiselect |
-| `privacy_security` | — | ✓ | Multiselect |
 | `fhir_r4_path` | — | ✓ | Search |
 | `fhir_data_type` | — | ✓ | — |
 | `chi_survivorship_logic` | — | ✓ | — |
 | `innovaccer_survivorship_logic` | — | ✓ | — |
 | `data_source_rank_reference` | — | ✓ | — |
-| `coverage_personids` | — | ✓ | — |
-| `granularity_level` | — | ✓ | — |
 | `data_quality_notes` | — | ✓ | — |
 
 **Join behavior:** The app uses an **inner join** on `semantic_id`. Elements that exist in only one of the two master tables are excluded from the main viewer.
@@ -844,7 +830,7 @@ Single, vertically stacked layout (no tabs). Four section blocks with distinct b
 |---------|-----------|---------|--------|
 | **Catalog** | section-catalog (#f9fafb) | from ddc-master_patient_catalog.parquet | Semantic ID, USCDI Data Class, USCDI Data Element, USCDI Element, Description, Classification, Domain, Ruleset Category, Privacy/Security, HIPAA Category, FHIR Security Label, Consent Category, Rollup Relationship, Is Rollup, Composite Group, Identifier Type, Identifier Authority, Data Steward, Steward Contact, Approval Status, Schema Version, Last Modified Date |
 | **Dictionary – FHIR Mapping** | section-fhir (#ecfdf5) | Canonical FHIR R4 path & type | Resource, FHIR Path, FHIR Data Type, FHIR Profile, FHIR Cardinality, FHIR Must Support |
-| **Dictionary – Survivorship & Sources** | section-survivorship (#fffbeb) | Business rules and source logic | HIE Survivorship Logic, Tie Breaker Rule, Conflict Detection Enabled, Manual Override Allowed, Innovaccer Survivorship Logic, Data Source Rank Reference, Identity Resolution Notes, Coverage (# PersonIDs), Granularity Level, Calculation Grain, Historical Freeze, Recalc Window (Months) |
+| **Dictionary – Survivorship & Sources** | section-survivorship (#fffbeb) | Business rules and source logic | CHI Survivorship Logic, Tie Breaker Rule, Conflict Detection Enabled, Manual Override Allowed, Innovaccer Survivorship Logic, Data Source Rank Reference, Identity Resolution Notes, Calculation Grain, Historical Freeze, Recalc Window (Months) |
 | **Dictionary – Quality & Governance** | section-quality (#f5f3ff) | — | Quality & Governance Notes, De-identification Method |
 
 Multiline fields (Description, survivorship logic, Data Source Rank Reference, Quality & Governance Notes) use `field-value-multiline` (scrollable, ~3–6 lines).
@@ -936,7 +922,7 @@ If this application is rebuilt in another platform (for example, Airtable), the 
 
 4. **Search and filters**
    - Support free-text search across `semantic_id`, `uscdi_element`, `uscdi_description`, `fhir_r4_path`, `domain`, and `composite_group`.
-   - Support multi-select filters for `fhir_resource`, `classification`, `domain`, `ruleset_category`, and `privacy_security`.
+   - Support multi-select filters for `fhir_resource`, `classification`, `domain`, and `ruleset_category`.
    - Apply filters with AND logic across filter groups.
 
 5. **Optional interoperability views**
@@ -1027,8 +1013,6 @@ Implementation status: **Phase D in progress and partially implemented**.
 
 - Canonical ADT and CCDA catalogs now include promoted governance fields:
   - `mapping_status`
-  - `business_rule_required`
-  - `business_rule_notes`
 - Build scripts now materialize these fields directly in:
   - `ddc-hl7_adt_catalog.parquet`
   - `ddc-ccda_catalog.parquet`

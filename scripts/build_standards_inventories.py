@@ -72,8 +72,6 @@ def _build_fhir_inventory(df_dict: pd.DataFrame, include_all_resources: bool) ->
                 "standard_reference_url": f"https://hl7.org/fhir/R4/{resource.lower()}.html" if resource else "",
                 "semantic_id": semantic_id,
                 "mapping_status": "mapped" if semantic_id else "needs_new_semantic",
-                "business_rule_required": "",
-                "business_rule_notes": "",
             }
         )
 
@@ -158,8 +156,6 @@ def _build_fhir_inventory_from_r5_spec(
                     "standard_reference_url": _clean_str(sd.get("url", "")),
                     "semantic_id": semantic_id,
                     "mapping_status": mapping_status,
-                    "business_rule_required": "",
-                    "business_rule_notes": "",
                 }
             )
 

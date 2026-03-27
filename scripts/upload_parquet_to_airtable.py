@@ -64,7 +64,6 @@ CATALOG_COLS = [
     "uscdi_data_element",
     "classification",
     "ruleset_category",
-    "privacy_security",
     "domain",
     "rollup_relationship",
     "is_rollup",
@@ -85,8 +84,6 @@ DICTIONARY_COLS = [
     "semantic_id",
     "chi_survivorship_logic",
     "data_source_rank_reference",
-    "coverage_personids",
-    "granularity_level",
     "innovaccer_survivorship_logic",
     "data_quality_notes",
     "fhir_r4_path",
@@ -117,8 +114,6 @@ ADT_COLS = [
     "fhir_r4_path",
     "notes",
     "mapping_status",
-    "business_rule_required",
-    "business_rule_notes",
 ]
 
 CCDA_COLS = [
@@ -130,8 +125,6 @@ CCDA_COLS = [
     "fhir_r4_path",
     "notes",
     "mapping_status",
-    "business_rule_required",
-    "business_rule_notes",
 ]
 
 AVAILABILITY_COLS = [
@@ -156,8 +149,6 @@ FHIR_INVENTORY_COLS = [
     "standard_reference_url",
     "semantic_id",
     "mapping_status",
-    "business_rule_required",
-    "business_rule_notes",
 ]
 
 BUSINESS_RULE_COLS = [
@@ -434,14 +425,11 @@ def compute_overall_standards_curation_qa(row_fields: Dict[str, str]) -> tuple[s
     # Survivorship & sourcing (standards domain for golden value determination)
     chi_logic = (row_fields.get("chi_survivorship_logic") or "").strip()
     data_source_rank_ref = (row_fields.get("data_source_rank_reference") or "").strip()
-    granularity = (row_fields.get("granularity_level") or "").strip()
 
     if not chi_logic:
         gaps.append("Missing CHI survivorship logic (chi_survivorship_logic)")
     if not data_source_rank_ref:
         gaps.append("Missing source rank reference (data_source_rank_reference)")
-    if not granularity:
-        gaps.append("Missing granularity level (granularity_level)")
 
     # Identity resolution and de-identification governance
     identity_notes = (row_fields.get("identity_resolution_notes") or "").strip()
@@ -880,14 +868,14 @@ def main():
         base_id=base_id,
         table_name="ddc-hl7_adt_catalog",
         field_names=["Name", UPSERT_KEY_FIELD] + ADT_COLS,
-        multiline_fields={"notes", "business_rule_notes"},
+        multiline_fields={"notes"},
     )
     ensure_text_fields_for_table(
         session=session,
         base_id=base_id,
         table_name="ddc-ccda_catalog",
         field_names=["Name", UPSERT_KEY_FIELD] + CCDA_COLS,
-        multiline_fields={"notes", "business_rule_notes"},
+        multiline_fields={"notes"},
     )
     ensure_text_fields_for_table(
         session=session,
@@ -907,7 +895,7 @@ def main():
             base_id=base_id,
             table_name="ddc-fhir_inventory",
             field_names=["Name", UPSERT_KEY_FIELD] + FHIR_INVENTORY_COLS,
-            multiline_fields={"fhir_definition", "business_rule_notes"},
+            multiline_fields={"fhir_definition"},
         )
         ensure_text_fields_for_table(
             session=session,

@@ -163,3 +163,18 @@ Use this as the fast, one-pass checklist while you build the live Airtable Inter
 2. On Page B, search `PID-5` and confirm only non-legacy ADT rows appear.
 3. On Page C, search an XML path fragment and confirm related context appears.
 4. On Page D, confirm deprecated business-rule placeholders do not appear.
+
+## Optional UI Cleanup (mark legacy deleted fields)
+
+For each relevant table, confirm these are treated as deleted legacy fields (renamed with `deleted_*` and hidden from views):
+
+- `privacy_security`
+- `coverage_personids`
+- `granularity_level`
+- `business_rule_required`
+- `business_rule_notes`
+
+Keep visible:
+
+- `innovaccer_survivorship_logic`
+- `reviewer_notes`

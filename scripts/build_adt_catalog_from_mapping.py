@@ -6,8 +6,7 @@ Reads mapping CSV (default `data/l2_to_semantic_id_mapping.csv`; archive fallbac
 and writes project-root `ddc-hl7_adt_catalog.parquet` with columns expected by the
 current steward-workspace pipeline:
 message_format, message_type, segment_id, field_id, field_name, data_type,
-optionality, cardinality, semantic_id, fhir_r4_path, notes, mapping_status,
-business_rule_required, business_rule_notes.
+optionality, cardinality, semantic_id, fhir_r4_path, notes, mapping_status.
 
 Usage:
   python scripts/build_adt_catalog_from_mapping.py
@@ -83,8 +82,6 @@ def main() -> None:
                 "notes": (r.get("notes") or "").strip(),
                 # Governance fields are now promoted into canonical ADT catalog.
                 "mapping_status": "mapped" if (r.get("semantic_id") or "").strip() else "needs_new_semantic",
-                "business_rule_required": "",
-                "business_rule_notes": (r.get("notes") or "").strip(),
             })
 
     df = pd.DataFrame(rows)

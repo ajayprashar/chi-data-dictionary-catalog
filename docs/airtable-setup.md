@@ -274,6 +274,21 @@ Use friendly labels in Airtable interface page titles:
 - `ddc-fhir_inventory` -> **FHIR Standards Inventory**
 - `ddc-business_rules` -> **Business Rules Registry**
 
+### Deleted legacy fields (schema cleanup)
+
+The following fields were removed from the governed Parquet and steward Airtable schemas:
+
+- `privacy_security`
+- `coverage_personids`
+- `granularity_level`
+- `business_rule_required`
+- `business_rule_notes` (in ADT/CCDA/FHIR inventory)
+
+Retained by design:
+
+- `innovaccer_survivorship_logic` (kept by design)
+- `reviewer_notes` in `ddc-master_patient_catalog` (active review workflow field)
+
 ### Table purpose and update cadence
 
 | Table | Purpose | Cadence | Mode |
@@ -306,7 +321,6 @@ Use friendly labels in Airtable interface page titles:
 | uscdi_description | A | multilineText | yes | |
 | ruleset_category | A | singleLineText | yes | |
 | classification | A | singleLineText | yes | |
-| privacy_security | A | singleLineText | yes | |
 | is_rollup | A | singleLineText | yes | |
 | rollup_relationship | A | singleLineText | yes | |
 | domain | A | singleLineText | yes | |
@@ -339,8 +353,6 @@ Use friendly labels in Airtable interface page titles:
 | semantic_id | A | singleLineText | yes | Foreign key; join key |
 | chi_survivorship_logic | A | multilineText | yes | Canonical CHI survivorship field |
 | data_source_rank_reference | A | multilineText | yes | |
-| coverage_personids | A | singleLineText | yes | |
-| granularity_level | A | singleLineText | yes | |
 | data_quality_notes | A | multilineText | yes | |
 | fhir_r4_path | A | singleLineText | yes | Canonical FHIR path |
 | innovaccer_survivorship_logic | A | multilineText | yes | |
@@ -382,8 +394,6 @@ Use friendly labels in Airtable interface page titles:
 | fhir_r4_path | A | singleLineText | yes | Per-format path |
 | cardinality | A | singleLineText | yes | |
 | mapping_status | A | singleLineText | yes | Promoted governance field |
-| business_rule_required | A | singleLineText | yes | Promoted governance field |
-| business_rule_notes | A | multilineText | yes | Promoted governance field |
 | catalog_element | L | multipleRecordLinks | — | Link to catalog; populated at sync |
 
 ### ddc-ccda_catalog
@@ -399,8 +409,6 @@ Use friendly labels in Airtable interface page titles:
 | entry_type | A | singleLineText | yes | |
 | xml_path | A | singleLineText | yes | |
 | mapping_status | A | singleLineText | yes | Promoted governance field |
-| business_rule_required | A | singleLineText | yes | Promoted governance field |
-| business_rule_notes | A | multilineText | yes | Promoted governance field |
 | catalog_element | L | multipleRecordLinks | — | Link to catalog; populated at sync |
 
 ### ddc-data_source_availability
