@@ -11,7 +11,7 @@ Use this page as the index for which documents are actively maintained versus ke
 - `TECH-SPEC.md`
   - Architecture, data model, and implementation behavior.
 - `docs/excel-workbook-guide.md`
-  - `chi-partner-intake-workbook.xlsx`, `chi-steward-workbook.xlsx`, data-source links, and round-trip pipeline.
+  - `workbooks/` living Excel files, data-source links, and round-trip pipeline.
 - `docs/jupyter-duckdb-parquet-setup.md`
   - Notebook and DuckDB execution guidance.
 

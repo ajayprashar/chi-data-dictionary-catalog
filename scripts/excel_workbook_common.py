@@ -45,6 +45,20 @@ def add_excel_table(ws: Worksheet, table_name: str) -> None:
     ws.auto_filter.ref = ref
 
 
+def prepare_data_sheet(ws: Worksheet) -> None:
+    """Freeze header row and enable filters without Excel Table objects.
+
+    openpyxl-generated Tables and DataValidations often trigger Excel's
+    'problem with some content' recovery dialog on open.
+    """
+    if ws.max_row < 1 or ws.max_column < 1:
+        return
+    end_col = get_column_letter(ws.max_column)
+    ref = f"A1:{end_col}{ws.max_row}"
+    ws.freeze_panes = "A2"
+    ws.auto_filter.ref = ref
+
+
 def add_list_validation(
     ws: Worksheet,
     column_name: str,

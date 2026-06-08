@@ -47,7 +47,7 @@ def import_workbook(workbook_path: Path, repo_root: Path) -> None:
 
 def main() -> None:
     repo_root = Path(__file__).resolve().parent.parent
-    default_workbook = repo_root / "docs" / "templates" / "chi-steward-workbook.xlsx"
+    default_workbook = repo_root / "workbooks" / "chi-steward-workbook.xlsx"
 
     parser = argparse.ArgumentParser(description="Import steward workbook sheets into parquet files.")
     parser.add_argument(

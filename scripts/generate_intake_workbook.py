@@ -130,7 +130,7 @@ def add_validations(ws) -> None:
 
 def main() -> None:
     repo_root = Path(__file__).resolve().parent.parent
-    out_dir = repo_root / "docs" / "templates"
+    out_dir = repo_root / "workbooks"
     out_dir.mkdir(parents=True, exist_ok=True)
     out_path = out_dir / OUT_NAME
 

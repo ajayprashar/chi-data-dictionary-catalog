@@ -14,7 +14,7 @@ Edit `chi-steward-workbook.xlsx` → import to parquet → optionally browse wit
 
 | Use now | Defer |
 |---------|-------|
-| `docs/templates/chi-steward-workbook.xlsx` | SharePoint / Power BI |
+| `workbooks/chi-steward-workbook.xlsx` | SharePoint / Power BI |
 | `Catalog` + `Dictionary` sheets | Partner intake workbook |
 | `Concept_Explorer` sheet | Full 28-source coverage |
 | `import_steward_workbook_to_parquet.py` | Azure DevOps, Innovaccer DEM |
@@ -32,7 +32,7 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-1. Open `docs/templates/chi-steward-workbook.xlsx`.
+1. Open `workbooks/chi-steward-workbook.xlsx`.
 2. In `Concept_Explorer`, set B3 to `Patient.race` (then ethnicity, language, gender identity, birth sex).
 3. Complete `Catalog`, `Dictionary`, and `Source_Availability` for those five rows.
 4. Save workbook edits back to parquet:

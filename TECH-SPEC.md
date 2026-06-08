@@ -444,7 +444,7 @@ flowchart TB
 | **scripts/** | `split_to_catalog_and_dictionary.py`, `generate_intake_workbook.py`, `build_adt_catalog_from_mapping.py`, `build_ccda_catalog_from_mapping.py`, `build_data_source_availability.py` |
 | **data/** | Mapping CSVs, feed profiles (segments, event types) |
 | **docs/** | `excel-workbook-guide.md`, `adding-data-sources.md`, `cmt-adt-feed-and-master-patient.md`, `jupyter-duckdb-parquet-setup.md` |
-| **docs/templates/** | `chi-partner-intake-workbook.xlsx`, `chi-steward-workbook.xlsx` |
+| **workbooks/** | `chi-partner-intake-workbook.xlsx`, `chi-steward-workbook.xlsx` (working documents) |
 
 ### 2.2.1 Table Naming Guide (plain language)
 

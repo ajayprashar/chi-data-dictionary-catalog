@@ -41,7 +41,7 @@ flowchart LR
 
 ## Primary workbook: CHI steward
 
-**Path:** `docs/templates/chi-steward-workbook.xlsx`
+**Path:** `workbooks/chi-steward-workbook.xlsx`
 
 ```powershell
 python scripts/generate_steward_workbook.py
@@ -75,7 +75,7 @@ python scripts/import_steward_workbook_to_parquet.py
 
 ## Secondary workbook: partner intake (defer until needed)
 
-**Path:** `docs/templates/chi-partner-intake-workbook.xlsx`
+**Path:** `workbooks/chi-partner-intake-workbook.xlsx`
 
 Use when onboarding an external source (jail, HMIS, etc.). Not required for the demographics POC.
 
