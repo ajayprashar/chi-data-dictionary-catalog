@@ -10,7 +10,7 @@ This document is a **CCD (Continuity of Care Document) interface mapping** orien
   - Extend **ddc-ccda_catalog.parquet** with more CCD section/XPath → semantic_id rows.
   - Cross-check CCD coverage vs. ADT and master patient elements.
 - **CCD section coverage**: The mapping covers Participants (contacts), Encounters, Problems, Medications, Allergies, Immunizations, Results, Vitals, Procedures, Social/Family History, and Insurance. Use it to decide which CCD sections to add to the catalog and to document expected INV (L2) targets.
-- **Reference only**: This is reference material. To drive the Airtable-first pipeline, add chosen rows into **ddc-ccda_catalog.parquet** (and optionally the master catalog) via script or manual curation.
+- **Reference only**: This is reference material. To drive the Excel/parquet pipeline, add chosen rows into **ddc-ccda_catalog.parquet** (and optionally the master catalog) via script or manual curation.
 
 ---
 
@@ -221,4 +221,4 @@ Many **INV COLUMN** values match the L2 columns and semantic_ids already in this
 - **Insurance**: inpid, inpn, inpfdt, inpldt, ptsid, infn, inmn, inln → Coverage.identifier, plan name, dates, subscriber.
 - **PCP / providers**: pcpid, pcpidt → Encounter.participant / PCP.
 
-You can use this mapping to add rows to **ddc-ccda_catalog.parquet** (CCD XPath → semantic_id or INV COLUMN → semantic_id) so Airtable tables and review interfaces show CCD mappings alongside ADT for the same elements.
+You can use this mapping to add rows to **ddc-ccda_catalog.parquet** (CCD XPath → semantic_id or INV COLUMN → semantic_id) so Excel stewardship views and the notebook viewer show CCD mappings alongside ADT for the same elements.

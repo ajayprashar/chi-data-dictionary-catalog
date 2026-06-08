@@ -1,6 +1,6 @@
 # HIE Evaluation Gaps — Implementation Summary
 
-> **Status note (historical snapshot):** This is a completion log from the original gap-closure pass. For current behavior and workflows, use `README.md`, `TECH-SPEC.md`, and `docs/airtable-setup.md`.
+> **Status note (historical snapshot):** This is a completion log from the original gap-closure pass. For current behavior and workflows, use `README.md`, `TECH-SPEC.md`, and `docs/excel-workbook-guide.md`.
 
 **Date:** March 4, 2026  
 **Status:** [OK] **Quick Wins Completed**

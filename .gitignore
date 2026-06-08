@@ -27,3 +27,6 @@ build/
 
 # Local junction to external FHIR release docs
 fhir_release_5/
+
+# Node (not used by this project)
+node_modules/

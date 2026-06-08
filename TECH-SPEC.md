@@ -6,6 +6,92 @@ For product context (why, who, scope), see **readme-prd.md**. For quick setup, s
 
 ---
 
+## Context and Strategic Rationale
+
+Community Health Insights (CHI) operates as a **health and social information exchange** across Alameda County partners. In that role, CHI must reconcile patient information originating from hospitals, FQHCs, behavioral health, payers, housing systems, and other social-service organizations that often describe the **same person, attribute, or event differently**.
+
+The purpose of this project is to establish a durable governance layer between raw source intake and downstream interoperability or analytics use. That layer must answer four questions consistently:
+
+1. **What concepts does CHI govern?**
+   - The **data catalog** answers this by defining one governed row per canonical patient concept using a stable `semantic_id`.
+2. **How is each concept defined, sourced, and resolved?**
+   - The **data dictionary** answers this by documenting survivorship logic, temporal rules, FHIR alignment, source-rank guidance, and implementation notes.
+3. **How do interoperability formats carry the governed concept?**
+   - The **ADT / CCDA / FHIR reference catalogs** answer this by describing where the concept appears in each format without redefining the concept itself.
+4. **How can partners contribute source knowledge without owning CHI semantic governance?**
+   - The intake model answers this by allowing source-oriented collection in Excel or similar workbooks while CHI performs semantic curation and steward review internally.
+
+This architecture is therefore both **strategic** and **operational**. It supports:
+
+- trustworthy conflict resolution across overlapping sources
+- better outreach and care coordination through more reliable demographic and contact data
+- stronger CMT and ADT matching performance
+- reusable definitions for reporting, analytics, and health equity use cases
+- steward workflows that preserve decision history rather than leaving logic in SQL, notes, or institutional memory
+
+---
+
+## Problem Statement
+
+CHI receives overlapping, inconsistent, and differently-structured data about the same people. The core problem is not simply data ingestion; it is **governed interpretation**.
+
+Without a governed catalog-and-dictionary layer:
+
+- one source may say `Mark`, another `Marc`, and another only an initial
+- address, phone, race, language, and housing-related attributes may conflict, be stale, or differ in granularity
+- message-based integrations such as HL7 ADT, CCDA, and FHIR lose alignment with the master person-centric model
+- partner onboarding becomes ad hoc because intake structure, semantic mapping, and implementation mapping are blended together
+- stewardship knowledge remains fragmented across SQL, notes, email, and working memory instead of being represented as a durable semantic asset
+
+The migration from legacy implementations into Innovaccer DAP and Verato increases the importance of this layer. Identity resolution alone does not answer:
+
+- which source should win for a given attribute
+- how calculated attributes should behave over time
+- how CHI-specific governance intent should be preserved across steward workflows, analytics, and interoperability outputs
+
+This specification exists to make those governance decisions explicit and implementable.
+
+---
+
+## Stakeholder Outcomes
+
+| Stakeholder | Why this matters |
+|-------------|------------------|
+| **Data governance / standards leads** | Need a durable semantic layer that records decisions, ownership, approval state, and implementation intent. |
+| **Program SMEs (for example Housing Services)** | Need calculated attributes such as AF/AG represented with explicit temporal and business-rule logic rather than treated as simple source fields. |
+| **Interface / interoperability teams** | Need clear cross-reference from governed CHI concepts to HL7 ADT, CCDA, and FHIR structures without collapsing those models into a single artifact. |
+| **Care coordination / CHR users** | Need more trustworthy demographic and contact data for search, outreach, and patient review. |
+| **Reporting / analytics / equity dashboard users** | Need stable rollups, source-aware interpretation, and reusable governed definitions for county and partner reporting. |
+| **External partners** | Need a practical intake path that captures source knowledge without requiring them to author CHI semantic governance directly. |
+
+---
+
+## Decision Log Summary
+
+**Accepted design decisions**
+
+- Keep **partner intake** separate from the governed semantic model; Excel/workbook intake remains acceptable and often preferable for early collection.
+- Keep **CHI governance** centered on canonical `semantic_id` concepts represented through catalog and dictionary artifacts.
+- Use **Excel as the steward workspace**, with parquet as the portable machine layer.
+- Keep **message-format catalogs separate** from person-centric governance tables.
+- Treat **Master Demographics**, **Master Patient Attributes**, and **Clinical Governance** as related but distinct governance domains.
+- Keep **enterprise terminology and value sets** in DAP; this repository documents CHI usage, governance rules, and crosswalk intent rather than duplicating enterprise terminology stores.
+
+**Deferred / future decisions**
+
+- machine-readable source hierarchy structures
+- field-level provenance at the winning-value level
+- full partner-specific interoperability crosswalk registry
+- broader clinical-governance and terminology tables beyond current demographics-centered scope
+
+**Working assumptions**
+
+- `semantic_id` remains the stable cross-artifact join key
+- CHI-specific business logic may outlive any single platform implementation
+- this repository should preserve rationale and governance intent, not just table structure
+
+---
+
 ## Interoperability Staff Quick Guide
 
 This section is written for interoperability, interface, and program staff who are **not** deep data engineers.
@@ -34,18 +120,15 @@ If you only need a high-level understanding, you can stop here and use the app. 
 
 ## Operating Model Alignment
 
-This repo implements the CHI workflow as a **3-layer model**:
+This repo implements the CHI workflow as a **2-layer model**:
 
-1. **Partner intake** stays outside the steward base.
-   - External/source-system field inventories, code sets, and context notes belong in Excel or intake workbooks, not in the core `ddc-*` Airtable tables.
+1. **Partner intake** stays in the partner workbook.
+   - External/source-system field inventories, code sets, and context notes belong in the intake workbook, not in the core `ddc-*` governance tables.
 2. **CHI governance** is the controlled semantic layer.
-   - The governed model is represented in parquet and synchronized into the core Airtable tables.
+   - The governed model is authored in Excel/CSV, represented in parquet, and reviewed in Excel or the Jupyter notebook viewer.
    - `ddc-master_patient_catalog`, `ddc-master_patient_dictionary`, and `ddc-business_rules` are the primary governance tables.
-3. **Airtable stewardship** is the working UI over the governed model.
-   - Airtable is used for lookup, curation, approval workflow, and queue management.
-   - It is not the only source of truth for semantic logic.
 
-For implementation purposes, the current Airtable base is grouped as:
+For implementation purposes, governed artifacts are grouped as:
 
 - **Core governance**: `ddc-master_patient_catalog`, `ddc-master_patient_dictionary`, `ddc-business_rules`
 - **Interoperability lookup/reference**: `ddc-hl7_adt_catalog`, `ddc-ccda_catalog`, `ddc-fhir_inventory`
@@ -258,16 +341,16 @@ To prevent drift and broken joins, apply these operating rules:
   - `mapping_status = needs_new_semantic` when concept should be added to catalog.
   - `mapping_status = out_of_scope` when intentionally not modeled in CHI catalog.
   - `mapping_status = mapped` only when `semantic_id` exists in catalog.
-- Avoid silent orphan rows: every table with `semantic_id` should also carry `catalog_element` link in Airtable where possible.
+- Avoid silent orphan rows: every table with `semantic_id` should resolve to a catalog row or be explicitly classified with `mapping_status`.
 
 ### 1.8.2 Unlinked Rows and Missing Semantic IDs
 
 Best practice for unlinked rows is **queue + disposition**, not deletion:
 
-1. Detect unlinked records (`semantic_id` present but no `catalog_element`).
+1. Detect unlinked records (`semantic_id` present but not in catalog).
 2. Classify each row using `mapping_status` and steward notes.
 3. Promote missing concepts into `ddc-master_patient_catalog` when needed.
-4. Re-run sync with relations to resolve links.
+4. Re-run build scripts and refresh parquet artifacts.
 
 For this project, `ddc-fhir_inventory` and `ddc-business_rules` are expected to link to catalog via `semantic_id` when resolvable.
 
@@ -328,9 +411,9 @@ flowchart TB
         Events["*_feed_event_types.csv"]
     end
 
-    subgraph AirtableOps["AIRTABLE-FIRST OPERATIONS"]
-        AirtableSync["upload_parquet_to_airtable.py upserts core + optional inventory tables"]
-        AirtableReview["Steward review in Airtable interfaces/views"]
+    subgraph Review["STEWARD REVIEW"]
+        ExcelReview["Excel workbooks and combined CSV exports"]
+        Notebook["chi-data-dictionary-catalog.ipynb DuckDB viewer"]
     end
 
     Excel --> Split
@@ -339,14 +422,13 @@ flowchart TB
     DataCSV --> Build
     Build --> ADT
     Build --> CCDA
-    Catalog --> AirtableSync
-    Dictionary --> AirtableSync
-    ADT --> AirtableSync
-    CCDA --> AirtableSync
-    Avail --> AirtableSync
-    Segments --> AirtableReview
-    Events --> AirtableReview
-    AirtableSync --> AirtableReview
+    Catalog --> ExcelReview
+    Dictionary --> ExcelReview
+    ADT --> Notebook
+    CCDA --> Notebook
+    Avail --> Notebook
+    Segments --> ExcelReview
+    Events --> ExcelReview
 ```
 
 ### 2.2 File and Directory Layout
@@ -359,13 +441,14 @@ flowchart TB
 | **ddc-hl7_adt_catalog.parquet** | Optional. ADT field mappings. |
 | **ddc-ccda_catalog.parquet** | Optional. CCD/CCDA XML mappings. |
 | **ddc-data_source_availability.parquet** | Optional. Source-to-semantic_id availability matrix. |
-| **scripts/** | `split_to_catalog_and_dictionary.py`, `build_adt_catalog_from_mapping.py`, `build_ccda_catalog_from_mapping.py`, `build_data_source_availability.py` |
+| **scripts/** | `split_to_catalog_and_dictionary.py`, `generate_intake_workbook.py`, `build_adt_catalog_from_mapping.py`, `build_ccda_catalog_from_mapping.py`, `build_data_source_availability.py` |
 | **data/** | Mapping CSVs, feed profiles (segments, event types) |
-| **docs/** | `adding-data-sources.md`, `cmt-adt-feed-and-master-patient.md`, `jupyter-duckdb-parquet-setup.md` |
+| **docs/** | `excel-workbook-guide.md`, `adding-data-sources.md`, `cmt-adt-feed-and-master-patient.md`, `jupyter-duckdb-parquet-setup.md` |
+| **docs/templates/** | `chi-partner-intake-workbook.xlsx`, `chi-steward-workbook.xlsx` |
 
 ### 2.2.1 Table Naming Guide (plain language)
 
-To reduce confusion, treat the physical table/file names as stable technical IDs and use friendly labels in Airtable interfaces and documentation.
+To reduce confusion, treat the physical table/file names as stable technical IDs and use friendly labels in Excel sheets and documentation.
 
 | Technical name | Friendly label | Why this name exists |
 |---|---|---|
@@ -379,7 +462,7 @@ To reduce confusion, treat the physical table/file names as stable technical IDs
 
 Interpretation tip: in `ddc-master_patient_catalog`, "master_patient" means *person-centric canonical scope* (not a patient table from an EHR), and "catalog" means *list of governed concepts*.
 
-**Airtable row labels (1.0):** In synced tables, **`Name`** is the friendly primary label; **`upsert_key`** holds the stable sync identity. See **§6.7.1**. Joins to the catalog still use **`semantic_id`** (and the `catalog_element` link where populated)—not `Name`.
+**Join key:** All governed tables join on **`semantic_id`**. Use friendly display columns such as `uscdi_element` in Excel for human review.
 
 ### 2.2.2 Update cadence and stewardship model
 
@@ -864,33 +947,14 @@ The documentation is session-state-driven (not an expander). A button opens the 
 
 1. Build/rebuild canonical parquet via split and mapping scripts.
 2. Build standards inventory parquet via `build_standards_inventories.py`.
-3. Upsert parquet into Airtable via `upload_parquet_to_airtable.py`.
-4. Airtable tables provide filtering, stewardship workflow, and review views.
-5. `semantic_id` remains the canonical join key across all standards layers.
-
-### 6.7.1 Airtable: display `Name` vs technical `upsert_key` (1.0)
-
-The upload script (`scripts/upload_parquet_to_airtable.py`) separates **what humans see** from **what the pipeline uses to match rows**:
-
-| Field | Role | Steward / UI guidance |
-|-------|------|------------------------|
-| **`Name`** | Primary field; **human-readable label** for grids, interfaces, and quick scanning. | Prefer showing this (or key facets like `semantic_id`) in Interfaces; safe to treat as display text. |
-| **`upsert_key`** | **Stable technical row identity** for sync; written on every uploaded table and kept aligned with `compute_upsert_key()`. | Treat as read-only in normal stewardship; use for troubleshooting duplicate-key issues or cross-checking ETL. |
-
-**Upsert matching (unchanged):** The script builds `existing_map` and matches creates/updates using `compute_upsert_key(table_type, row_fields)` from the **same parquet/Airtable columns as today** (e.g. for ADT: `semantic_id`, `message_type`, `segment_id`, `field_id`, `fhir_r4_path`). It does **not** key off `Name`. Changing a display `Name` in Airtable does not break row identity for the next sync.
-
-**`upsert_key` composition (by table type):** Mirrors the prior pipe-concatenated primary labels—now stored explicitly—e.g. catalog/dictionary = `semantic_id`; ADT = those five fields joined with `|`; CCDA, availability, FHIR inventory, and business rules use their respective composite keys as implemented in the script.
-
-**Referential integrity:** `catalog_element` (and any future links) continue to resolve via **`semantic_id`** and catalog record IDs, independent of `Name` / `upsert_key` formatting.
-
-**Interface best practice:** Surface **`semantic_id`** plus context columns (e.g. ADT `segment_id` / `field_id`) in list/detail views; use **`Name`** as the row title when helpful; keep **`upsert_key`** available in an admin or “technical” view only if needed.
+3. Review and steward in Excel workbooks or query parquet with the Jupyter notebook.
+4. `semantic_id` remains the canonical join key across all standards layers.
 
 ### 6.8 Error Handling
 
-- Missing required parquet files raise `FileNotFoundError` in build/upload scripts and fail fast.
-- Join mismatch risk is handled by preserving `semantic_id` as the canonical key and validating generated inventories before sync.
-- Optional artifacts (ADT/CCDA inventories, business rules) can be absent without blocking core catalog/dictionary sync.
-- Airtable schema drift is mitigated by metadata API field-creation logic in the upload script.
+- Missing required parquet files raise `FileNotFoundError` in build scripts and fail fast.
+- Join mismatch risk is handled by preserving `semantic_id` as the canonical key and validating generated inventories before publish.
+- Optional artifacts (ADT/CCDA inventories, business rules) can be absent without blocking core catalog/dictionary builds.
 
 ### 6.9 Diagram Rendering
 
@@ -900,7 +964,7 @@ Mermaid diagrams are documented as markdown source-of-truth and can be rendered 
 
 ### 6.10 Platform-Neutral Recreation Requirements
 
-If this application is rebuilt in another platform (for example, Airtable), the following behaviors should be preserved:
+If this application is rebuilt in another platform, the following behaviors should be preserved:
 
  1. **Core data model**
    - Use `ddc-master_patient_catalog.parquet` and `ddc-master_patient_dictionary.parquet` as the required master tables.
@@ -956,7 +1020,7 @@ If this application is rebuilt in another platform (for example, Airtable), the 
 | 4. CCDA catalog (optional) | `python scripts/build_ccda_catalog_from_mapping.py` | `ddc-ccda_catalog.parquet` |
 | 5. Data source availability | `python scripts/build_data_source_availability.py` | `ddc-data_source_availability.parquet` |
 | 6. Standards inventories | `python scripts/build_standards_inventories.py -d .` | `ddc-fhir_inventory.parquet`, `ddc-business_rules.parquet` |
-| 7. Sync to Airtable | `python scripts/upload_parquet_to_airtable.py --include-standards-inventories` | Airtable tables populated/updated |
+| 7. Review | Open `chi-data-dictionary-catalog.ipynb` or steward in Excel | Validated governed model |
 
 ---
 
@@ -981,7 +1045,7 @@ This section defines the centralized plan for standards-aligned enrichment while
 ### 8.3 Delivery phases
 
 1. **Phase A (implemented):** Inventory scaffold generation from existing parquet tables using `scripts/build_standards_inventories.py`.
-2. **Phase B:** Steward mapping review (`mapped`, `needs_new_semantic`, `out_of_scope`) in Airtable.
+2. **Phase B:** Steward mapping review (`mapped`, `needs_new_semantic`, `out_of_scope`) in Excel.
 3. **Phase C:** Rule authoring in `ddc-business_rules.parquet`; only approved rules are promoted into runtime logic.
 4. **Phase D:** Optional schema promotion into core tables for high-value fields only (avoid broad denormalization).
 
@@ -1000,12 +1064,12 @@ This section defines the centralized plan for standards-aligned enrichment while
   - `version.info` — confirms `FhirVersion=5.0.0`.
 - Prioritized Administration resources: `Patient`, `Practitioner`, `CareTeam`, `Device`, `Organization`, `Location`, `HealthcareService`.
 
-### 8.5 Airtable alignment plan
+### 8.5 Excel alignment plan
 
-- Recommended new Airtable tables mirroring parquet artifacts:
+- Governed Excel exports and parquet artifacts should include:
   - `ddc-fhir_inventory`
   - `ddc-business_rules`
-- Keep core table sync unchanged until steward validation confirms promotion candidates.
+- Keep core table structure unchanged until steward validation confirms promotion candidates.
 
 ### 8.6 ADT/CCDA de-dup migration plan
 
@@ -1016,11 +1080,11 @@ Implementation status: **Phase D in progress and partially implemented**.
 - Build scripts now materialize these fields directly in:
   - `ddc-hl7_adt_catalog.parquet`
   - `ddc-ccda_catalog.parquet`
-- Upload script now ensures these fields exist in Airtable canonical tables before sync.
+- Build scripts now materialize these fields directly in canonical parquet catalogs.
 
 Remaining de-dup completion step:
 
-1. Steward-validate parity and then archive/deprecate `ddc-hl7_adt_inventory` and `ddc-ccda_inventory` Airtable tables.
+1. Steward-validate parity and then archive any legacy inventory-only artifacts that duplicate the promoted catalogs.
 
 This preserves data fidelity while reducing long-term table count.
 

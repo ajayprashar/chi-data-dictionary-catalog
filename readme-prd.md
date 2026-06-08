@@ -118,14 +118,14 @@ This mirrors enterprise metadata patterns while remaining simple.
 *   **Reproducible setup**:
     *   Create a local virtual environment in the project folder.
     *   Install dependencies from `requirements.txt`.
-    *   Build parquet artifacts and sync to Airtable (or use the Jupyter notebook `chi-data-dictionary-catalog.ipynb`) from this folder.
+    *   Build parquet artifacts from Excel/CSV (or use the Jupyter notebook `chi-data-dictionary-catalog.ipynb`) from this folder.
 *   **Mobility requirement**: A user can move the POC to a new machine by copying the folder, recreating the virtual environment, and reinstalling from `requirements.txt`—no additional configuration files, registries, or services.
 
 ***
 
-## Viewer UX (Airtable-first POC)
+## Viewer UX (Excel-first POC)
 
-The primary viewer is Airtable interfaces and views that present catalog and dictionary metadata as a management tool for the **Community Health Insights (CHI)** data model.
+The primary steward surface is Excel workbooks for intake and governance, with the Jupyter notebook (`chi-data-dictionary-catalog.ipynb`) providing a local record-centric viewer over parquet for the **Community Health Insights (CHI)** data model.
 
 ### Key user workflows
 
@@ -194,14 +194,4 @@ The POC is **platform‑agnostic by design**.
 ## Bottom Line
 
 This POC delivers **high signal at low cost**: it improves clarity, reduces friction, and informs strategy—without triggering licensing, governance, or architectural overhead.
-
-***
-
-If you want next, I can:
-
-*   Reformat this as a **1‑slide executive brief**
-*   Add a **“current state vs future state” visual**
-*   Turn this into a **decision memo** explaining why Power Pages was deferred
-
-Just tell me what artifact you want.
 

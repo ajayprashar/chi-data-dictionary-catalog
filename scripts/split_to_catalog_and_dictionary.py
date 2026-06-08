@@ -8,7 +8,7 @@ dictionary columns), splits by column set, and writes
 Both tables include Semantic ID for joining.
 
 This script is for the CHI governance layer. Partner intake workbooks remain
-outside the steward base and should be normalized before being passed here.
+separate from the steward workbook and should be normalized before being passed here.
 
 Usage:
   python scripts/split_to_catalog_and_dictionary.py combined_metadata.csv

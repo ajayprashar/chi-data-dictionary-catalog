@@ -1,6 +1,6 @@
 # CHI Metadata Catalog — HIE Interoperability Best Practices Evaluation
 
-> **Status note (historical snapshot):** This document captures a point-in-time evaluation and roadmap context. Treat `README.md`, `TECH-SPEC.md`, and `docs/airtable-setup.md` as the current operational source of truth.
+> **Status note (historical snapshot):** This document captures a point-in-time evaluation and roadmap context. Treat `README.md`, `TECH-SPEC.md`, and `docs/excel-workbook-guide.md` as the current operational source of truth.
 
 **Evaluation Date:** March 4, 2026
 
