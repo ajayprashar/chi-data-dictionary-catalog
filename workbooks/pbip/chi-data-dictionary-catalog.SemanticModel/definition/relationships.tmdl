@@ -1,0 +1,11 @@
+relationship 85392997-6cf7-f2e7-d68a-42b1685d1886
+	crossFilteringBehavior: bothDirections
+	fromCardinality: one
+	fromColumn: ddc-master_patient_catalog.semantic_id
+	toColumn: ddc-master_patient_dictionary.semantic_id
+
+relationship 0f72c909-7ff1-c34f-3bc4-3343da5580af
+	crossFilteringBehavior: bothDirections
+	fromColumn: ddc-data_source_availability.semantic_id
+	toColumn: ddc-master_patient_catalog.semantic_id
+

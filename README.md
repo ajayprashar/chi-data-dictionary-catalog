@@ -14,7 +14,8 @@ Edit `chi-steward-workbook.xlsx` → import to parquet → optionally browse wit
 
 | Use now | Defer |
 |---------|-------|
-| `workbooks/chi-steward-workbook.xlsx` | SharePoint / Power BI |
+| `workbooks/chi-steward-workbook.xlsx` | SharePoint |
+| `workbooks/pbip/chi-data-dictionary-catalog.pbip` | Power BI read-only catalog viewer |
 | `Catalog` + `Dictionary` sheets | Partner intake workbook |
 | `Concept_Explorer` sheet | Full 28-source coverage |
 | `import_steward_workbook_to_parquet.py` | Azure DevOps, Innovaccer DEM |
@@ -98,6 +99,7 @@ python scripts/generate_intake_workbook.py
 ### Documentation
 
 - `docs/excel-workbook-guide.md` — POC workbook guide (start here)
+- `docs/excel-workbook-generation-rules.md` — openpyxl rules (avoid Excel repair prompts)
 - `readme-prd.md` — executive summary for stakeholders
 - `TECH-SPEC.md` — full architecture reference
 - `docs/documentation-map.md` — canonical vs historical docs

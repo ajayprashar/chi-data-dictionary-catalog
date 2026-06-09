@@ -1,0 +1,61 @@
+{
+  "version": "1.1.0",
+  "diagrams": [
+    {
+      "ordinal": 0,
+      "scrollPosition": {
+        "x": 0,
+        "y": 0
+      },
+      "nodes": [
+        {
+          "location": {
+            "x": 0,
+            "y": 0
+          },
+          "nodeIndex": "ddc-master_patient_catalog",
+          "nodeLineageTag": "683c3345-69ac-4982-9780-1d274b17f0ce",
+          "size": {
+            "height": 300,
+            "width": 289
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 332,
+            "y": 326
+          },
+          "nodeIndex": "ddc-master_patient_dictionary",
+          "nodeLineageTag": "187302bc-d747-47f7-9a76-8d71c86070c5",
+          "size": {
+            "height": 300,
+            "width": 389
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 568,
+            "y": 38
+          },
+          "nodeIndex": "ddc-data_source_availability",
+          "nodeLineageTag": "16e13d03-b820-4bbf-81f6-8f7f7dff0a34",
+          "size": {
+            "height": 224,
+            "width": 313
+          },
+          "zIndex": 0
+        }
+      ],
+      "name": "All tables",
+      "zoomValue": 100,
+      "pinKeyFieldsToTop": false,
+      "showExtraHeaderInfo": false,
+      "hideKeyFieldsWhenCollapsed": false,
+      "tablesLocked": false
+    }
+  ],
+  "selectedDiagram": "All tables",
+  "defaultDiagram": "All tables"
+}

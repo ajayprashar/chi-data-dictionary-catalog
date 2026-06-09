@@ -2,6 +2,8 @@
 
 Local proof-of-concept: **one steward workbook** is the primary surface; parquet is the portable machine copy in this repo folder.
 
+**Maintainers:** before changing workbook generators, read **`docs/excel-workbook-generation-rules.md`** (openpyxl pitfalls, Table naming, AutoFilter rules).
+
 ---
 
 ## POC scope (what matters now)
@@ -50,10 +52,29 @@ python scripts/import_steward_workbook_to_parquet.py
 
 ### Sheets to use in the POC
 
+### Excel Table names (chi_*)
+
+Each data sheet is a **named Excel Table** (Table Design tab in Excel):
+
+| Excel Table | Sheet tab | Parquet |
+|-------------|-----------|---------|
+| `chi_catalog` | Catalog | `ddc-master_patient_catalog.parquet` |
+| `chi_dictionary` | Dictionary | `ddc-master_patient_dictionary.parquet` |
+| `chi_source_availability` | Source_Availability | `ddc-data_source_availability.parquet` |
+| `chi_adt_mappings` | ADT_Mappings | `ddc-hl7_adt_catalog.parquet` |
+| `chi_ccda_mappings` | CCDA_Mappings | `ddc-ccda_catalog.parquet` |
+| `chi_fhir_inventory` | FHIR_Inventory | `ddc-fhir_inventory.parquet` |
+| `chi_business_rules` | Business_Rules | `ddc-business_rules.parquet` |
+| `chi_source_registry` | Source_Registry | steward metadata |
+| `chi_steward_queue` | Steward_Queue | workflow overlay |
+| `chi_lookup_lists` | Lookup_Lists | reference lists |
+
+See **Table_Index** sheet for the full map. Naming pattern: `chi_{artifact}` in snake_case.
+
 | Sheet | Use in POC? | Purpose |
 |-------|-------------|---------|
 | `Concept_Explorer` | **Yes** | Pick `semantic_id` in B3; preview linked fields |
-| `Catalog` | **Yes** | Business context, steward, approval |
+| `Catalog` (`chi_catalog`) | **Yes** | Business context, steward, approval |
 | `Dictionary` | **Yes** | FHIR, survivorship, implementation |
 | `Source_Availability` | **Yes** | Link concepts to `source_id` |
 | `Steward_Queue` | Optional | Workflow notes |
@@ -78,6 +99,18 @@ python scripts/import_steward_workbook_to_parquet.py
 **Path:** `workbooks/chi-partner-intake-workbook.xlsx`
 
 Use when onboarding an external source (jail, HMIS, etc.). Not required for the demographics POC.
+
+Each data sheet is a named Excel Table (`chi_intake_*`). Allowed values are in **Lookup_Lists** (no dropdown validations).
+
+| Excel Table | Sheet tab |
+|-------------|-----------|
+| `chi_intake_source_summary` | Source_Summary |
+| `chi_intake_field_inventory` | Field_Inventory |
+| `chi_intake_code_values` | Code_Values |
+| `chi_intake_keys_relationships` | Keys_and_Relationships |
+| `chi_intake_open_questions` | Open_Questions |
+| `chi_intake_curation_bridge` | CHI_Curation_Bridge |
+| `chi_intake_governance_load_plan` | Governance_Load_Plan |
 
 ```powershell
 python scripts/generate_intake_workbook.py

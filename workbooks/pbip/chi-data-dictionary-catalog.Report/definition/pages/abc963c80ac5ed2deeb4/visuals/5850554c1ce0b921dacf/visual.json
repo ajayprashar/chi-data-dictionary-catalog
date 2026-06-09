@@ -1,0 +1,37 @@
+﻿{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
+  "name": "5850554c1ce0b921dacf",
+  "position": {
+    "x": 28,
+    "y": 1052,
+    "z": 13,
+    "height": 36,
+    "width": 1500,
+    "tabOrder": 13
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Read-only view. Edit chi-steward-workbook.xlsx, run import_steward_workbook_to_parquet.py, then Refresh.",
+                    "textStyle": {
+                      "fontSize": "12pt",
+                      "color": "#000000"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

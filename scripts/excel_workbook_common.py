@@ -1,4 +1,7 @@
-"""Shared helpers for CHI Excel workbook generators."""
+"""Shared helpers for CHI Excel workbook generators.
+
+See docs/excel-workbook-generation-rules.md before changing Table or filter logic.
+"""
 
 from __future__ import annotations
 
@@ -12,6 +15,9 @@ from openpyxl.worksheet.worksheet import Worksheet
 HEADER_FILL = PatternFill("solid", fgColor="1F4E78")
 MODEL_FILL = PatternFill("solid", fgColor="E2EFDA")
 README_TITLE_FILL = PatternFill("solid", fgColor="D9EAF7")
+
+# Excel table naming: chi_{artifact} in snake_case, unique, no spaces.
+# Matches governed ddc-* parquet artifacts where applicable.
 
 
 def style_header_row(ws: Worksheet, row: int = 1) -> None:
@@ -28,6 +34,7 @@ def autosize_columns(ws: Worksheet, max_width: int = 38, min_width: int = 12) ->
 
 
 def add_excel_table(ws: Worksheet, table_name: str) -> None:
+    """Register the sheet data range as a named Excel Table."""
     if ws.max_row < 2 or ws.max_column < 1:
         return
     end_col = get_column_letter(ws.max_column)
@@ -42,21 +49,16 @@ def add_excel_table(ws: Worksheet, table_name: str) -> None:
     )
     ws.add_table(table)
     ws.freeze_panes = "A2"
-    ws.auto_filter.ref = ref
+    # Do not set ws.auto_filter here — the Table definition already includes
+    # autoFilter; a worksheet-level duplicate triggers Excel's repair dialog.
 
 
-def prepare_data_sheet(ws: Worksheet) -> None:
-    """Freeze header row and enable filters without Excel Table objects.
-
-    openpyxl-generated Tables and DataValidations often trigger Excel's
-    'problem with some content' recovery dialog on open.
-    """
-    if ws.max_row < 1 or ws.max_column < 1:
-        return
-    end_col = get_column_letter(ws.max_column)
-    ref = f"A1:{end_col}{ws.max_row}"
-    ws.freeze_panes = "A2"
-    ws.auto_filter.ref = ref
+def table_lookup_formula(table_name: str, key_column: str, value_column: str) -> str:
+    """INDEX/MATCH over Excel structured references (requires real Table objects)."""
+    return (
+        f'=IF($B$3="","",IFERROR(INDEX({table_name}[{value_column}],'
+        f'MATCH($B$3,{table_name}[{key_column}],0)),""))'
+    )
 
 
 def add_list_validation(
@@ -75,9 +77,19 @@ def add_list_validation(
     dv.add(f"{col_letter}2:{col_letter}{max_row}")
 
 
-def write_readme_sheet(ws: Worksheet, title: str, rows: list[tuple[str, str]]) -> None:
+def write_readme_sheet(
+    ws: Worksheet,
+    title: str,
+    rows: list[tuple[str, str]],
+    start_here_steps: list[str] | None = None,
+) -> None:
     ws.append((title,))
     ws.append(())
+    if start_here_steps:
+        ws.append(("Start here", ""))
+        for step_number, step in enumerate(start_here_steps, 1):
+            ws.append((f"  {step_number}.", step))
+        ws.append(())
     for left, right in rows:
         ws.append((left, right))
     ws["A1"].font = Font(size=14, bold=True)

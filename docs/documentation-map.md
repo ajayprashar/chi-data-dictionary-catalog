@@ -12,6 +12,8 @@ Use this page as the index for which documents are actively maintained versus ke
   - Architecture, data model, and implementation behavior.
 - `docs/excel-workbook-guide.md`
   - `workbooks/` living Excel files, data-source links, and round-trip pipeline.
+- `docs/excel-workbook-generation-rules.md`
+  - openpyxl DO/DON'T rules so Excel opens workbooks without repair prompts.
 - `docs/jupyter-duckdb-parquet-setup.md`
   - Notebook and DuckDB execution guidance.
 

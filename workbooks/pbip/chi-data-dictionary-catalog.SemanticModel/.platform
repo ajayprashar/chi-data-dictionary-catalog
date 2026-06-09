@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "chi-data-dictionary-catalog"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "4c453cd9-d799-4e16-8ceb-722074a0c0fd"
+  }
+}
