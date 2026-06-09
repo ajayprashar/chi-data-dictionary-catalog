@@ -13,7 +13,7 @@ Use this page as the index for which documents are actively maintained versus ke
 - `docs/demographics-pilot-plan.md`
   - Living pilot status, phased plan, definition of done, per-attribute checklist.
 - `docs/excel-workbook-guide.md`
-  - `workbooks/` living Excel files, data-source links, and round-trip pipeline.
+  - `workbooks/` living Excel files, governance workflow (Excel → parquet → Power BI), publish ritual, and round-trip pipeline.
 - `docs/excel-workbook-generation-rules.md`
   - openpyxl DO/DON'T rules so Excel opens workbooks without repair prompts.
 - `docs/power-bi-concept-profile-setup.md`

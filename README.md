@@ -24,6 +24,14 @@ Edit `chi-steward-workbook.xlsx` → import to parquet → review in Power BI (o
 
 **Pilot status and next steps:** `docs/demographics-pilot-plan.md`
 
+### Governance workflow
+
+```text
+Excel (author)  →  import script  →  parquet  →  Power BI Refresh (read)
+```
+
+Excel does not auto-update parquet — run the import script after each save. Layer roles and the publish ritual: **`docs/excel-workbook-guide.md`** (*Operating model*).
+
 ---
 
 ### Quick start

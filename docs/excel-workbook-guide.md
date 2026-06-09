@@ -21,26 +21,58 @@ Local proof-of-concept: **one steward workbook** is the primary surface; parquet
 
 ---
 
-## Operating model (simplified)
+## Operating model
+
+### What you have today
+
+```text
+Excel (author)  →  import script  →  parquet  →  Power BI Refresh (read)
+```
+
+That mirrors a common metadata governance split:
+
+| Layer | Role |
+|-------|------|
+| **Excel** | Human-friendly authoring |
+| **Parquet** | Stable, machine-readable copy (git, scripts, Power BI) |
+| **Power BI** | Read-only discovery for reviewers |
+
+For **prove catalog + dictionary before buying a platform**, this is reasonable and maintainable if everyone follows the same **publish ritual** (below).
+
+Excel does **not** update parquet when you save. The import script is the explicit **publish** step so reviewers and Power BI always consume a deliberate snapshot.
 
 ```mermaid
 flowchart LR
     Steward["chi-steward-workbook.xlsx"]
+    Import["import_steward_workbook_to_parquet.py"]
     Parquet["ddc-*.parquet in repo folder"]
     PBI["Power BI PBIP read-only"]
     Notebook["Jupyter optional ad-hoc"]
 
-    Steward --> Parquet
+    Steward --> Import --> Parquet
     Parquet --> Steward
     Parquet --> PBI
     Parquet --> Notebook
 ```
 
-1. **Edit** the steward workbook locally.
-2. **Import** changes to parquet when ready.
-3. **Regenerate** the workbook from parquet if parquet was rebuilt by scripts.
+### Publish ritual (each curation session)
 
-`semantic_id` is the stable join key.
+1. **Edit** `chi-steward-workbook.xlsx` (Catalog, Dictionary, Source_Availability) and **save**.
+2. **Publish** to parquet:
+
+   ```powershell
+   python scripts/import_steward_workbook_to_parquet.py
+   ```
+
+3. **Review** — open `workbooks/pbip/chi-data-dictionary-catalog.pbip` and **Refresh** (see `docs/power-bi-concept-profile-setup.md`).
+
+**Reverse direction** (only when scripts rebuild parquet, not daily use):
+
+```powershell
+python scripts/generate_steward_workbook.py
+```
+
+`semantic_id` is the stable join key across all layers.
 
 ---
 

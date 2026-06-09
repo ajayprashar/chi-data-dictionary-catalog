@@ -222,6 +222,8 @@ Power BI **Concept Profile** shows catalog + dictionary + sources for any of the
 
 ## Operating rhythm
 
+Full workflow rationale (Excel → parquet → Power BI layers and publish ritual): **`docs/excel-workbook-guide.md`** → *Operating model*.
+
 ```mermaid
 flowchart LR
     Edit["Edit steward workbook"]
