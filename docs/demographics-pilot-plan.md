@@ -2,6 +2,8 @@
 
 Operational plan for the **5-attribute demographics pilot** and the path to additional measures. This is the living status and next-steps doc for stewards and project leads.
 
+**Product vision (north star):** `docs/product-vision.md` — governed catalog + dictionary, standards-based curation, ADT/CDA/FHIR contexts in Power BI.
+
 **Related docs**
 
 | Doc | Role |
@@ -9,6 +11,7 @@ Operational plan for the **5-attribute demographics pilot** and the path to addi
 | `docs/excel-workbook-guide.md` | How to edit sheets and run import/export |
 | `docs/power-bi-concept-profile-setup.md` | How to open and refresh the read-only viewer |
 | `readme-prd.md` | Executive summary for stakeholders |
+| `docs/shie-standards-reference.md` | SHIE standards (CDCREC, BCP 47, NullFlavor) → pilot attributes |
 | `TECH-SPEC.md` | Column schemas and architecture reference |
 
 ---
@@ -47,11 +50,11 @@ Create a governed **Data Catalog** and **Data Dictionary** for five demographics
 
 | Metric | Current |
 |--------|---------|
-| Pilot rows with `approval_status` = Approved | **0 / 5** |
-| Pilot rows with `data_steward` assigned | **0 / 5** |
+| Pilot rows with `approval_status` = Approved | **5 / 5** |
+| Pilot rows with `data_steward` assigned | **5 / 5** (`SHIE Data Governance`) |
 | Pilot rows with FHIR path in Dictionary | **5 / 5** |
-| Pilot rows with survivorship logic in Dictionary | **5 / 5** |
-| Source links with non-`unknown` availability | **0 / 5** (all `cmt`, `unknown`) |
+| Pilot rows with survivorship logic in Dictionary | **5 / 5** (SHIE county summaries seeded) |
+| Source links with non-`unknown` availability | **5 / 5** (`cmt`, `partial`) |
 
 The repo proves the **model and workflow**. The missing work is **stewardship of content** in Excel — not more tooling.
 
@@ -108,7 +111,7 @@ Maps **SHIE county master-demographics logic** (survivorship spreadsheet, CMT SQ
 | Data owner, approval | **Catalog** | `data_steward`, `steward_contact`, `approval_status` |
 | ASCMI / HIPAA context | **Catalog** | `consent_category`, `hipaa_category` |
 | County survivorship rules (summary) | **Dictionary** | `chi_survivorship_logic` |
-| Code sets, granularity, alerts | **Dictionary** | `data_quality_notes` |
+| Code sets, terminology OIDs, NullFlavor | **Dictionary** | `data_quality_notes` (see `docs/shie-standards-reference.md`) |
 | Source ranking narrative | **Dictionary** | `data_source_rank_reference` |
 | Per-source coverage today | **Source_Availability** | `source_id`, `availability`, `completeness_pct`, `notes` |
 | Used for (equity, consent, DxF) | **Steward_Queue** | `steward_action_notes`, `next_action` |
@@ -141,7 +144,7 @@ Exclude Unknown, DTS, Other Race from aggregates. Self-report first; else reliab
 Multi-racial when consistent across sources. Alert on unmapped values for curation.
 ```
 
-**Dictionary — `data_quality_notes`:** `28+ source race values; granularity varies; reference Table 5 – Initial Race Groupings and [CDC PHIN workbook](http://www.cdc.gov/phin/resources/vocabulary/documents/PH_RaceAndEthnicity_CDC_v1.3.xlsx).`
+**Dictionary — `data_quality_notes`:** CDCREC OID, HL7 Race Value Set, example ombCategory codes, NullFlavor, OMB/Table 5 rollup — see `docs/shie-standards-reference.md` and seeded text in `seed_demographics_pilot.py`.
 
 **Dictionary — `data_source_rank_reference`:** `CMT expanded pop. Reliability tiers 1–3. Example ranking: Highland #1, Alliance #7, Housing #20 (Mark Table 2).`
 
@@ -224,16 +227,23 @@ For SBR rollup: map Male to Female → Female, Female to Male → Male per count
 5. **Steward_Queue** → `steward_action_notes` (used for), `curation_status` when done.
 6. Save → `python scripts/import_steward_workbook_to_parquet.py` → Power BI **Refresh**.
 
+**Re-seed from plan text (parquet + workbook):** `python scripts/seed_demographics_pilot.py` then `python scripts/generate_steward_workbook.py`
+
 **Suggested pilot order:** `Patient.race` (template) → ethnicity → language → gender_id → birth_sex.
 
 ### What appears in Power BI after publish
 
-| You filled | Concept Profile shows |
-|------------|----------------------|
-| Catalog `data_steward`, `approval_status` | Profile Data Steward, Profile Approval Status (no longer **—**) |
-| Catalog consent/HIPAA | Business & USCDI governance table |
-| Dictionary survivorship / FHIR | Dictionary table (scroll if below fold) |
-| Source_Availability | Source availability table |
+| You filled | Concept Profile shows | Standards & Contexts shows |
+|------------|----------------------|----------------------------|
+| Catalog `data_steward`, `approval_status` | Profile cards | (via slicer filter) |
+| Catalog consent/HIPAA | Business & USCDI governance table | — |
+| Dictionary FHIR + terminology | Implementation table (`fhir_profile`, `data_quality_notes`) | FHIR + terminology table |
+| Dictionary survivorship | `chi_survivorship_logic` | Same table |
+| ADT_Mappings rows | — | HL7 ADT segment/field table |
+| CCDA_Mappings rows | — | C-CDA XML path table |
+| Source_Availability | Source availability table | — |
+
+See **`docs/product-vision.md`** for the layered standards model.
 
 ---
 
@@ -302,47 +312,47 @@ Copy this block when curating; check off in **Steward_Queue** or here as you go.
 
 ### `Patient.race`
 
-- [ ] `data_steward` set on Catalog
-- [ ] `approval_status` = Approved (or documented exception)
-- [ ] FHIR path reviewed on Dictionary
-- [ ] Survivorship logic reviewed on Dictionary
-- [ ] Source_Availability: at least one source with non-`unknown` availability
+- [x] `data_steward` set on Catalog
+- [x] `approval_status` = Approved (or documented exception)
+- [x] FHIR path reviewed on Dictionary
+- [x] Survivorship logic reviewed on Dictionary
+- [x] Source_Availability: at least one source with non-`unknown` availability
 - [ ] Power BI Concept Profile verified after import
 
 ### `Patient.ethnicity`
 
-- [ ] `data_steward` set on Catalog
-- [ ] `approval_status` = Approved (or documented exception)
-- [ ] FHIR path reviewed on Dictionary
-- [ ] Survivorship logic reviewed on Dictionary
-- [ ] Source_Availability: at least one source with non-`unknown` availability
+- [x] `data_steward` set on Catalog
+- [x] `approval_status` = Approved (or documented exception)
+- [x] FHIR path reviewed on Dictionary
+- [x] Survivorship logic reviewed on Dictionary
+- [x] Source_Availability: at least one source with non-`unknown` availability
 - [ ] Power BI Concept Profile verified after import
 
 ### `Patient.language`
 
-- [ ] `data_steward` set on Catalog
-- [ ] `approval_status` = Approved (or documented exception)
-- [ ] FHIR path reviewed on Dictionary
-- [ ] Survivorship logic reviewed on Dictionary
-- [ ] Source_Availability: at least one source with non-`unknown` availability
+- [x] `data_steward` set on Catalog
+- [x] `approval_status` = Approved (or documented exception)
+- [x] FHIR path reviewed on Dictionary
+- [x] Survivorship logic reviewed on Dictionary
+- [x] Source_Availability: at least one source with non-`unknown` availability
 - [ ] Power BI Concept Profile verified after import
 
 ### `Patient.gender_id`
 
-- [ ] `data_steward` set on Catalog
-- [ ] `approval_status` = Approved (or documented exception)
-- [ ] FHIR path reviewed on Dictionary
-- [ ] Survivorship logic reviewed on Dictionary
-- [ ] Source_Availability: at least one source with non-`unknown` availability
+- [x] `data_steward` set on Catalog
+- [x] `approval_status` = Approved (or documented exception)
+- [x] FHIR path reviewed on Dictionary
+- [x] Survivorship logic reviewed on Dictionary
+- [x] Source_Availability: at least one source with non-`unknown` availability
 - [ ] Power BI Concept Profile verified after import
 
 ### `Patient.birth_sex`
 
-- [ ] `data_steward` set on Catalog
-- [ ] `approval_status` = Approved (or documented exception)
-- [ ] FHIR path reviewed on Dictionary
-- [ ] Survivorship logic reviewed on Dictionary
-- [ ] Source_Availability: at least one source with non-`unknown` availability
+- [x] `data_steward` set on Catalog
+- [x] `approval_status` = Approved (or documented exception)
+- [x] FHIR path reviewed on Dictionary
+- [x] Survivorship logic reviewed on Dictionary
+- [x] Source_Availability: at least one source with non-`unknown` availability
 - [ ] Power BI Concept Profile verified after import
 
 ---

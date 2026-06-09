@@ -82,8 +82,8 @@ python -c "import pandas as pd; cat = pd.read_parquet('ddc-master_patient_catalo
 - `scripts/build_data_source_availability.py` — NEW: source availability builder
 
 ### Application ([OK] Updated)
-- `app.py` — Streamlit app with all new fields displayed
-- `chi-data-dictionary-catalog.ipynb` — Jupyter notebook for data exploration
+- `workbooks/pbip/chi-data-dictionary-catalog.pbip` — Power BI read surface (replaces retired local web viewer)
+- `chi-data-dictionary-catalog.ipynb` — Jupyter notebook for optional ad-hoc data exploration
 
 ### Documentation ([OK] Current)
 - `README.md` — Quick start guide
@@ -97,7 +97,6 @@ python -c "import pandas as pd; cat = pd.read_parquet('ddc-master_patient_catalo
 ### Data & Configuration ([OK] Valid)
 - `data/` — Mapping CSVs, feed profiles
 - `docs/` — Additional documentation
-- `.streamlit/config.toml` — Streamlit theme configuration
 - `.gitignore` — Properly configured
 - `requirements.txt` — Python dependencies
 
@@ -108,7 +107,6 @@ python -c "import pandas as pd; cat = pd.read_parquet('ddc-master_patient_catalo
 **Modified (M):**
 - README.md
 - TECH-SPEC.md
-- app.py
 - ddc-master_patient_catalog.parquet
 - ddc-master_patient_dictionary.parquet
 - scripts/split_to_catalog_and_dictionary.py

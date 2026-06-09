@@ -125,8 +125,8 @@ Added to `MASTER_PATIENT_DICTIONARY`:
 2. **`scripts/build_data_source_availability.py`** — New script to build source availability matrix
 
 ### Application
-3. **`app.py`** — Updated schema tolerance lists, ERD diagram, detail view rendering with all new fields
-4. **`app.py`** — Updated `load_five_tables_for_review()` to load and display data source availability table
+3. **Power BI PBIP** — Concept Profile and governance pages for read-only review (retired local web viewer)
+4. **`chi-data-dictionary-catalog.ipynb`** — Optional DuckDB/Parquet exploration notebook
 
 ### Data
 5. **`ddc-master_patient_catalog.parquet`** — Upgraded from 10 to 20 columns via `--upgrade-schema`

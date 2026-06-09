@@ -12,9 +12,11 @@ Below is a **1‑page executive PRD** distilled from the longer PRD and our disc
 
 ## Executive Summary
 
-This proof‑of‑concept (POC) demonstrates how existing Excel‑based metadata (data catalog and data dictionary) can be presented as a **clean, application‑style experience**—without Power Apps, Dataverse, VBA, or enterprise platform dependencies.
+This proof‑of‑concept (POC) delivers a **governed data catalog and data dictionary** for CHI patient concepts, curated against **healthcare standards** (USCDI, US Core, CDCREC, BCP 47), with **interoperability context** for **HL7 ADT**, **C-CDA**, and **FHIR** on a single `semantic_id`.
 
-The goal is to validate **usability, data model clarity, and stakeholder value** before committing to any production technology or licensing decisions.
+Stewards author in Excel; stakeholders review in Power BI (**Concept Profile**, **Standards & Contexts**, **Governance Overview**)—without Power Apps, Dataverse, or enterprise platform dependencies.
+
+The goal is to validate **governance clarity, standards alignment, and multi-format discoverability** before production platform decisions. See **`docs/product-vision.md`**.
 
 ***
 
@@ -69,8 +71,9 @@ Primary use case: **review, validation, and discussion of metadata**.
 *   Metadata **authored** in **Excel** (`chi-steward-workbook.xlsx`)
 *   Saved to **open, portable Parquet files** in the project folder
 *   **Presented** in **Power BI Desktop** (read-only PBIP report) as:
-    *   A **Concept Profile** — one `semantic_id` at a time (catalog + dictionary + sources)
-    *   A **Governance Overview** — portfolio KPIs and full concept table
+    *   **Concept Profile** — governance + dictionary + sources for one `semantic_id`
+    *   **Standards & Contexts** — FHIR/US Core, terminology notes, HL7 ADT fields, C-CDA paths
+    *   **Governance Overview** — portfolio KPIs and full concept table
 
 Excel remains the **authoring surface**; Power BI is the **review and discovery surface**. A Jupyter notebook is available only for optional ad-hoc DuckDB queries over Parquet.
 

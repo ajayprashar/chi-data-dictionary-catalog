@@ -6,8 +6,10 @@ Use this page as the index for which documents are actively maintained versus ke
 
 ## Canonical (actively maintained)
 
+- `docs/product-vision.md`
+  - North star: governed catalog + dictionary, healthcare standards, ADT/CDA/FHIR contexts.
 - `README.md`
-  - Entry point for the 2-layer operating model, pipeline commands, and core files.
+  - Entry point for the operating model, pipeline commands, and core files.
 - `TECH-SPEC.md`
   - Architecture, data model, and implementation behavior.
 - `docs/demographics-pilot-plan.md`
@@ -23,6 +25,8 @@ Use this page as the index for which documents are actively maintained versus ke
 
 ## Reference (domain/source-specific)
 
+- `docs/shie-standards-reference.md`
+  - SHIE governed standards (USCDI, US Core, CDCREC, BCP 47, NullFlavor) mapped to demographics pilot `semantic_id`s.
 - `docs/cmt-adt-feed-and-master-patient.md`
   - CMT ADT profile and how it maps into the catalog model.
 - `docs/adding-data-sources.md`

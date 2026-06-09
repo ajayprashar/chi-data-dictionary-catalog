@@ -1,0 +1,78 @@
+table ddc-ccda_catalog
+	lineageTag: ad933cc2cb0b7873d6ed
+
+	column message_format
+		dataType: string
+		lineageTag: 7316725149645df0e1f5
+		summarizeBy: none
+		sourceColumn: message_format
+
+		annotation SummarizationSetBy = Automatic
+
+	column section_name
+		dataType: string
+		lineageTag: ee3484bf509bc3e5164c
+		summarizeBy: none
+		sourceColumn: section_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column entry_type
+		dataType: string
+		lineageTag: c3c3a5ed0d4cad6d6875
+		summarizeBy: none
+		sourceColumn: entry_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column xml_path
+		dataType: string
+		lineageTag: cfb969916bee5f174fb9
+		summarizeBy: none
+		sourceColumn: xml_path
+
+		annotation SummarizationSetBy = Automatic
+
+	column semantic_id
+		dataType: string
+		lineageTag: 97a9150dde8f0d81e34f
+		summarizeBy: none
+		sourceColumn: semantic_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column fhir_r4_path
+		dataType: string
+		lineageTag: 8597142cda53317bf04d
+		summarizeBy: none
+		sourceColumn: fhir_r4_path
+
+		annotation SummarizationSetBy = Automatic
+
+	column notes
+		dataType: string
+		lineageTag: cc89ad8354fd3b96063c
+		summarizeBy: none
+		sourceColumn: notes
+
+		annotation SummarizationSetBy = Automatic
+
+	column mapping_status
+		dataType: string
+		lineageTag: 4ebaa03786cbef57094c
+		summarizeBy: none
+		sourceColumn: mapping_status
+
+		annotation SummarizationSetBy = Automatic
+
+	partition ddc-ccda_catalog = m
+		mode: import
+		source =
+				let
+				    Source = Parquet.Document(File.Contents("C:\AI\chi-data-dictionary-catalog\ddc-ccda_catalog.parquet"), [Compression=null, LegacyColumnNameEncoding=false, MaxDepth=null])
+				in
+				    Source
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table

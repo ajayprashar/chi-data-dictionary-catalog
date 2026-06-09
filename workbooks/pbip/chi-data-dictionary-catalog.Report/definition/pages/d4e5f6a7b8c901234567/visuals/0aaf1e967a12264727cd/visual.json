@@ -1,0 +1,37 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
+  "name": "0aaf1e967a12264727cd",
+  "position": {
+    "x": 32,
+    "y": 136,
+    "z": 3,
+    "height": 72,
+    "width": 1856,
+    "tabOrder": 3
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "USCDI = Catalog (what) | US Core + FHIR = Dictionary (how) | Terminology = data_quality_notes | HL7 ADT + C-CDA = message context tables below | Survivorship = chi_survivorship_logic",
+                    "textStyle": {
+                      "fontSize": "12pt",
+                      "color": "#000000"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

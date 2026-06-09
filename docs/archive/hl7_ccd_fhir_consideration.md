@@ -618,7 +618,7 @@ This foundation keeps metadata **simple to manage** (separate concerns) and **qu
 
 ## Current CHI Metadata Viewer ERD (POC)
 
-The Mermaid ERD below captures the **actual Parquet structures used by the current Streamlit app**—the master patient catalog/dictionary plus the small ADT/CCD catalogs. **Where FHIR appears:** FHIR path and data type are stored as metadata in **MASTER_PATIENT_DICTIONARY** (`fhir_r4_path`, `fhir_data_type`) and in **HL7_ADT_CATALOG** / **CCDA_CATALOG** (per-format `fhir_r4_path`). This POC does **not** store FHIR resource instance data (e.g. Patient/Encounter JSON); that would live in FHIR servers, APIs, or other data stores, not in these Parquet files.
+The Mermaid ERD below captures the **actual Parquet structures used by the current catalog**—the master patient catalog/dictionary plus the small ADT/CCD catalogs. **Where FHIR appears:** FHIR path and data type are stored as metadata in **MASTER_PATIENT_DICTIONARY** (`fhir_r4_path`, `fhir_data_type`) and in **HL7_ADT_CATALOG** / **CCDA_CATALOG** (per-format `fhir_r4_path`). This POC does **not** store FHIR resource instance data (e.g. Patient/Encounter JSON); that would live in FHIR servers, APIs, or other data stores, not in these Parquet files.
 
 ```mermaid
 erDiagram
@@ -675,7 +675,7 @@ erDiagram
 
 ### Mermaid ERD syntax notes (avoid "Syntax error in graph")
 
-When editing this ERD (here or in the Streamlit app’s `_ERD_MERMAID`), follow these rules so Mermaid 9.x can parse it:
+When editing this ERD, follow these rules so Mermaid 9.x can parse it:
 
 1. **Attribute keys**  
    Only `PK`, `FK`, and `UK` are valid. For an attribute that is both primary and foreign key, use **comma-separated** keys: `PK, FK`.  
@@ -687,13 +687,13 @@ When editing this ERD (here or in the Streamlit app’s `_ERD_MERMAID`), follow 
    - **Wrong:** `||--o{{` (double brace) → causes syntax error.  
    - **Right:** `||--o{`.
 
-Keep the diagram in `app.py` and in this file in sync when changing the ERD. If the in‑app ERD breaks again, the safest fix is to copy this entire `erDiagram` block into `_ERD_MERMAID` in `app.py`.
+Keep this diagram in sync with the canonical ERD in `TECH-SPEC.md` when changing the data model.
 
 ---
 
 ## FUTURE / POST POC — Extended ERD (coding system tables)
 
-The Streamlit app includes a second ERD under **Documentation → FUTURE / POST POC** that shows the extended model with value-set/code-system tables and crosswalks that were strategically left out of the current POC:
+A **FUTURE / POST POC** extended ERD (not in the current five-table model) shows value-set/code-system tables and crosswalks that were strategically left out of the current POC:
 
 - **VALUE_SET_DEFINITION** — Value set metadata (name, code system, version)
 - **VALUE_SET_MEMBER** — Codes within a value set (code, display, definition)

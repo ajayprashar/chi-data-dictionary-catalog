@@ -1,6 +1,6 @@
 # Excel Workbook Guide (POC)
 
-Local proof-of-concept: **one steward workbook** is the primary surface; parquet is the portable machine copy in this repo folder.
+Local proof-of-concept: **one steward workbook** is the primary surface for a **governed catalog + dictionary** with **ADT/CCDA/FHIR** context. Parquet is the portable machine copy. Vision: `docs/product-vision.md`.
 
 **Maintainers:** before changing workbook generators, read **`docs/excel-workbook-generation-rules.md`** (openpyxl pitfalls, Table naming, AutoFilter rules).
 

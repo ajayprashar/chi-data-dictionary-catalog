@@ -1,6 +1,6 @@
 # Power BI Concept Profile
 
-Read-only **Metadata Catalog Viewer** (see `readme-prd.md`). Excel authors data; Power BI presents it.
+Read-only **governed catalog and dictionary viewer** (see `docs/product-vision.md`). Excel authors data; Power BI presents governance, standards, and ADT/CDA/FHIR contexts.
 
 **Recommended:** open the PBIP project in Power BI Desktop:
 
@@ -8,12 +8,15 @@ Read-only **Metadata Catalog Viewer** (see `readme-prd.md`). Excel authors data;
 workbooks/pbip/chi-data-dictionary-catalog.pbip
 ```
 
-The report includes two pages:
+The report includes three pages:
 
 | Page | Purpose |
 |------|---------|
-| **Concept Profile** | Pick one `semantic_id` — USCDI, FHIR, survivorship, sources on one screen |
+| **Concept Profile** | One `semantic_id` — governance, FHIR/US Core, survivorship, sources |
+| **Standards & Contexts** | Same slicer — terminology notes, **HL7 ADT** fields, **C-CDA** paths, layered standards banner |
 | **Governance Overview** | Portfolio KPIs, classification/approval charts, full concept table |
+
+Semantic model tables: catalog, dictionary, source availability, **ADT catalog**, **CCDA catalog** (joined on `semantic_id`).
 
 After steward Excel edits: `python scripts/import_steward_workbook_to_parquet.py` → **Refresh** in Power BI.
 

@@ -1,0 +1,110 @@
+table ddc-hl7_adt_catalog
+	lineageTag: 7de7e1fcf8eb6809449a
+
+	column message_format
+		dataType: string
+		lineageTag: b5c5e4c7e7a4dfe6c850
+		summarizeBy: none
+		sourceColumn: message_format
+
+		annotation SummarizationSetBy = Automatic
+
+	column message_type
+		dataType: string
+		lineageTag: 003e8c428f408d6f28e3
+		summarizeBy: none
+		sourceColumn: message_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column segment_id
+		dataType: string
+		lineageTag: f1afe7429915e0ba3569
+		summarizeBy: none
+		sourceColumn: segment_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column field_id
+		dataType: string
+		lineageTag: e21eed100ea1000a4a72
+		summarizeBy: none
+		sourceColumn: field_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column field_name
+		dataType: string
+		lineageTag: 14f0e8a51b231fd11a62
+		summarizeBy: none
+		sourceColumn: field_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column data_type
+		dataType: string
+		lineageTag: e1a0a9e396561d8cd8a9
+		summarizeBy: none
+		sourceColumn: data_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column optionality
+		dataType: string
+		lineageTag: 4eeef0b85f225b3c6a1d
+		summarizeBy: none
+		sourceColumn: optionality
+
+		annotation SummarizationSetBy = Automatic
+
+	column cardinality
+		dataType: string
+		lineageTag: d6d4a2439cfa434f2efb
+		summarizeBy: none
+		sourceColumn: cardinality
+
+		annotation SummarizationSetBy = Automatic
+
+	column semantic_id
+		dataType: string
+		lineageTag: 8dfc70a350d1aee33309
+		summarizeBy: none
+		sourceColumn: semantic_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column fhir_r4_path
+		dataType: string
+		lineageTag: cacd83a771d613988af8
+		summarizeBy: none
+		sourceColumn: fhir_r4_path
+
+		annotation SummarizationSetBy = Automatic
+
+	column notes
+		dataType: string
+		lineageTag: 411994554bbb3438b537
+		summarizeBy: none
+		sourceColumn: notes
+
+		annotation SummarizationSetBy = Automatic
+
+	column mapping_status
+		dataType: string
+		lineageTag: fd3f3682bda64fa4f881
+		summarizeBy: none
+		sourceColumn: mapping_status
+
+		annotation SummarizationSetBy = Automatic
+
+	partition ddc-hl7_adt_catalog = m
+		mode: import
+		source =
+				let
+				    Source = Parquet.Document(File.Contents("C:\AI\chi-data-dictionary-catalog\ddc-hl7_adt_catalog.parquet"), [Compression=null, LegacyColumnNameEncoding=false, MaxDepth=null])
+				in
+				    Source
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table

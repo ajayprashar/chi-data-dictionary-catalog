@@ -1,12 +1,14 @@
 ## chi-data-dictionary-catalog (POC)
 
-Local proof-of-concept: govern patient data elements in **Excel**, store them as **parquet** in this folder, and validate the catalog/dictionary model works before any platform investment.
+**Governed data catalog and data dictionary** for CHI patient concepts (`semantic_id`), curated against **healthcare standards** (USCDI, US Core, terminology), with dictionary detail and **interop views for HL7 ADT, C-CDA, and FHIR**.
+
+Full vision: **`docs/product-vision.md`**
 
 ---
 
 ### POC in one sentence
 
-Edit `chi-steward-workbook.xlsx` → import to parquet → review in Power BI (optional Jupyter for ad-hoc queries).
+Edit `chi-steward-workbook.xlsx` → import to parquet → review in Power BI (**Concept Profile** + **Standards & Contexts**).
 
 ---
 
@@ -15,14 +17,14 @@ Edit `chi-steward-workbook.xlsx` → import to parquet → review in Power BI (o
 | Authoring (use now) | Optional read | Defer |
 |---------------------|---------------|-------|
 | `workbooks/chi-steward-workbook.xlsx` | `workbooks/pbip/chi-data-dictionary-catalog.pbip` (Power BI) | SharePoint |
-| `Catalog` + `Dictionary` + `Source_Availability` | See `docs/power-bi-concept-profile-setup.md` | Partner intake workbook |
+| `Catalog` + `Dictionary` + `Source_Availability` + `ADT_Mappings` + `CCDA_Mappings` | See `docs/power-bi-concept-profile-setup.md` | Partner intake workbook |
 | `Concept_Explorer` sheet | Jupyter notebook (`chi-data-dictionary-catalog.ipynb`) for ad-hoc DuckDB queries only | Full 28-source coverage |
 | `import_steward_workbook_to_parquet.py` | | Azure DevOps, Innovaccer DEM |
 | 5 demographics attributes | | FHIR inventory curation |
 
-**POC goal:** prove that `semantic_id` joins business catalog to technical dictionary in a maintainable Excel workflow.
+**POC goal:** prove governed catalog + dictionary + standards + message contexts (ADT/CDA/FHIR) on one `semantic_id`.
 
-**Pilot status and next steps:** `docs/demographics-pilot-plan.md`
+**Pilot status:** `docs/demographics-pilot-plan.md` · **Standards:** `docs/shie-standards-reference.md`
 
 ### Governance workflow
 
@@ -71,7 +73,7 @@ python scripts/generate_steward_workbook.py
 | `ddc-master_patient_dictionary.parquet` | Implementation detail per concept |
 | `ddc-data_source_availability.parquet` | Concept ↔ source links |
 
-Additional parquet files (`ddc-hl7_adt_catalog`, `ddc-ccda_catalog`, `ddc-fhir_inventory`, `ddc-business_rules`) support interoperability demos and can be ignored until needed.
+Interop context parquet (`ddc-hl7_adt_catalog`, `ddc-ccda_catalog`) links the same `semantic_id` to **HL7 ADT** and **C-CDA** paths; shown on the PBIP **Standards & Contexts** page. Optional: `ddc-fhir_inventory`, `ddc-business_rules`.
 
 ---
 
@@ -108,7 +110,9 @@ python scripts/generate_intake_workbook.py
 
 ### Documentation
 
+- `docs/product-vision.md` — north star (governance + standards + ADT/CDA/FHIR contexts)
 - `docs/demographics-pilot-plan.md` — pilot status, phased plan, per-attribute checklist
+- `docs/shie-standards-reference.md` — SHIE standards (CDCREC, US Core, BCP 47) → pilot attributes
 - `docs/excel-workbook-guide.md` — POC workbook guide (start here for stewards)
 - `docs/power-bi-concept-profile-setup.md` — Power BI viewer setup and refresh
 - `docs/excel-workbook-generation-rules.md` — openpyxl rules (avoid Excel repair prompts)

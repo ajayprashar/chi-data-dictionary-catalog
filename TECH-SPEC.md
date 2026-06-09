@@ -567,7 +567,7 @@ erDiagram
     MASTER_PATIENT_CATALOG ||--o{ BUSINESS_RULES : semantic_id
 ```
 
-Note: historical Streamlit-era ERD variants are archived in `docs/archive/hl7_ccd_fhir_consideration.md` and are not the source of truth.
+Note: historical ERD variants are archived in `docs/archive/hl7_ccd_fhir_consideration.md` and are not the source of truth.
 
 ---
 
@@ -785,9 +785,9 @@ Expected columns (Excel headers; script normalizes and converts to snake_case):
 
 ## 5. Test Data Display
 
-### 5.1 Joined View (App Main Dataframe)
+### 5.1 Joined View (Power BI Semantic Model)
 
-The app joins catalog + dictionary on `semantic_id` and derives `fhir_resource`. Columns displayed or used:
+The Power BI semantic model joins catalog + dictionary on `semantic_id` and derives `fhir_resource`. Columns displayed or used:
 
 | Column | In List View | In Detail View | In Filters |
 |--------|--------------|----------------|------------|
@@ -806,9 +806,9 @@ The app joins catalog + dictionary on `semantic_id` and derives `fhir_resource`.
 | `data_source_rank_reference` | — | ✓ | — |
 | `data_quality_notes` | — | ✓ | — |
 
-**Join behavior:** The app uses an **inner join** on `semantic_id`. Elements that exist in only one of the two master tables are excluded from the main viewer.
+**Join behavior:** The semantic model uses an **inner join** on `semantic_id`. Elements that exist in only one of the two master tables are excluded from the main viewer.
 
-**Join sanity check:** The app calculates `only_in_catalog` and `only_in_dictionary` sets and shows a warning if the two master tables do not have the same `semantic_id` coverage.
+**Join sanity check:** Import and build scripts should validate `only_in_catalog` and `only_in_dictionary` sets before publish; mismatched coverage should be resolved in Excel before refresh.
 
 ### 5.2 Message-Format Mappings (Detail View)
 
@@ -824,191 +824,83 @@ Displayed as **—** (em dash). Multiline fields (Description, survivorship logi
 
 ---
 
-## 6. UI Layout, Organization, and Logic
+## 6. Viewer Layout, Organization, and Logic
 
-### 6.1 Page Structure
+The read surface is **Power BI** (`workbooks/pbip/chi-data-dictionary-catalog.pbip`). Stewards author in **Excel**; optional **Jupyter** supports ad-hoc parquet queries. See `docs/power-bi-concept-profile-setup.md` for open, refresh, and troubleshooting.
+
+### 6.1 Report Pages
 
 ```mermaid
-flowchart TB
-    subgraph Header["HEADER"]
-        Title["Community Health Insights (CHI) Metadata Catalog"]
-        Caption["Caption: Local viewer for the CHI data catalog and data dictionary..."]
-    end
-
-    subgraph Body["MAIN BODY"]
-        subgraph Sidebar["SIDEBAR"]
-            Search["Search & Filters"]
-            QuickSearch["Quick search"]
-            FHIR["FHIR resource"]
-            Class["Classification"]
-            Ruleset["Ruleset category"]
-            Privacy["Privacy / security"]
-            Search --- QuickSearch
-            Search --- FHIR
-            Search --- Class
-            Search --- Ruleset
-            Search --- Privacy
-        end
-
-        subgraph MainContent["MAIN CONTENT"]
-            subgraph LeftCol["LEFT COL (1.0)"]
-                ListTitle["Catalog elements"]
-                ListDesc["Dataframe, single-row selection"]
-                FeedTitle["Feed profile"]
-                FeedDesc["Dropdown + segments + event types"]
-                ListTitle --- ListDesc
-                ListDesc --- FeedTitle
-                FeedTitle --- FeedDesc
-            end
-
-            subgraph RightCol["RIGHT COL (2.2)"]
-                DetailTitle["Element detail"]
-                DetailDesc["4 section blocks + optional ADT/CCDA mappings"]
-                DetailTitle --- DetailDesc
-            end
-
-            LeftCol --- RightCol
-        end
-
-        Sidebar --- MainContent
-    end
-
-    subgraph Footer["DOCUMENTATION (button to open; Return to catalog at key scroll points)"]
-        DocSpec["Technical Specification (TECH-SPEC.md)"]
-        DocSummary["Summary for current filters"]
-        DocERD["Data model (ERD) - Mermaid diagram"]
-        DocTables["Table preview - MASTER_PATIENT_CATALOG, DICTIONARY, HL7_ADT, CCDA, DATA_SOURCE_AVAILABILITY"]
-        DocFuture["FUTURE / POST POC ERD"]
-        DocSpec --- DocSummary
-        DocSummary --- DocERD
-        DocERD --- DocTables
-        DocTables --- DocFuture
-    end
-
-    Header --> Body
-    Body --> Footer
+flowchart LR
+    Excel["chi-steward-workbook.xlsx"] --> Import["import_steward_workbook_to_parquet.py"]
+    Import --> Parquet["ddc-*.parquet"]
+    Parquet --> Refresh["Power BI Refresh"]
+    Refresh --> Profile["Concept Profile"]
+    Refresh --> Standards["Standards & Contexts"]
+    Refresh --> Overview["Governance Overview"]
 ```
 
-### 6.2 Sidebar: Search & Filters
+| Page | Purpose |
+|------|---------|
+| **Concept Profile** | One `semantic_id` — governance, FHIR/US Core, survivorship, source availability |
+| **Standards & Contexts** | Same slicer — terminology notes, HL7 ADT fields, C-CDA paths, standards banner |
+| **Governance Overview** | Portfolio KPIs, classification/approval charts, full concept table |
 
-- **Quick search:** Free-text, case-insensitive. Searches `semantic_id`, `uscdi_element`, `uscdi_description`, `fhir_r4_path`, `domain`, `composite_group`. Updates results as user types.
-- **FHIR resource:** Multiselect. Options derived from `fhir_resource` (Patient, Observation, etc.).
-- **Classification:** Multiselect (e.g., Master Demographics, SDOH).
-- **Domain:** Multiselect (e.g., Domain 1: Master Demographics, Domain 2: Master Patient Attributes). HIE Three-Domain Separation.
-- **Ruleset category:** Multiselect (e.g., Static Identity, Dynamic Identity).
-- **Privacy / security:** Multiselect for PII/sensitive flags.
+Semantic model tables: `ddc-master_patient_catalog`, `ddc-master_patient_dictionary`, `ddc-data_source_availability`, `ddc-hl7_adt_catalog`, `ddc-ccda_catalog` (all joined on `semantic_id`).
 
-**Logic:** All filters are ANDed. Empty multiselects = no filter on that dimension. Search is OR across the text columns.
+### 6.2 Concept Profile Page
 
-### 6.3 Left Column: Catalog Elements
+- **Slicer:** `semantic_id` (single selection drives all visuals on this page and Standards & Contexts).
+- **Governance cards:** data steward, approval status, schema version, last modified date.
+- **Catalog block:** USCDI data class/element, classification, domain, ruleset category, privacy/security, rollup/composite fields.
+- **Dictionary – FHIR mapping:** resource, FHIR path, data type, profile, cardinality, must support.
+- **Dictionary – survivorship & sources:** CHI survivorship logic, tie-breaker, conflict detection, Innovaccer logic, data source rank reference, identity resolution notes, calculation grain, historical freeze, recalc window.
+- **Dictionary – quality & governance:** data quality notes (including terminology guidance), de-identification method.
+- **Source availability:** table filtered to the selected `semantic_id` (source_id, availability, notes).
 
-- **Dataframe:** Columns Semantic ID, Element, Resource. `selection_mode="single-row"`, `on_select="rerun"`.
-- **Selection:** First selected row, or row 0 if none. Selected row drives the detail view.
-- **Feed profile:** Dropdown lists sources (e.g., "CMT feed profile") discovered from `data/*_feed_segments.csv`. Selecting a source shows:
-  - **Segments:** Dataframe with segment_id, data_received, notes, link_segment_id.
-  - **Event types:** Dataframe with event_type, file_count, % of total, description, link_segment_id (event-level marker).
+### 6.3 Standards & Contexts Page
 
-### 6.4 Right Column: Element Detail
+- **Shared slicer:** same `semantic_id` as Concept Profile.
+- **Terminology / standards notes:** surfaced from `data_quality_notes` and steward workbook context.
+- **HL7 ADT table:** message_type, segment_id, field_id, field_name, notes for the selected concept.
+- **C-CDA table:** section_name, entry_type, xml_path, notes for the selected concept.
+- **Standards banner:** links stewards to `docs/shie-standards-reference.md` and `docs/product-vision.md`.
 
-Single, vertically stacked layout (no tabs). Four section blocks with distinct background tints:
+### 6.4 Governance Overview Page
 
-| Section | CSS Class | Caption | Fields |
-|---------|-----------|---------|--------|
-| **Catalog** | section-catalog (#f9fafb) | from ddc-master_patient_catalog.parquet | Semantic ID, USCDI Data Class, USCDI Data Element, USCDI Element, Description, Classification, Domain, Ruleset Category, Privacy/Security, HIPAA Category, FHIR Security Label, Consent Category, Rollup Relationship, Is Rollup, Composite Group, Identifier Type, Identifier Authority, Data Steward, Steward Contact, Approval Status, Schema Version, Last Modified Date |
-| **Dictionary – FHIR Mapping** | section-fhir (#ecfdf5) | Canonical FHIR R4 path & type | Resource, FHIR Path, FHIR Data Type, FHIR Profile, FHIR Cardinality, FHIR Must Support |
-| **Dictionary – Survivorship & Sources** | section-survivorship (#fffbeb) | Business rules and source logic | CHI Survivorship Logic, Tie Breaker Rule, Conflict Detection Enabled, Manual Override Allowed, Innovaccer Survivorship Logic, Data Source Rank Reference, Identity Resolution Notes, Calculation Grain, Historical Freeze, Recalc Window (Months) |
-| **Dictionary – Quality & Governance** | section-quality (#f5f3ff) | — | Quality & Governance Notes, De-identification Method |
+- **KPI cards:** total concepts, approved count, concepts with FHIR mapping, PII/sensitive counts.
+- **Charts:** classification and approval status distributions.
+- **Concept table:** searchable portfolio view across all governed `semantic_id` rows.
 
-Multiline fields (Description, survivorship logic, Data Source Rank Reference, Quality & Governance Notes) use `field-value-multiline` (scrollable, ~3–6 lines).
+### 6.5 Steward Authoring (Excel)
 
-**Message-format mappings** (conditional): If ADT or CCDA catalog has rows for the selected `semantic_id`, show:
-- **HL7 ADT** block (#eff6ff): Dataframe with semantic_id, message_type, segment_id, field_id, field_name, notes.
-- **CCD / CCDA** block (#f0fdf4): Dataframe with semantic_id, section_name, entry_type, xml_path, notes.
+- **Workbook:** `workbooks/chi-steward-workbook.xlsx` (generated by `scripts/generate_steward_workbook.py`).
+- **Sheets:** Steward_Queue, Concept_Explorer, Source_Availability, HL7_ADT_Catalog, CCDA_Catalog (and related intake sheets as needed).
+- **Publish ritual:** edit workbook → `python scripts/import_steward_workbook_to_parquet.py` → Power BI **Refresh**.
 
-### 6.5 Documentation Section
+### 6.6 Data Loading Logic
 
-The documentation is session-state-driven (not an expander). A button opens the full section; **"↑ Return to catalog"** buttons at key scroll points collapse it and return focus to the main UI.
-
-- **Open:** Click **"Documentation — Summary, ERD, table preview, TECH-SPEC"** to reveal the section.
-- **Technical Specification:** Full TECH-SPEC.md with Mermaid diagrams (2.1 Data Flow, 6.1 Page Structure) rendered inline.
-- **Summary:** Total elements, distinct FHIR resources, with/without FHIR mapping, missing survivorship, PII count.
-- **ERD:** Mermaid diagram (embedded via components.v1.html or fallback code block).
-- **Table preview:** Raw Parquet preview for all five tables; row limit selector (50, 500, "5 trillion").
-- **FUTURE / POST POC:** Extended ERD with value-set tables, FHIR catalog, crosswalk.
-- **Return to catalog:** Buttons at top, after Technical Specification, after ERD, and at bottom.
-
-### 6.6 Theme and Styling
-
-- **Background:** #f3f4f6 (main), #e5e7eb (sidebar).
-- **Accent:** #047857 / #059669 (medical green).
-- **Typography:** System fonts (-apple-system, Segoe UI, Roboto).
-- **Labels:** 15rem width/min-width, right-aligned; secondary color #4b5563. Colons are added in CSS so all rows align consistently.
-- **Value boxes:** White background, 1px #d1d5db border, 4px radius.
-- **Tables:** `st.dataframe` text is styled to match the main page content size (`0.95rem`).
-
-### 6.7 Data Loading Logic
-
-1. Build/rebuild canonical parquet via split and mapping scripts.
+1. Build/rebuild canonical parquet via split and mapping scripts (or import from steward workbook).
 2. Build standards inventory parquet via `build_standards_inventories.py`.
-3. Review in Power BI (after import) or steward in Excel workbooks; Jupyter is optional for ad-hoc parquet queries.
+3. Review in Power BI after refresh; steward in Excel workbooks; Jupyter optional for ad-hoc parquet queries.
 4. `semantic_id` remains the canonical join key across all standards layers.
 
-### 6.8 Error Handling
+### 6.7 Error Handling
 
 - Missing required parquet files raise `FileNotFoundError` in build scripts and fail fast.
 - Join mismatch risk is handled by preserving `semantic_id` as the canonical key and validating generated inventories before publish.
 - Optional artifacts (ADT/CCDA inventories, business rules) can be absent without blocking core catalog/dictionary builds.
+- Power BI refresh errors (missing parquet, UTF-8 BOM on PBIP JSON) — see `docs/power-bi-concept-profile-setup.md`.
 
-### 6.9 Diagram Rendering
+### 6.8 Viewer Behavior Requirements
 
-Mermaid diagrams are documented as markdown source-of-truth and can be rendered in tools like Mermaid Live or documentation platforms that support Mermaid syntax. Keep diagrams simple, portable, and platform-agnostic.
+Any replacement read surface should preserve:
 
----
-
-### 6.10 Platform-Neutral Recreation Requirements
-
-If this application is rebuilt in another platform, the following behaviors should be preserved:
-
- 1. **Core data model**
-   - Use `ddc-master_patient_catalog.parquet` and `ddc-master_patient_dictionary.parquet` as the required master tables.
-   - Join them on `semantic_id`.
-   - Treat `ddc-hl7_adt_catalog.parquet`, `ddc-ccda_catalog.parquet`, and `ddc-data_source_availability.parquet` as optional supporting tables.
-
-2. **Primary user workflow**
-   - Left side: searchable/filterable list of elements showing `semantic_id`, `uscdi_element`, and derived `fhir_resource`.
-   - Right side: one selected element shown in a full detail view.
-   - Default behavior: if no row is explicitly selected, show the first row in the filtered result set.
-
-3. **Detail layout**
-   - Preserve the four main detail groups in this order:
-     - Catalog
-     - Dictionary – FHIR Mapping
-     - Dictionary – Survivorship & Sources
-     - Dictionary – Quality & Governance
-   - Preserve the field order within each section, especially the grouping of `uscdi_data_class`, `uscdi_data_element`, and `uscdi_element`.
-
-4. **Search and filters**
-   - Support free-text search across `semantic_id`, `uscdi_element`, `uscdi_description`, `fhir_r4_path`, `domain`, and `composite_group`.
-   - Support multi-select filters for `fhir_resource`, `classification`, `domain`, and `ruleset_category`.
-   - Apply filters with AND logic across filter groups.
-
-5. **Optional interoperability views**
-   - For the selected `semantic_id`, show matching HL7 ADT rows and CCDA rows when available.
-   - Include `semantic_id` in those tables so the linkage is visible to users.
-   - Show feed-profile segment and event-type tables separately from message-format mappings.
-
-6. **Documentation / review area**
-   - Include a documentation area that shows:
-     - Technical specification
-     - Filtered summary metrics
-     - ERD / architecture visuals
-     - Raw table previews, including `data_source_availability` when present
-   - This area is part of the user experience, not just internal documentation, because it helps stewards validate the model.
-
-7. **Display conventions**
-   - Show blank or missing values as `—`.
-   - Keep label/value alignment consistent across all sections.
-   - Keep multiline fields readable in bounded boxes or equivalent expandable text areas.
+1. **Core data model** — catalog + dictionary inner join on `semantic_id`; ADT, CCDA, and source availability as optional supporting tables.
+2. **Primary workflow** — select one `semantic_id`; show full catalog + dictionary detail for that concept.
+3. **Detail layout** — four groups in order: Catalog → FHIR Mapping → Survivorship & Sources → Quality & Governance.
+4. **Interoperability context** — ADT and CCDA rows for the selected `semantic_id` when present.
+5. **Display conventions** — blank values as `—`; multiline fields readable in bounded text areas or tables.
 
 ---
 
@@ -1023,7 +915,7 @@ If this application is rebuilt in another platform, the following behaviors shou
 | 4. CCDA catalog (optional) | `python scripts/build_ccda_catalog_from_mapping.py` | `ddc-ccda_catalog.parquet` |
 | 5. Data source availability | `python scripts/build_data_source_availability.py` | `ddc-data_source_availability.parquet` |
 | 6. Standards inventories | `python scripts/build_standards_inventories.py -d .` | `ddc-fhir_inventory.parquet`, `ddc-business_rules.parquet` |
-| 7. Review | Open `chi-data-dictionary-catalog.ipynb` or steward in Excel | Validated governed model |
+| 7. Review | Refresh Power BI PBIP (or steward in Excel; Jupyter optional for ad-hoc queries) | Validated governed model |
 
 ---
 

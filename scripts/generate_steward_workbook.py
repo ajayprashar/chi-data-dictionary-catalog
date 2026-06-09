@@ -124,34 +124,44 @@ CONCEPT_EXPLORER_DEFAULT_SEMANTIC_ID = "Patient.race"
 
 DEMOGRAPHICS_PILOT: dict[str, dict[str, str]] = {
     "Patient.race": {
-        "curation_status": "Needs Action",
+        "curation_status": "Approved",
+        "steward_assigned_to": "SHIE Data Governance",
+        "steward_action_notes": "Health equity dashboard; ASCMI consent; crosswalk validation",
         "priority": "POC",
         "queue_type": "demographics_pilot",
-        "next_action": "Set approval_status in Catalog; confirm survivorship in Dictionary.",
+        "next_action": "Done",
     },
     "Patient.ethnicity": {
-        "curation_status": "Needs Action",
+        "curation_status": "Approved",
+        "steward_assigned_to": "SHIE Data Governance",
+        "steward_action_notes": "Health equity dashboard; ASCMI consent",
         "priority": "POC",
         "queue_type": "demographics_pilot",
-        "next_action": "Set approval_status in Catalog; confirm survivorship in Dictionary.",
+        "next_action": "Done",
     },
     "Patient.language": {
-        "curation_status": "Needs Action",
+        "curation_status": "Approved",
+        "steward_assigned_to": "SHIE Data Governance",
+        "steward_action_notes": "Health equity dashboard; outreach language targeting",
         "priority": "POC",
         "queue_type": "demographics_pilot",
-        "next_action": "Set approval_status in Catalog; confirm survivorship in Dictionary.",
+        "next_action": "Done",
     },
     "Patient.gender_id": {
-        "curation_status": "Needs Action",
+        "curation_status": "Approved",
+        "steward_assigned_to": "SHIE Data Governance",
+        "steward_action_notes": "ASCMI consent; equity reporting",
         "priority": "POC",
         "queue_type": "demographics_pilot",
-        "next_action": "Set approval_status in Catalog; confirm survivorship in Dictionary.",
+        "next_action": "Done",
     },
     "Patient.birth_sex": {
-        "curation_status": "Needs Action",
+        "curation_status": "Approved",
+        "steward_assigned_to": "SHIE Data Governance",
+        "steward_action_notes": "UMPI matching; clinical use; not interchangeable with gender identity",
         "priority": "POC",
         "queue_type": "demographics_pilot",
-        "next_action": "Set approval_status in Catalog; confirm survivorship in Dictionary.",
+        "next_action": "Done",
     },
 }
 
@@ -174,8 +184,13 @@ EXPLORER_FIELDS = [
     ("chi_catalog", "data_steward", "Data steward"),
     ("chi_catalog", "approval_status", "Approval status"),
     ("chi_dictionary", "fhir_r4_path", "FHIR R4 path"),
+    ("chi_dictionary", "fhir_profile", "US Core profile"),
+    ("chi_dictionary", "data_quality_notes", "Terminology / standards notes"),
     ("chi_dictionary", "chi_survivorship_logic", "CHI survivorship logic"),
     ("chi_dictionary", "data_source_rank_reference", "Data source rank"),
+    ("chi_adt_mappings", "field_id", "HL7 ADT field (first match)"),
+    ("chi_adt_mappings", "segment_id", "HL7 ADT segment (first match)"),
+    ("chi_ccda_mappings", "xml_path", "C-CDA XML path (first match)"),
     ("chi_source_availability", "source_id", "Primary source (first link)"),
     ("chi_source_availability", "availability", "Source availability"),
 ]
@@ -305,9 +320,9 @@ def steward_queue_row(semantic_id: str) -> list[str]:
     return [
         semantic_id,
         pilot.get("curation_status", ""),
-        "",
-        "",
-        "",
+        pilot.get("steward_assigned_to", ""),
+        pilot.get("steward_action_notes", ""),
+        pilot.get("reviewer_notes", ""),
         pilot.get("priority", ""),
         pilot.get("queue_type", ""),
         pilot.get("next_action", ""),
@@ -334,8 +349,8 @@ def add_concept_explorer_sheet(wb: Workbook) -> None:
     ws["A1"] = "Concept Explorer"
     ws["A1"].font = Font(size=14, bold=True)
     ws["A2"] = (
-        "Change semantic_id in B3 to preview a concept. "
-        "Source rows show the first linked source; see Source_Availability for the full list."
+        "Change semantic_id in B3 to preview catalog, dictionary, ADT/CCDA context, and sources. "
+        "ADT/CCDA show first matching row; see ADT_Mappings and CCDA_Mappings for full lists."
     )
     ws["A3"] = "semantic_id"
     ws["B3"] = CONCEPT_EXPLORER_DEFAULT_SEMANTIC_ID
@@ -371,7 +386,8 @@ def add_readme_sheet(wb: Workbook) -> None:
         [
             (
                 "Purpose",
-                "Human-facing steward layer over governed ddc-* parquet. Each data sheet is a named Excel Table (chi_*).",
+                "Governed data catalog + dictionary over ddc-* parquet, curated to healthcare standards, "
+                "with HL7 ADT and C-CDA context sheets. See docs/product-vision.md.",
             ),
             (
                 "Table naming",

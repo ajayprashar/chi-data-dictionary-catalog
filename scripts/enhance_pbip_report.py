@@ -15,6 +15,17 @@ THEME_DIR = PBIP / "chi-data-dictionary-catalog.Report" / "StaticResources" / "S
 CATALOG = "ddc-master_patient_catalog"
 DICTIONARY = "ddc-master_patient_dictionary"
 SOURCES = "ddc-data_source_availability"
+ADT = "ddc-hl7_adt_catalog"
+CCDA = "ddc-ccda_catalog"
+
+SEMANTIC_MODEL = PBIP / "chi-data-dictionary-catalog.SemanticModel" / "definition"
+TABLES_DIR = SEMANTIC_MODEL / "tables"
+REPO_PARQUET = r"C:\AI\chi-data-dictionary-catalog"
+
+STANDARDS_LAYER_TEXT = (
+    "USCDI = Catalog (what) | US Core + FHIR = Dictionary (how) | Terminology = data_quality_notes | "
+    "HL7 ADT + C-CDA = message context tables below | Survivorship = chi_survivorship_logic"
+)
 
 # High-contrast primary palette (background vs text)
 PRIMARY_BLUE = "#0047AB"
@@ -441,8 +452,15 @@ def build_concept_profile_page(page_dir: Path) -> None:
         ),
         table_ex(
             vid(), margin, dict_y, 1184, dict_h, 10, DICTIONARY,
-            ["fhir_r4_path", "fhir_data_type", "chi_survivorship_logic", "data_source_rank_reference", "data_quality_notes"],
-            title="Implementation & survivorship",
+            [
+                "fhir_r4_path",
+                "fhir_profile",
+                "fhir_data_type",
+                "chi_survivorship_logic",
+                "data_quality_notes",
+                "data_source_rank_reference",
+            ],
+            title="Implementation & survivorship (FHIR + standards)",
         ),
         table_ex(
             vid(), margin + 1200, tables_y, 656, dict_y + dict_h - tables_y, 11, SOURCES,
@@ -458,6 +476,185 @@ def build_concept_profile_page(page_dir: Path) -> None:
     ]
     for v in visuals:
         write_visual(page_dir, v)
+
+
+def build_standards_contexts_page(page_dir: Path) -> None:
+    clear_visuals(page_dir)
+    w, h = PAGE_PROFILE_W, PAGE_PROFILE_H
+    margin = 32
+    content_w = w - (margin * 2)
+    header_h = 128
+    layer_y = header_h + 8
+    layer_h = 72
+    slicer_y = layer_y + layer_h + 12
+    slicer_h = 120
+    tables_y = slicer_y + slicer_h + 16
+    fhir_h = 220
+    adt_ccda_y = tables_y + fhir_h + 16
+    adt_h = 248
+    footer_h = 52
+    half_w = (content_w - 16) // 2
+    visuals = [
+        shape_rect(vid(), 0, 0, w, header_h, 0, PRIMARY_BLUE),
+        textbox(
+            vid(), margin, 20, 1700, 56, 1,
+            "Standards & interoperability contexts",
+            bold=True, size="28pt", color=TEXT_WHITE, transparent=True,
+        ),
+        textbox(
+            vid(), margin, 80, 1750, 40, 2,
+            "Healthcare standards + HL7 ADT + C-CDA + FHIR for one semantic_id",
+            size="13pt", color=TEXT_WHITE, transparent=True,
+        ),
+        textbox(
+            vid(), margin, layer_y, content_w, layer_h, 3,
+            STANDARDS_LAYER_TEXT,
+            size="12pt", color=TEXT_BLACK,
+        ),
+        slicer_dropdown(vid(), margin, slicer_y, content_w, slicer_h, 4, CATALOG, "semantic_id", "Patient.race"),
+        table_ex(
+            vid(), margin, tables_y, content_w, fhir_h, 5, DICTIONARY,
+            ["semantic_id", "fhir_r4_path", "fhir_profile", "data_quality_notes", "chi_survivorship_logic"],
+            title="FHIR R4 + US Core + terminology (Dictionary)",
+        ),
+        table_ex(
+            vid(), margin, adt_ccda_y, half_w, adt_h, 6, ADT,
+            ["semantic_id", "segment_id", "field_id", "field_name", "message_type", "mapping_status", "notes"],
+            title="HL7 v2 ADT context",
+        ),
+        table_ex(
+            vid(), margin + half_w + 16, adt_ccda_y, half_w, adt_h, 7, CCDA,
+            ["semantic_id", "section_name", "entry_type", "xml_path", "mapping_status", "notes"],
+            title="C-CDA / CCD context",
+        ),
+        shape_rect(vid(), 0, h - footer_h, w, footer_h, 8, PRIMARY_YELLOW),
+        textbox(
+            vid(), margin, h - footer_h + 10, content_w, 36, 9,
+            "Standards reference: docs/shie-standards-reference.md | Vision: docs/product-vision.md",
+            size="12pt", color=TEXT_BLACK, transparent=True,
+        ),
+    ]
+    for v in visuals:
+        write_visual(page_dir, v)
+
+
+def write_parquet_table_tmdl(table_name: str, parquet_filename: str, columns: list[str]) -> None:
+    """Write a minimal import-mode TMDL table from parquet column names."""
+    lines = [f"table {table_name}", f"\tlineageTag: {vid()}", ""]
+    for col in columns:
+        tag = vid()
+        lines.extend(
+            [
+                f"\tcolumn {col}",
+                "\t\tdataType: string",
+                f"\t\tlineageTag: {tag}",
+                "\t\tsummarizeBy: none",
+                f"\t\tsourceColumn: {col}",
+                "",
+                "\t\tannotation SummarizationSetBy = Automatic",
+                "",
+            ]
+        )
+    lines.extend(
+        [
+            f"\tpartition {table_name} = m",
+            "\t\tmode: import",
+            "\t\tsource =",
+            "\t\t\t\tlet",
+            f'\t\t\t\t    Source = Parquet.Document(File.Contents("{REPO_PARQUET}\\{parquet_filename}"), [Compression=null, LegacyColumnNameEncoding=false, MaxDepth=null])',
+            "\t\t\t\tin",
+            "\t\t\t\t    Source",
+            "",
+            "\tannotation PBI_NavigationStepName = Navigation",
+            "",
+            "\tannotation PBI_ResultType = Table",
+            "",
+        ]
+    )
+    TABLES_DIR.mkdir(parents=True, exist_ok=True)
+    write_text_utf8_no_bom(TABLES_DIR / f"{table_name}.tmdl", "\n".join(lines))
+
+
+def sync_semantic_model() -> None:
+    write_parquet_table_tmdl(
+        ADT,
+        "ddc-hl7_adt_catalog.parquet",
+        [
+            "message_format",
+            "message_type",
+            "segment_id",
+            "field_id",
+            "field_name",
+            "data_type",
+            "optionality",
+            "cardinality",
+            "semantic_id",
+            "fhir_r4_path",
+            "notes",
+            "mapping_status",
+        ],
+    )
+    write_parquet_table_tmdl(
+        CCDA,
+        "ddc-ccda_catalog.parquet",
+        [
+            "message_format",
+            "section_name",
+            "entry_type",
+            "xml_path",
+            "semantic_id",
+            "fhir_r4_path",
+            "notes",
+            "mapping_status",
+        ],
+    )
+
+    rel_path = SEMANTIC_MODEL / "relationships.tmdl"
+    rel_body = rel_path.read_text(encoding="utf-8")
+    adt_rel = (
+        f"\nrelationship {vid()}\n"
+        f"\tcrossFilteringBehavior: bothDirections\n"
+        f"\tfromColumn: {ADT}.semantic_id\n"
+        f"\ttoColumn: {CATALOG}.semantic_id\n"
+    )
+    ccda_rel = (
+        f"\nrelationship {vid()}\n"
+        f"\tcrossFilteringBehavior: bothDirections\n"
+        f"\tfromColumn: {CCDA}.semantic_id\n"
+        f"\ttoColumn: {CATALOG}.semantic_id\n"
+    )
+    if f"fromColumn: {ADT}.semantic_id" not in rel_body:
+        rel_body = rel_body.rstrip() + adt_rel
+    if f"fromColumn: {CCDA}.semantic_id" not in rel_body:
+        rel_body = rel_body.rstrip() + ccda_rel
+    write_text_utf8_no_bom(rel_path, rel_body)
+
+    model_path = SEMANTIC_MODEL / "model.tmdl"
+    model_lines = model_path.read_text(encoding="utf-8").splitlines()
+    query_order = None
+    ref_adt = f"ref table {ADT}"
+    ref_ccda = f"ref table {CCDA}"
+    out: list[str] = []
+    for line in model_lines:
+        if line.startswith("annotation PBI_QueryOrder"):
+            tables = [
+                "ddc-master_patient_catalog",
+                "ddc-master_patient_dictionary",
+                "ddc-data_source_availability",
+                ADT,
+                CCDA,
+            ]
+            out.append(f'annotation PBI_QueryOrder = {json.dumps(tables)}')
+            query_order = True
+            continue
+        out.append(line)
+    if ref_adt not in out:
+        out.insert(out.index("ref cultureInfo en-US"), ref_adt)
+    if ref_ccda not in out:
+        out.insert(out.index("ref cultureInfo en-US"), ref_ccda)
+    if not query_order:
+        out.insert(8, f'annotation PBI_QueryOrder = {json.dumps([CATALOG, DICTIONARY, SOURCES, ADT, CCDA])}')
+    write_text_utf8_no_bom(model_path, "\n".join(out) + "\n")
 
 
 def build_overview_page(page_dir: Path) -> None:
@@ -615,20 +812,24 @@ def write_page_json(page_dir: Path, page_id: str, display_name: str, *, width: i
 
 def main() -> None:
     profile_id = "abc963c80ac5ed2deeb4"
+    standards_id = "d4e5f6a7b8c901234567"
     overview_id = "c8f1a2b3d4e5f6071829"
     profile_page = REPORT / "pages" / profile_id
+    standards_page = REPORT / "pages" / standards_id
     overview_page = REPORT / "pages" / overview_id
     profile_page.mkdir(parents=True, exist_ok=True)
+    standards_page.mkdir(parents=True, exist_ok=True)
     overview_page.mkdir(parents=True, exist_ok=True)
 
     write_page_json(profile_page, profile_id, "Concept Profile", width=PAGE_PROFILE_W, height=PAGE_PROFILE_H)
+    write_page_json(standards_page, standards_id, "Standards & Contexts", width=PAGE_PROFILE_W, height=PAGE_PROFILE_H)
     write_page_json(overview_page, overview_id, "Governance Overview", width=PAGE_OVERVIEW_W, height=PAGE_OVERVIEW_H)
     write_text_utf8_no_bom(
         REPORT / "pages" / "pages.json",
         json.dumps(
             {
                 "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/pagesMetadata/1.1.0/schema.json",
-                "pageOrder": [profile_id, overview_id],
+                "pageOrder": [profile_id, standards_id, overview_id],
                 "activePageName": profile_id,
             },
             indent=2,
@@ -636,11 +837,13 @@ def main() -> None:
     )
 
     THEME_DIR.mkdir(parents=True, exist_ok=True)
+    sync_semantic_model()
     write_chi_theme()
     update_report_json()
     build_concept_profile_page(profile_page)
+    build_standards_contexts_page(standards_page)
     build_overview_page(overview_page)
-    print(f"Regenerated PBIP report at {PBIP}")
+    print(f"Regenerated PBIP report and semantic model at {PBIP}")
 
 
 if __name__ == "__main__":
