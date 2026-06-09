@@ -16,8 +16,8 @@ PILOT_IDS = [
     "Patient.birth_sex",
 ]
 
-STEWARD = "SHIE Data Governance"
-STEWARD_CONTACT = ""
+STEWARD = "Ajay Prashar"
+STEWARD_CONTACT = "Ajay.Prashar@acgov.org"
 APPROVAL = "Approved"
 CONSENT = "ASCMI"
 HIPAA = "Demographics"

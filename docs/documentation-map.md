@@ -14,6 +14,8 @@ Use this page as the index for which documents are actively maintained versus ke
   - Architecture, data model, and implementation behavior.
 - `docs/demographics-pilot-plan.md`
   - Living pilot status, phased plan, definition of done, per-attribute checklist.
+- `docs/operational-runbook.md`
+  - Level A production without SharePoint: roles, publish ritual, git policy, checklists, 90-day path.
 - `docs/excel-workbook-guide.md`
   - `workbooks/` living Excel files, governance workflow (Excel → parquet → Power BI), publish ritual, and round-trip pipeline.
 - `docs/excel-workbook-generation-rules.md`

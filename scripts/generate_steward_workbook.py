@@ -125,7 +125,7 @@ CONCEPT_EXPLORER_DEFAULT_SEMANTIC_ID = "Patient.race"
 DEMOGRAPHICS_PILOT: dict[str, dict[str, str]] = {
     "Patient.race": {
         "curation_status": "Approved",
-        "steward_assigned_to": "SHIE Data Governance",
+        "steward_assigned_to": "Ajay Prashar",
         "steward_action_notes": "Health equity dashboard; ASCMI consent; crosswalk validation",
         "priority": "POC",
         "queue_type": "demographics_pilot",
@@ -133,7 +133,7 @@ DEMOGRAPHICS_PILOT: dict[str, dict[str, str]] = {
     },
     "Patient.ethnicity": {
         "curation_status": "Approved",
-        "steward_assigned_to": "SHIE Data Governance",
+        "steward_assigned_to": "Ajay Prashar",
         "steward_action_notes": "Health equity dashboard; ASCMI consent",
         "priority": "POC",
         "queue_type": "demographics_pilot",
@@ -141,7 +141,7 @@ DEMOGRAPHICS_PILOT: dict[str, dict[str, str]] = {
     },
     "Patient.language": {
         "curation_status": "Approved",
-        "steward_assigned_to": "SHIE Data Governance",
+        "steward_assigned_to": "Ajay Prashar",
         "steward_action_notes": "Health equity dashboard; outreach language targeting",
         "priority": "POC",
         "queue_type": "demographics_pilot",
@@ -149,7 +149,7 @@ DEMOGRAPHICS_PILOT: dict[str, dict[str, str]] = {
     },
     "Patient.gender_id": {
         "curation_status": "Approved",
-        "steward_assigned_to": "SHIE Data Governance",
+        "steward_assigned_to": "Ajay Prashar",
         "steward_action_notes": "ASCMI consent; equity reporting",
         "priority": "POC",
         "queue_type": "demographics_pilot",
@@ -157,7 +157,7 @@ DEMOGRAPHICS_PILOT: dict[str, dict[str, str]] = {
     },
     "Patient.birth_sex": {
         "curation_status": "Approved",
-        "steward_assigned_to": "SHIE Data Governance",
+        "steward_assigned_to": "Ajay Prashar",
         "steward_action_notes": "UMPI matching; clinical use; not interchangeable with gender identity",
         "priority": "POC",
         "queue_type": "demographics_pilot",

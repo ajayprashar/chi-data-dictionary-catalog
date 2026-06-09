@@ -8,6 +8,7 @@ Operational plan for the **5-attribute demographics pilot** and the path to addi
 
 | Doc | Role |
 |-----|------|
+| `docs/operational-runbook.md` | Level A production: roles, git publish, checklists (no SharePoint) |
 | `docs/excel-workbook-guide.md` | How to edit sheets and run import/export |
 | `docs/power-bi-concept-profile-setup.md` | How to open and refresh the read-only viewer |
 | `readme-prd.md` | Executive summary for stakeholders |
@@ -46,12 +47,13 @@ Create a governed **Data Catalog** and **Data Dictionary** for five demographics
 | Import / export scripts | Done |
 | Power BI viewer (`workbooks/pbip/chi-data-dictionary-catalog.pbip`) | Done |
 
-### Governance content: not done yet
+### Governance content: Phase 1 in progress
 
 | Metric | Current |
 |--------|---------|
 | Pilot rows with `approval_status` = Approved | **5 / 5** |
-| Pilot rows with `data_steward` assigned | **5 / 5** (`SHIE Data Governance`) |
+| Pilot rows with `data_steward` assigned | **5 / 5** (`Ajay Prashar`) |
+| Publisher (Level A) | **Ajay Prashar** — see `docs/operational-runbook.md` |
 | Pilot rows with FHIR path in Dictionary | **5 / 5** |
 | Pilot rows with survivorship logic in Dictionary | **5 / 5** (SHIE county summaries seeded) |
 | Source links with non-`unknown` availability | **5 / 5** (`cmt`, `partial`) |
