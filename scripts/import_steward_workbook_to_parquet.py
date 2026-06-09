@@ -18,6 +18,9 @@ SHEET_TO_PARQUET: dict[str, str] = {
     "CCDA_Mappings": "ddc-ccda_catalog.parquet",
     "FHIR_Inventory": "ddc-fhir_inventory.parquet",
     "Business_Rules": "ddc-business_rules.parquet",
+    "Value_Set_Bindings": "ddc-value_set_binding.parquet",
+    "Value_Set_Members": "ddc-value_set_member.parquet",
+    "Source_Value_Crosswalk": "ddc-source_value_crosswalk.parquet",
 }
 
 

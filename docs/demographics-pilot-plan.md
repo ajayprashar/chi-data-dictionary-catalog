@@ -243,6 +243,8 @@ For SBR rollup: map Male to Female → Female, Female to Male → Male per count
 | Dictionary survivorship | `chi_survivorship_logic` | Same table |
 | ADT_Mappings rows | — | HL7 ADT segment/field table |
 | CCDA_Mappings rows | — | C-CDA XML path table |
+| Value_Set_Members | — | Governed value set codes (CDCREC, BCP 47, etc.) |
+| Source_Value_Crosswalk | — | Source → standard code map (e.g. `cmt`) |
 | Source_Availability | Source availability table | — |
 
 See **`docs/product-vision.md`** for the layered standards model.

@@ -80,17 +80,19 @@
       "*": {
         "columnHeaders": [
           {
-            "fontSize": 13,
+            "fontSize": 12,
             "fontColor": {
               "solid": {
-                "color": "#FFFFFF"
+                "color": "#003B7A"
               }
             },
             "backColor": {
               "solid": {
-                "color": "#0047AB"
+                "color": "#C5D9F2"
               }
-            }
+            },
+            "outline": "Frame",
+            "bold": true
           }
         ],
         "values": [
@@ -111,6 +113,23 @@
                 "color": "#FFF9E6"
               }
             }
+          }
+        ],
+        "grid": [
+          {
+            "gridHorizontal": true,
+            "gridHorizontalColor": {
+              "solid": {
+                "color": "#B8C4D4"
+              }
+            },
+            "outlineColor": {
+              "solid": {
+                "color": "#B8C4D4"
+              }
+            },
+            "outlineWeight": 1,
+            "rowPadding": 6
           }
         ]
       }

@@ -38,6 +38,9 @@ DATA_TABLES: list[tuple[str, str, str]] = [
     ("ddc-ccda_catalog.parquet", "CCDA_Mappings", "chi_ccda_mappings"),
     ("ddc-fhir_inventory.parquet", "FHIR_Inventory", "chi_fhir_inventory"),
     ("ddc-business_rules.parquet", "Business_Rules", "chi_business_rules"),
+    ("ddc-value_set_binding.parquet", "Value_Set_Bindings", "chi_value_set_binding"),
+    ("ddc-value_set_member.parquet", "Value_Set_Members", "chi_value_set_member"),
+    ("ddc-source_value_crosswalk.parquet", "Source_Value_Crosswalk", "chi_source_value_crosswalk"),
 ]
 
 SHEET_TO_TABLE = {sheet: table for _, sheet, table in DATA_TABLES}
@@ -108,6 +111,33 @@ MODEL_ROWS = [
         "semantic_id",
         "1:N",
         "Organization-specific rules for the concept.",
+    ),
+    (
+        "catalog_value_set_binding",
+        "chi_catalog",
+        "semantic_id",
+        "chi_value_set_binding",
+        "semantic_id",
+        "1:N",
+        "Which terminology / value set applies to the concept.",
+    ),
+    (
+        "catalog_value_set_member",
+        "chi_catalog",
+        "semantic_id",
+        "chi_value_set_member",
+        "semantic_id",
+        "1:N",
+        "Governed codes for the concept (CHI subset).",
+    ),
+    (
+        "catalog_source_crosswalk",
+        "chi_catalog",
+        "semantic_id",
+        "chi_source_value_crosswalk",
+        "semantic_id",
+        "1:N",
+        "Source-local values mapped to governed standard codes.",
     ),
     (
         "catalog_steward_queue",
@@ -191,6 +221,9 @@ EXPLORER_FIELDS = [
     ("chi_adt_mappings", "field_id", "HL7 ADT field (first match)"),
     ("chi_adt_mappings", "segment_id", "HL7 ADT segment (first match)"),
     ("chi_ccda_mappings", "xml_path", "C-CDA XML path (first match)"),
+    ("chi_value_set_member", "code", "Governed code (first member)"),
+    ("chi_value_set_member", "display", "Governed code display (first member)"),
+    ("chi_source_value_crosswalk", "source_code", "Source crosswalk code (first match)"),
     ("chi_source_availability", "source_id", "Primary source (first link)"),
     ("chi_source_availability", "availability", "Source availability"),
 ]
@@ -207,6 +240,9 @@ TABLE_README_ROWS = [
     ("chi_ccda_mappings", "CCDA_Mappings", "ddc-ccda_catalog.parquet", "Mappings"),
     ("chi_fhir_inventory", "FHIR_Inventory", "ddc-fhir_inventory.parquet", "Mappings"),
     ("chi_business_rules", "Business_Rules", "ddc-business_rules.parquet", "Mappings"),
+    ("chi_value_set_binding", "Value_Set_Bindings", "ddc-value_set_binding.parquet", "Terminology"),
+    ("chi_value_set_member", "Value_Set_Members", "ddc-value_set_member.parquet", "Terminology"),
+    ("chi_source_value_crosswalk", "Source_Value_Crosswalk", "ddc-source_value_crosswalk.parquet", "Crosswalk"),
     ("chi_lookup_lists", "Lookup_Lists", "(reference lists)", "Reference"),
     ("chi_table_index", "Table_Index", "(navigation map; not imported)", "Reference"),
 ]

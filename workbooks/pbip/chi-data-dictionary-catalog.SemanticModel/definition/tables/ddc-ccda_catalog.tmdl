@@ -1,9 +1,9 @@
 table ddc-ccda_catalog
-	lineageTag: ad933cc2cb0b7873d6ed
+	lineageTag: f82978c89623ff5ed73b
 
 	column message_format
 		dataType: string
-		lineageTag: 7316725149645df0e1f5
+		lineageTag: 339dab07abc6832d573f
 		summarizeBy: none
 		sourceColumn: message_format
 
@@ -11,7 +11,7 @@ table ddc-ccda_catalog
 
 	column section_name
 		dataType: string
-		lineageTag: ee3484bf509bc3e5164c
+		lineageTag: 7291df1ef39e8439f103
 		summarizeBy: none
 		sourceColumn: section_name
 
@@ -19,7 +19,7 @@ table ddc-ccda_catalog
 
 	column entry_type
 		dataType: string
-		lineageTag: c3c3a5ed0d4cad6d6875
+		lineageTag: 839834d63bb81974ab5e
 		summarizeBy: none
 		sourceColumn: entry_type
 
@@ -27,7 +27,7 @@ table ddc-ccda_catalog
 
 	column xml_path
 		dataType: string
-		lineageTag: cfb969916bee5f174fb9
+		lineageTag: 6d10cc99ac98c062c7e0
 		summarizeBy: none
 		sourceColumn: xml_path
 
@@ -35,7 +35,7 @@ table ddc-ccda_catalog
 
 	column semantic_id
 		dataType: string
-		lineageTag: 97a9150dde8f0d81e34f
+		lineageTag: fc665b7c2624ba3b3799
 		summarizeBy: none
 		sourceColumn: semantic_id
 
@@ -43,7 +43,7 @@ table ddc-ccda_catalog
 
 	column fhir_r4_path
 		dataType: string
-		lineageTag: 8597142cda53317bf04d
+		lineageTag: 52326b54480b425dcdb3
 		summarizeBy: none
 		sourceColumn: fhir_r4_path
 
@@ -51,7 +51,7 @@ table ddc-ccda_catalog
 
 	column notes
 		dataType: string
-		lineageTag: cc89ad8354fd3b96063c
+		lineageTag: 7197bacbcc7aab022903
 		summarizeBy: none
 		sourceColumn: notes
 
@@ -59,7 +59,7 @@ table ddc-ccda_catalog
 
 	column mapping_status
 		dataType: string
-		lineageTag: 4ebaa03786cbef57094c
+		lineageTag: 652c414e7fdbbdc88e78
 		summarizeBy: none
 		sourceColumn: mapping_status
 
@@ -76,3 +76,4 @@ table ddc-ccda_catalog
 	annotation PBI_NavigationStepName = Navigation
 
 	annotation PBI_ResultType = Table
+

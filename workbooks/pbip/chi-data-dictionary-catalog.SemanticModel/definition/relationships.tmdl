@@ -8,11 +8,24 @@ relationship 0f72c909-7ff1-c34f-3bc4-3343da5580af
 	crossFilteringBehavior: bothDirections
 	fromColumn: ddc-data_source_availability.semantic_id
 	toColumn: ddc-master_patient_catalog.semantic_id
+
 relationship 7296f251f6ec30a824e6
 	crossFilteringBehavior: bothDirections
 	fromColumn: ddc-hl7_adt_catalog.semantic_id
 	toColumn: ddc-master_patient_catalog.semantic_id
+
 relationship c1b09049e1bc32557d04
 	crossFilteringBehavior: bothDirections
 	fromColumn: ddc-ccda_catalog.semantic_id
 	toColumn: ddc-master_patient_catalog.semantic_id
+
+relationship ec9aecabdcf972646669
+	crossFilteringBehavior: bothDirections
+	fromColumn: ddc-value_set_member.semantic_id
+	toColumn: ddc-master_patient_catalog.semantic_id
+
+relationship f4495eb9464c8d38d566
+	crossFilteringBehavior: bothDirections
+	fromColumn: ddc-source_value_crosswalk.semantic_id
+	toColumn: ddc-master_patient_catalog.semantic_id
+

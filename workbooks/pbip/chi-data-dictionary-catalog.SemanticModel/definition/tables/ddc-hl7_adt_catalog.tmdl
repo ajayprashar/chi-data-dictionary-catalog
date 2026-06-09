@@ -1,9 +1,9 @@
 table ddc-hl7_adt_catalog
-	lineageTag: 7de7e1fcf8eb6809449a
+	lineageTag: 96192b820a97cf6e6d35
 
 	column message_format
 		dataType: string
-		lineageTag: b5c5e4c7e7a4dfe6c850
+		lineageTag: 37f3fb7888b08ccb6847
 		summarizeBy: none
 		sourceColumn: message_format
 
@@ -11,7 +11,7 @@ table ddc-hl7_adt_catalog
 
 	column message_type
 		dataType: string
-		lineageTag: 003e8c428f408d6f28e3
+		lineageTag: 90c0ed7c63ca98f3b433
 		summarizeBy: none
 		sourceColumn: message_type
 
@@ -19,7 +19,7 @@ table ddc-hl7_adt_catalog
 
 	column segment_id
 		dataType: string
-		lineageTag: f1afe7429915e0ba3569
+		lineageTag: 48f4dad63b172e8be3f2
 		summarizeBy: none
 		sourceColumn: segment_id
 
@@ -27,7 +27,7 @@ table ddc-hl7_adt_catalog
 
 	column field_id
 		dataType: string
-		lineageTag: e21eed100ea1000a4a72
+		lineageTag: 3fc24b022e1e70f17203
 		summarizeBy: none
 		sourceColumn: field_id
 
@@ -35,7 +35,7 @@ table ddc-hl7_adt_catalog
 
 	column field_name
 		dataType: string
-		lineageTag: 14f0e8a51b231fd11a62
+		lineageTag: b6df44b0f47e99ce94bd
 		summarizeBy: none
 		sourceColumn: field_name
 
@@ -43,7 +43,7 @@ table ddc-hl7_adt_catalog
 
 	column data_type
 		dataType: string
-		lineageTag: e1a0a9e396561d8cd8a9
+		lineageTag: 81314757342013d8a29c
 		summarizeBy: none
 		sourceColumn: data_type
 
@@ -51,7 +51,7 @@ table ddc-hl7_adt_catalog
 
 	column optionality
 		dataType: string
-		lineageTag: 4eeef0b85f225b3c6a1d
+		lineageTag: 3094cde866655790bcc1
 		summarizeBy: none
 		sourceColumn: optionality
 
@@ -59,7 +59,7 @@ table ddc-hl7_adt_catalog
 
 	column cardinality
 		dataType: string
-		lineageTag: d6d4a2439cfa434f2efb
+		lineageTag: 7120e0ccf62bbda1e0d9
 		summarizeBy: none
 		sourceColumn: cardinality
 
@@ -67,7 +67,7 @@ table ddc-hl7_adt_catalog
 
 	column semantic_id
 		dataType: string
-		lineageTag: 8dfc70a350d1aee33309
+		lineageTag: 58a3e0e24438c23be04b
 		summarizeBy: none
 		sourceColumn: semantic_id
 
@@ -75,7 +75,7 @@ table ddc-hl7_adt_catalog
 
 	column fhir_r4_path
 		dataType: string
-		lineageTag: cacd83a771d613988af8
+		lineageTag: 59d4eeabebd2de3142f5
 		summarizeBy: none
 		sourceColumn: fhir_r4_path
 
@@ -83,7 +83,7 @@ table ddc-hl7_adt_catalog
 
 	column notes
 		dataType: string
-		lineageTag: 411994554bbb3438b537
+		lineageTag: 60eb98d68b76c566db21
 		summarizeBy: none
 		sourceColumn: notes
 
@@ -91,7 +91,7 @@ table ddc-hl7_adt_catalog
 
 	column mapping_status
 		dataType: string
-		lineageTag: fd3f3682bda64fa4f881
+		lineageTag: 0c1f5cd17672e2177485
 		summarizeBy: none
 		sourceColumn: mapping_status
 
@@ -108,3 +108,4 @@ table ddc-hl7_adt_catalog
 	annotation PBI_NavigationStepName = Navigation
 
 	annotation PBI_ResultType = Table
+

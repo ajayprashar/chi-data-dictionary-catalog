@@ -108,12 +108,15 @@ County survivorship excludes Unknown / DTS / Other from equity aggregates; FHIR 
 |----------------|-------|-----------|
 | USCDI | Catalog | `uscdi_element`, `uscdi_description`, `classification` |
 | US Core / FHIR | Dictionary | `fhir_r4_path`, `fhir_profile`, `fhir_data_type`, `fhir_cardinality` |
-| Terminology + NullFlavor | Dictionary | `data_quality_notes` |
+| Terminology + NullFlavor | Dictionary | `data_quality_notes` (summary) |
+| Governed codes (CHI subset) | **Value_Set_Members** | `ddc-value_set_member.parquet` |
+| Value set authority | **Value_Set_Bindings** | `ddc-value_set_binding.parquet` |
+| Source → standard map | **Source_Value_Crosswalk** | `ddc-source_value_crosswalk.parquet` |
 | County survivorship | Dictionary | `chi_survivorship_logic` |
 | HL7 v2 / CCDA paths | ADT_Mappings, CCDA_Mappings | segment/field or XPath → `semantic_id` |
-| Re-seed pilot terminology notes | Script | `python scripts/seed_demographics_pilot.py` |
+| Re-seed pilot terminology | Script | `python scripts/seed_value_sets_pilot.py` |
 
-Power BI **Concept Profile** → **Implementation & survivorship** shows `data_quality_notes` and `chi_survivorship_logic` after publish refresh.
+Power BI **Standards & Contexts** → **Governed value set codes** and **Source value crosswalk** after publish refresh. See `docs/crosswalk-model.md`.
 
 ---
 

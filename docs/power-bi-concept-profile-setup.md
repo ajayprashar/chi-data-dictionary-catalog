@@ -16,7 +16,7 @@ The report includes three pages:
 | **Standards & Contexts** | Same slicer — terminology notes, **HL7 ADT** fields, **C-CDA** paths, layered standards banner |
 | **Governance Overview** | Portfolio KPIs, classification/approval charts, full concept table |
 
-Semantic model tables: catalog, dictionary, source availability, **ADT catalog**, **CCDA catalog** (joined on `semantic_id`).
+Semantic model tables: catalog, dictionary, source availability, **ADT catalog**, **CCDA catalog**, **value set members**, **source crosswalk** (joined on `semantic_id`).
 
 After steward Excel edits: `python scripts/import_steward_workbook_to_parquet.py` → **Refresh** in Power BI.
 
@@ -25,6 +25,8 @@ After steward Excel edits: `python scripts/import_steward_workbook_to_parquet.py
 ### Readability (zoom and page size)
 
 The report uses **Actual size** (not Fit to page) and a **high-contrast** theme (blue / yellow / black on white).
+
+**Table readability:** each table has three visual layers — **dark blue title band** (visual title), **light blue column header row** (field names), **white/zebra data rows**. If column headers look like the title after manual edits, select the visual → **Format** → **Reset to default** (theme + `enhance_pbip_report.py` set the header row separately).
 
 In Power BI Desktop:
 

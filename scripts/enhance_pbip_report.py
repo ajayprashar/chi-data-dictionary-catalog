@@ -17,14 +17,16 @@ DICTIONARY = "ddc-master_patient_dictionary"
 SOURCES = "ddc-data_source_availability"
 ADT = "ddc-hl7_adt_catalog"
 CCDA = "ddc-ccda_catalog"
+VALUE_MEMBER = "ddc-value_set_member"
+SOURCE_XW = "ddc-source_value_crosswalk"
 
 SEMANTIC_MODEL = PBIP / "chi-data-dictionary-catalog.SemanticModel" / "definition"
 TABLES_DIR = SEMANTIC_MODEL / "tables"
 REPO_PARQUET = r"C:\AI\chi-data-dictionary-catalog"
 
 STANDARDS_LAYER_TEXT = (
-    "USCDI = Catalog (what) | US Core + FHIR = Dictionary (how) | Terminology = data_quality_notes | "
-    "HL7 ADT + C-CDA = message context tables below | Survivorship = chi_survivorship_logic"
+    "USCDI = Catalog (what) | US Core + FHIR = Dictionary (how) | Governed codes = Value_Set_Members | "
+    "Source maps = Source_Value_Crosswalk | HL7 ADT + C-CDA = message context | Survivorship = chi_survivorship_logic"
 )
 
 # High-contrast primary palette (background vs text)
@@ -34,6 +36,10 @@ PRIMARY_YELLOW = "#FFC000"
 TEXT_BLACK = "#000000"
 TEXT_WHITE = "#FFFFFF"
 BG_LIGHT = "#FFF9E6"
+# Table visual: title band (dark) vs column header row (light) vs data rows (white/zebra)
+TABLE_COL_HEADER_BG = "#C5D9F2"
+TABLE_COL_HEADER_FG = "#003B7A"
+TABLE_GRID_LINE = "#B8C4D4"
 
 # Concept Profile: 1920x1080 (16:9) — room for a full-width concept slicer.
 PAGE_PROFILE_W = 1920
@@ -185,14 +191,17 @@ def card_format(*, value_pt: int = 26, label_pt: int = 12) -> dict:
     }
 
 
-def table_format(*, header_pt: int = 13, value_pt: int = 12) -> dict:
+def table_format(*, header_pt: int = 12, value_pt: int = 12) -> dict:
+    """Column header row uses light blue + navy text; container title stays dark blue (see container_title)."""
     return {
         "columnHeaders": [
             {
                 "properties": {
                     "fontSize": lit_pt(header_pt),
-                    "fontColor": {"solid": {"color": lit_str(TEXT_WHITE)}},
-                    "backColor": {"solid": {"color": lit_str(PRIMARY_BLUE)}},
+                    "fontColor": {"solid": {"color": lit_str(TABLE_COL_HEADER_FG)}},
+                    "backColor": {"solid": {"color": lit_str(TABLE_COL_HEADER_BG)}},
+                    "outline": lit_str("Frame"),
+                    "bold": lit_bool(True),
                 }
             }
         ],
@@ -206,7 +215,17 @@ def table_format(*, header_pt: int = 13, value_pt: int = 12) -> dict:
                 }
             }
         ],
-        "grid": [{"properties": {"rowPadding": lit_pt(6)}}],
+        "grid": [
+            {
+                "properties": {
+                    "rowPadding": lit_pt(6),
+                    "gridHorizontal": lit_bool(True),
+                    "gridHorizontalColor": {"solid": {"color": lit_str(TABLE_GRID_LINE)}},
+                    "outlineColor": {"solid": {"color": lit_str(TABLE_GRID_LINE)}},
+                    "outlineWeight": lit_pt(1),
+                }
+            }
+        ],
     }
 
 
@@ -489,9 +508,11 @@ def build_standards_contexts_page(page_dir: Path) -> None:
     slicer_y = layer_y + layer_h + 12
     slicer_h = 120
     tables_y = slicer_y + slicer_h + 16
-    fhir_h = 220
-    adt_ccda_y = tables_y + fhir_h + 16
-    adt_h = 248
+    fhir_h = 170
+    codes_y = tables_y + fhir_h + 12
+    codes_h = 200
+    adt_ccda_y = codes_y + codes_h + 12
+    adt_h = 200
     footer_h = 52
     half_w = (content_w - 16) // 2
     visuals = [
@@ -515,22 +536,41 @@ def build_standards_contexts_page(page_dir: Path) -> None:
         table_ex(
             vid(), margin, tables_y, content_w, fhir_h, 5, DICTIONARY,
             ["semantic_id", "fhir_r4_path", "fhir_profile", "data_quality_notes", "chi_survivorship_logic"],
-            title="FHIR R4 + US Core + terminology (Dictionary)",
+            title="FHIR R4 + US Core (Dictionary)",
         ),
         table_ex(
-            vid(), margin, adt_ccda_y, half_w, adt_h, 6, ADT,
+            vid(), margin, codes_y, half_w, codes_h, 6, VALUE_MEMBER,
+            ["semantic_id", "code_system_oid", "code", "display", "member_type", "binding_strength", "notes"],
+            title="Governed value set codes",
+        ),
+        table_ex(
+            vid(), margin + half_w + 16, codes_y, half_w, codes_h, 7, SOURCE_XW,
+            [
+                "source_id",
+                "source_field",
+                "source_code",
+                "source_display",
+                "target_code",
+                "target_display",
+                "mapping_type",
+                "approval_status",
+            ],
+            title="Source value crosswalk",
+        ),
+        table_ex(
+            vid(), margin, adt_ccda_y, half_w, adt_h, 8, ADT,
             ["semantic_id", "segment_id", "field_id", "field_name", "message_type", "mapping_status", "notes"],
             title="HL7 v2 ADT context",
         ),
         table_ex(
-            vid(), margin + half_w + 16, adt_ccda_y, half_w, adt_h, 7, CCDA,
+            vid(), margin + half_w + 16, adt_ccda_y, half_w, adt_h, 9, CCDA,
             ["semantic_id", "section_name", "entry_type", "xml_path", "mapping_status", "notes"],
             title="C-CDA / CCD context",
         ),
-        shape_rect(vid(), 0, h - footer_h, w, footer_h, 8, PRIMARY_YELLOW),
+        shape_rect(vid(), 0, h - footer_h, w, footer_h, 10, PRIMARY_YELLOW),
         textbox(
-            vid(), margin, h - footer_h + 10, content_w, 36, 9,
-            "Standards reference: docs/shie-standards-reference.md | Vision: docs/product-vision.md",
+            vid(), margin, h - footer_h + 10, content_w, 36, 11,
+            "Standards: docs/shie-standards-reference.md | Crosswalk model: docs/crosswalk-model.md",
             size="12pt", color=TEXT_BLACK, transparent=True,
         ),
     ]
@@ -608,6 +648,41 @@ def sync_semantic_model() -> None:
             "mapping_status",
         ],
     )
+    write_parquet_table_tmdl(
+        VALUE_MEMBER,
+        "ddc-value_set_member.parquet",
+        [
+            "semantic_id",
+            "code_system_oid",
+            "code",
+            "display",
+            "member_type",
+            "binding_role",
+            "binding_strength",
+            "active",
+            "sort_order",
+            "notes",
+        ],
+    )
+    write_parquet_table_tmdl(
+        SOURCE_XW,
+        "ddc-source_value_crosswalk.parquet",
+        [
+            "source_id",
+            "source_field",
+            "source_code",
+            "source_display",
+            "semantic_id",
+            "target_code_system_oid",
+            "target_code",
+            "target_display",
+            "mapping_type",
+            "approval_status",
+            "effective_from",
+            "effective_to",
+            "notes",
+        ],
+    )
 
     rel_path = SEMANTIC_MODEL / "relationships.tmdl"
     rel_body = rel_path.read_text(encoding="utf-8")
@@ -627,13 +702,28 @@ def sync_semantic_model() -> None:
         rel_body = rel_body.rstrip() + adt_rel
     if f"fromColumn: {CCDA}.semantic_id" not in rel_body:
         rel_body = rel_body.rstrip() + ccda_rel
+    member_rel = (
+        f"\nrelationship {vid()}\n"
+        f"\tcrossFilteringBehavior: bothDirections\n"
+        f"\tfromColumn: {VALUE_MEMBER}.semantic_id\n"
+        f"\ttoColumn: {CATALOG}.semantic_id\n"
+    )
+    xw_rel = (
+        f"\nrelationship {vid()}\n"
+        f"\tcrossFilteringBehavior: bothDirections\n"
+        f"\tfromColumn: {SOURCE_XW}.semantic_id\n"
+        f"\ttoColumn: {CATALOG}.semantic_id\n"
+    )
+    if f"fromColumn: {VALUE_MEMBER}.semantic_id" not in rel_body:
+        rel_body = rel_body.rstrip() + member_rel
+    if f"fromColumn: {SOURCE_XW}.semantic_id" not in rel_body:
+        rel_body = rel_body.rstrip() + xw_rel
     write_text_utf8_no_bom(rel_path, rel_body)
 
     model_path = SEMANTIC_MODEL / "model.tmdl"
     model_lines = model_path.read_text(encoding="utf-8").splitlines()
     query_order = None
-    ref_adt = f"ref table {ADT}"
-    ref_ccda = f"ref table {CCDA}"
+    extra_tables = [ADT, CCDA, VALUE_MEMBER, SOURCE_XW]
     out: list[str] = []
     for line in model_lines:
         if line.startswith("annotation PBI_QueryOrder"):
@@ -641,19 +731,22 @@ def sync_semantic_model() -> None:
                 "ddc-master_patient_catalog",
                 "ddc-master_patient_dictionary",
                 "ddc-data_source_availability",
-                ADT,
-                CCDA,
+                *extra_tables,
             ]
             out.append(f'annotation PBI_QueryOrder = {json.dumps(tables)}')
             query_order = True
             continue
         out.append(line)
-    if ref_adt not in out:
-        out.insert(out.index("ref cultureInfo en-US"), ref_adt)
-    if ref_ccda not in out:
-        out.insert(out.index("ref cultureInfo en-US"), ref_ccda)
+    culture_idx = out.index("ref cultureInfo en-US")
+    for ref in extra_tables:
+        ref_line = f"ref table {ref}"
+        if ref_line not in out:
+            out.insert(culture_idx, ref_line)
     if not query_order:
-        out.insert(8, f'annotation PBI_QueryOrder = {json.dumps([CATALOG, DICTIONARY, SOURCES, ADT, CCDA])}')
+        out.insert(
+            8,
+            f'annotation PBI_QueryOrder = {json.dumps([CATALOG, DICTIONARY, SOURCES, *extra_tables])}',
+        )
     write_text_utf8_no_bom(model_path, "\n".join(out) + "\n")
 
 
@@ -728,9 +821,11 @@ def write_chi_theme() -> None:
                 "*": {
                     "columnHeaders": [
                         {
-                            "fontSize": 13,
-                            "fontColor": {"solid": {"color": TEXT_WHITE}},
-                            "backColor": {"solid": {"color": PRIMARY_BLUE}},
+                            "fontSize": 12,
+                            "fontColor": {"solid": {"color": TABLE_COL_HEADER_FG}},
+                            "backColor": {"solid": {"color": TABLE_COL_HEADER_BG}},
+                            "outline": "Frame",
+                            "bold": True,
                         }
                     ],
                     "values": [
@@ -739,6 +834,15 @@ def write_chi_theme() -> None:
                             "fontColorPrimary": {"solid": {"color": TEXT_BLACK}},
                             "backColorPrimary": {"solid": {"color": TEXT_WHITE}},
                             "backColorSecondary": {"solid": {"color": BG_LIGHT}},
+                        }
+                    ],
+                    "grid": [
+                        {
+                            "gridHorizontal": True,
+                            "gridHorizontalColor": {"solid": {"color": TABLE_GRID_LINE}},
+                            "outlineColor": {"solid": {"color": TABLE_GRID_LINE}},
+                            "outlineWeight": 1,
+                            "rowPadding": 6,
                         }
                     ],
                 }

@@ -142,6 +142,9 @@ Open PBIP → **Refresh** → verify the concept(s) under review.
 | `ddc-data_source_availability.parquet` | Yes | Source links |
 | `ddc-hl7_adt_catalog.parquet` | Yes, if ADT_Mappings changed | |
 | `ddc-ccda_catalog.parquet` | Yes, if CCDA_Mappings changed | |
+| `ddc-value_set_binding.parquet` | Yes, if Value_Set_Bindings changed | |
+| `ddc-value_set_member.parquet` | Yes, if Value_Set_Members changed | |
+| `ddc-source_value_crosswalk.parquet` | Yes, if Source_Value_Crosswalk changed | |
 | `docs/demographics-pilot-plan.md` | Yes, if status counts changed | Update “Where we are” |
 
 **Commit message pattern:**
