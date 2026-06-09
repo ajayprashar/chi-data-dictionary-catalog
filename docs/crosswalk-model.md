@@ -80,8 +80,13 @@ flowchart LR
 ## Publish ritual
 
 ```powershell
-python scripts/seed_value_sets_pilot.py          # re-seed from script (maintainers)
-# or edit Value_Set_* / Source_Value_Crosswalk sheets in Excel, then:
+# Expand Race / Ethnicity from HL7 (optional; preserves nullflavor rows):
+python scripts/build_value_set_members.py --write-cache
+
+# Re-seed pilot bindings from script (maintainers only — overwrites binding/crosswalk seed):
+python scripts/seed_value_sets_pilot.py
+
+# Or edit Value_Set_* / Source_Value_Crosswalk sheets in Excel, then:
 python scripts/import_steward_workbook_to_parquet.py
 python scripts/generate_steward_workbook.py      # optional reverse sync
 ```

@@ -61,6 +61,13 @@ Regenerate workbook from parquet after script rebuilds:
 python scripts/generate_steward_workbook.py
 ```
 
+Expand governed CDCREC codes for race/ethnicity from HL7 (see `docs/crosswalk-model.md`):
+
+```powershell
+python scripts/build_value_set_members.py --write-cache
+python scripts/generate_steward_workbook.py
+```
+
 ---
 
 ### Core artifacts
