@@ -10,12 +10,16 @@ Use this page as the index for which documents are actively maintained versus ke
   - Entry point for the 2-layer operating model, pipeline commands, and core files.
 - `TECH-SPEC.md`
   - Architecture, data model, and implementation behavior.
+- `docs/demographics-pilot-plan.md`
+  - Living pilot status, phased plan, definition of done, per-attribute checklist.
 - `docs/excel-workbook-guide.md`
   - `workbooks/` living Excel files, data-source links, and round-trip pipeline.
 - `docs/excel-workbook-generation-rules.md`
   - openpyxl DO/DON'T rules so Excel opens workbooks without repair prompts.
+- `docs/power-bi-concept-profile-setup.md`
+  - Power BI PBIP viewer — open, refresh, troubleshooting (read surface after Excel import).
 - `docs/jupyter-duckdb-parquet-setup.md`
-  - Notebook and DuckDB execution guidance.
+  - Optional ad-hoc DuckDB queries over Parquet (not the primary viewer).
 
 ## Reference (domain/source-specific)
 

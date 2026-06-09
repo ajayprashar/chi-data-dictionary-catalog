@@ -8,15 +8,16 @@ Local proof-of-concept: **one steward workbook** is the primary surface; parquet
 
 ## POC scope (what matters now)
 
-| In scope | Deferred |
-|----------|----------|
-| `chi-steward-workbook.xlsx` — edit Catalog + Dictionary | SharePoint / team portals |
-| 5 demographics pilot (`Patient.race`, `.ethnicity`, `.language`, `.gender_id`, `.birth_sex`) | All 28 data sources |
-| `semantic_id` as join key | Power BI search UI |
-| Round-trip: Excel → parquet in this folder | Partner intake (until onboarding a source) |
-| Optional: notebook browse of parquet | Full FHIR inventory curation |
+| Authoring (in scope) | Optional read | Deferred |
+|----------------------|---------------|----------|
+| `chi-steward-workbook.xlsx` — edit Catalog + Dictionary + Source_Availability | Power BI PBIP (`workbooks/pbip/chi-data-dictionary-catalog.pbip`) | SharePoint / team portals |
+| 5 demographics pilot (`Patient.race`, `.ethnicity`, `.language`, `.gender_id`, `.birth_sex`) | See `docs/power-bi-concept-profile-setup.md` | All 28 data sources |
+| `semantic_id` as join key | Jupyter notebook — ad-hoc DuckDB queries only | Partner intake (until onboarding a source) |
+| Round-trip: Excel → parquet in this folder | | Full FHIR inventory curation |
 
 **POC success** = a steward can open the workbook, review one concept in `Concept_Explorer`, and see catalog + dictionary + source link on one `semantic_id`.
+
+**What to curate and in what order:** `docs/demographics-pilot-plan.md`
 
 ---
 
@@ -26,10 +27,12 @@ Local proof-of-concept: **one steward workbook** is the primary surface; parquet
 flowchart LR
     Steward["chi-steward-workbook.xlsx"]
     Parquet["ddc-*.parquet in repo folder"]
-    Notebook["notebook optional"]
+    PBI["Power BI PBIP read-only"]
+    Notebook["Jupyter optional ad-hoc"]
 
     Steward --> Parquet
     Parquet --> Steward
+    Parquet --> PBI
     Parquet --> Notebook
 ```
 
@@ -145,5 +148,7 @@ python scripts/split_to_catalog_and_dictionary.py path\to\combined_export.csv
 ## Related documents
 
 - `README.md` — quick start
+- `docs/demographics-pilot-plan.md` — pilot status and checklist
+- `docs/power-bi-concept-profile-setup.md` — Power BI viewer (refresh after import)
 - `TECH-SPEC.md` — full column schemas (reference, not required for daily POC use)
 - `docs/cmt-adt-feed-and-master-patient.md` — ADT mapping context

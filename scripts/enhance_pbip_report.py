@@ -24,8 +24,21 @@ TEXT_BLACK = "#000000"
 TEXT_WHITE = "#FFFFFF"
 BG_LIGHT = "#FFF9E6"
 
-PAGE_W = 1664
-PAGE_H = 1100
+# Concept Profile: 1920x1080 (16:9) — room for a full-width concept slicer.
+PAGE_PROFILE_W = 1920
+PAGE_PROFILE_H = 1080
+# Governance Overview: same canvas for consistency.
+PAGE_OVERVIEW_W = 1920
+PAGE_OVERVIEW_H = 1080
+
+# Card visuals need measures (raw text columns render blank in programmatic PBIP).
+PROFILE_CARD_MEASURES = [
+    ("Profile USCDI Element", 30),
+    ("Profile Classification", 22),
+    ("Profile Approval Status", 22),
+    ("Profile Data Steward", 20),
+    ("Profile Domain", 20),
+]
 
 
 def vid() -> str:
@@ -87,7 +100,14 @@ def visual_container(name: str, x: float, y: float, w: float, h: float, z: int, 
     }
 
 
-def container_title(title: str, *, bg: str = PRIMARY_BLUE, fg: str = TEXT_WHITE, size: int = 14) -> dict:
+def container_title(
+    title: str,
+    *,
+    bg: str = PRIMARY_BLUE,
+    fg: str = TEXT_WHITE,
+    size: int = 14,
+    pad: int = 12,
+) -> dict:
     return {
         "title": [
             {
@@ -102,7 +122,34 @@ def container_title(title: str, *, bg: str = PRIMARY_BLUE, fg: str = TEXT_WHITE,
         ],
         "background": [{"properties": {"show": lit_bool(True), "color": {"solid": {"color": lit_str(BG_LIGHT)}}}}],
         "border": [{"properties": {"show": lit_bool(True), "color": {"solid": {"color": lit_str(PRIMARY_BLUE)}}}}],
-        "padding": [{"properties": {"top": lit_pt(8), "bottom": lit_pt(8), "left": lit_pt(10), "right": lit_pt(10)}}],
+        "padding": [
+            {
+                "properties": {
+                    "top": lit_pt(pad),
+                    "bottom": lit_pt(pad),
+                    "left": lit_pt(12),
+                    "right": lit_pt(12),
+                }
+            }
+        ],
+    }
+
+
+def transparent_container() -> dict:
+    """Text on top of a shape — no extra box chrome or scrollbars."""
+    return {
+        "background": [{"properties": {"show": lit_bool(False)}}],
+        "border": [{"properties": {"show": lit_bool(False)}}],
+        "padding": [
+            {
+                "properties": {
+                    "top": lit_pt(0),
+                    "bottom": lit_pt(0),
+                    "left": lit_pt(0),
+                    "right": lit_pt(0),
+                }
+            }
+        ],
     }
 
 
@@ -182,14 +229,31 @@ def bar_format() -> dict:
     }
 
 
-def textbox(name: str, x: float, y: float, w: float, h: float, z: int, text: str, *, bold: bool = False, size: str = "14pt", color: str = TEXT_BLACK) -> dict:
+def textbox(
+    name: str,
+    x: float,
+    y: float,
+    w: float,
+    h: float,
+    z: int,
+    text: str,
+    *,
+    bold: bool = False,
+    size: str = "14pt",
+    color: str = TEXT_BLACK,
+    transparent: bool = False,
+) -> dict:
     run: dict = {"value": text, "textStyle": {"fontSize": size, "color": color}}
     if bold:
         run["textStyle"]["fontWeight"] = "bold"
-    return visual_container(
-        name, x, y, w, h, z,
-        {"visualType": "textbox", "objects": {"general": [{"properties": {"paragraphs": [{"textRuns": [run]}]}}]}, "drillFilterOtherVisuals": True},
-    )
+    visual: dict = {
+        "visualType": "textbox",
+        "objects": {"general": [{"properties": {"paragraphs": [{"textRuns": [run]}]}}]},
+        "drillFilterOtherVisuals": True,
+    }
+    if transparent:
+        visual["visualContainerObjects"] = transparent_container()
+    return visual_container(name, x, y, w, h, z, visual)
 
 
 def shape_rect(name: str, x: float, y: float, w: float, h: float, z: int, color: str) -> dict:
@@ -215,8 +279,9 @@ def slicer_dropdown(name: str, x: float, y: float, w: float, h: float, z: int, e
             "query": {"queryState": {"Values": {"projections": [{**projection(entity, prop), "active": True}]}}},
             "objects": {
                 "data": [{"properties": {"mode": {"expr": {"Literal": {"Value": "'Dropdown'"}}}}}],
-                "header": [{"properties": {"show": lit_bool(True), "fontSize": lit_pt(13)}}],
-                "items": [{"properties": {"fontSize": lit_pt(13), "fontColor": {"solid": {"color": lit_str(TEXT_BLACK)}}}}],
+                "header": [{"properties": {"show": lit_bool(False)}}],
+                "items": [{"properties": {"fontSize": lit_pt(14), "fontColor": {"solid": {"color": lit_str(TEXT_BLACK)}}}}],
+                "selection": [{"properties": {"selectAllCheckboxEnabled": lit_bool(True)}}],
                 "general": [{
                     "properties": {
                         "filter": {
@@ -236,7 +301,13 @@ def slicer_dropdown(name: str, x: float, y: float, w: float, h: float, z: int, e
                     }
                 }],
             },
-            "visualContainerObjects": container_title("Select governed concept", bg=PRIMARY_YELLOW, fg=TEXT_BLACK, size=13),
+            "visualContainerObjects": container_title(
+                "Select governed concept (semantic_id)",
+                bg=PRIMARY_YELLOW,
+                fg=TEXT_BLACK,
+                size=14,
+                pad=14,
+            ),
             "drillFilterOtherVisuals": True,
         },
     )
@@ -252,6 +323,16 @@ def card(name: str, x: float, y: float, w: float, h: float, z: int, entity: str,
             "visualContainerObjects": {
                 "background": [{"properties": {"show": lit_bool(True), "color": {"solid": {"color": lit_str(TEXT_WHITE)}}}}],
                 "border": [{"properties": {"show": lit_bool(True), "color": {"solid": {"color": lit_str(PRIMARY_BLUE)}}}}],
+                "padding": [
+                    {
+                        "properties": {
+                            "top": lit_pt(10),
+                            "bottom": lit_pt(10),
+                            "left": lit_pt(10),
+                            "right": lit_pt(10),
+                        }
+                    }
+                ],
             },
             "drillFilterOtherVisuals": True,
         },
@@ -289,10 +370,15 @@ def bar_chart(name: str, x: float, y: float, w: float, h: float, z: int, entity:
     )
 
 
+def write_text_utf8_no_bom(path: Path, content: str) -> None:
+    """Power BI PBIP requires UTF-8 without BOM (see excel-workbook-generation-rules / MS PBIP docs)."""
+    path.write_bytes(content.encode("utf-8"))
+
+
 def write_visual(page_dir: Path, container: dict) -> None:
     vdir = page_dir / "visuals" / container["name"]
     vdir.mkdir(parents=True, exist_ok=True)
-    (vdir / "visual.json").write_text(json.dumps(container, indent=2), encoding="utf-8")
+    write_text_utf8_no_bom(vdir / "visual.json", json.dumps(container, indent=2))
 
 
 def clear_visuals(page_dir: Path) -> None:
@@ -307,40 +393,67 @@ def clear_visuals(page_dir: Path) -> None:
 
 def build_concept_profile_page(page_dir: Path) -> None:
     clear_visuals(page_dir)
+    w, h = PAGE_PROFILE_W, PAGE_PROFILE_H
+    margin = 32
+    content_w = w - (margin * 2)
+    header_h = 128
+    slicer_y = header_h + 12
+    slicer_h = 132
+    cards_y = slicer_y + slicer_h + 16
+    card_h = 156
+    tables_y = cards_y + card_h + 20
+    biz_h = 318
+    dict_y = tables_y + biz_h + 16
+    dict_h = 248
+    footer_h = 52
     visuals = [
-        shape_rect(vid(), 0, 0, PAGE_W, 96, 0, PRIMARY_BLUE),
-        textbox(vid(), 28, 18, 900, 40, 1, "CHI Data Dictionary Catalog", bold=True, size="28pt", color=TEXT_WHITE),
+        shape_rect(vid(), 0, 0, w, header_h, 0, PRIMARY_BLUE),
         textbox(
-            vid(), 28, 56, 1100, 32, 2,
-            "Concept profile — catalog, dictionary, and source availability on one semantic_id",
-            size="13pt", color=TEXT_WHITE,
+            vid(), margin, 20, 1700, 56, 1,
+            "CHI Data Dictionary Catalog",
+            bold=True, size="28pt", color=TEXT_WHITE, transparent=True,
         ),
-        slicer_dropdown(vid(), 1120, 20, 520, 72, 3, CATALOG, "semantic_id", "Patient.race"),
-        card(vid(), 28, 112, 360, 130, 4, CATALOG, "uscdi_element", value_pt=30),
-        card(vid(), 404, 112, 360, 130, 5, CATALOG, "classification", value_pt=22),
-        card(vid(), 780, 112, 320, 130, 6, CATALOG, "approval_status", value_pt=22),
-        card(vid(), 1116, 112, 260, 130, 7, CATALOG, "data_steward", value_pt=20),
-        card(vid(), 1392, 112, 248, 130, 8, CATALOG, "domain", value_pt=20),
+        textbox(
+            vid(), margin, 80, 1750, 40, 2,
+            "Concept profile — catalog, dictionary, and source availability on one semantic_id",
+            size="13pt", color=TEXT_WHITE, transparent=True,
+        ),
+        slicer_dropdown(vid(), margin, slicer_y, content_w, slicer_h, 3, CATALOG, "semantic_id", "Patient.race"),
+        *[
+            card(
+                vid(),
+                margin + (idx * 376),
+                cards_y,
+                360,
+                card_h,
+                4 + idx,
+                CATALOG,
+                measure_name,
+                measure=True,
+                value_pt=value_pt,
+            )
+            for idx, (measure_name, value_pt) in enumerate(PROFILE_CARD_MEASURES)
+        ],
         table_ex(
-            vid(), 28, 264, 1000, 240, 9, CATALOG,
+            vid(), margin, tables_y, 1184, biz_h, 9, CATALOG,
             ["uscdi_description", "ruleset_category", "uscdi_data_class", "uscdi_data_element", "hipaa_category", "steward_contact"],
             title="Business & USCDI governance",
         ),
         table_ex(
-            vid(), 28, 524, 1000, 300, 10, DICTIONARY,
+            vid(), margin, dict_y, 1184, dict_h, 10, DICTIONARY,
             ["fhir_r4_path", "fhir_data_type", "chi_survivorship_logic", "data_source_rank_reference", "data_quality_notes"],
             title="Implementation & survivorship",
         ),
         table_ex(
-            vid(), 1048, 264, 592, 560, 11, SOURCES,
+            vid(), margin + 1200, tables_y, 656, dict_y + dict_h - tables_y, 11, SOURCES,
             ["source_id", "availability", "completeness_pct", "timeliness_sla_hours", "notes"],
             title="Source availability",
         ),
-        shape_rect(vid(), 0, 1040, PAGE_W, 60, 12, PRIMARY_YELLOW),
+        shape_rect(vid(), 0, h - footer_h, w, footer_h, 12, PRIMARY_YELLOW),
         textbox(
-            vid(), 28, 1052, 1500, 36, 13,
+            vid(), margin, h - footer_h + 10, content_w, 36, 13,
             "Read-only view. Edit chi-steward-workbook.xlsx, run import_steward_workbook_to_parquet.py, then Refresh.",
-            size="12pt", color=TEXT_BLACK,
+            size="12pt", color=TEXT_BLACK, transparent=True,
         ),
     ]
     for v in visuals:
@@ -349,22 +462,29 @@ def build_concept_profile_page(page_dir: Path) -> None:
 
 def build_overview_page(page_dir: Path) -> None:
     clear_visuals(page_dir)
+    w, h = PAGE_OVERVIEW_W, PAGE_OVERVIEW_H
+    margin = 32
+    header_h = 128
     visuals = [
-        shape_rect(vid(), 0, 0, PAGE_W, 96, 0, PRIMARY_BLUE),
-        textbox(vid(), 28, 18, 900, 40, 1, "Governance overview", bold=True, size="28pt", color=TEXT_WHITE),
+        shape_rect(vid(), 0, 0, w, header_h, 0, PRIMARY_BLUE),
         textbox(
-            vid(), 28, 56, 1100, 32, 2,
-            "Portfolio of governed patient concepts — approval and classification",
-            size="13pt", color=TEXT_WHITE,
+            vid(), margin, 20, 900, 56, 1,
+            "Governance overview",
+            bold=True, size="28pt", color=TEXT_WHITE, transparent=True,
         ),
-        card(vid(), 28, 112, 300, 140, 3, CATALOG, "Total Concepts", measure=True, value_pt=32),
-        card(vid(), 344, 112, 300, 140, 4, CATALOG, "Approved Concepts", measure=True, value_pt=32),
-        card(vid(), 660, 112, 300, 140, 5, CATALOG, "Pending Approval", measure=True, value_pt=32),
-        card(vid(), 976, 112, 300, 140, 6, CATALOG, "Demographics Pilot", measure=True, value_pt=32),
-        bar_chart(vid(), 28, 276, 780, 360, 7, CATALOG, "classification", "Concepts by classification"),
-        bar_chart(vid(), 828, 276, 812, 360, 8, CATALOG, "approval_status", "Concepts by approval status"),
+        textbox(
+            vid(), margin, 80, 1200, 40, 2,
+            "Portfolio of governed patient concepts — approval and classification",
+            size="13pt", color=TEXT_WHITE, transparent=True,
+        ),
+        card(vid(), margin, 148, 448, 148, 3, CATALOG, "Total Concepts", measure=True, value_pt=32),
+        card(vid(), margin + 464, 148, 448, 148, 4, CATALOG, "Approved Concepts", measure=True, value_pt=32),
+        card(vid(), margin + 928, 148, 448, 148, 5, CATALOG, "Pending Approval", measure=True, value_pt=32),
+        card(vid(), margin + 1392, 148, 448, 148, 6, CATALOG, "Demographics Pilot", measure=True, value_pt=32),
+        bar_chart(vid(), margin, 316, 900, 340, 7, CATALOG, "classification", "Concepts by classification"),
+        bar_chart(vid(), margin + 924, 316, 900, 340, 8, CATALOG, "approval_status", "Concepts by approval status"),
         table_ex(
-            vid(), 28, 656, 1612, 420, 9, CATALOG,
+            vid(), margin, 676, w - (margin * 2), 372, 9, CATALOG,
             ["semantic_id", "uscdi_element", "uscdi_description", "classification", "data_steward", "approval_status"],
             title="All governed concepts",
         ),
@@ -441,7 +561,7 @@ def write_chi_theme() -> None:
             },
         },
     }
-    (THEME_DIR / "CHI High Contrast.json").write_text(json.dumps(theme, indent=2), encoding="utf-8")
+    write_text_utf8_no_bom(THEME_DIR / "CHI High Contrast.json", json.dumps(theme, indent=2))
 
 
 def update_report_json() -> None:
@@ -463,19 +583,20 @@ def update_report_json() -> None:
             ],
         }
     ]
-    path.write_text(json.dumps(data, indent=2), encoding="utf-8")
+    write_text_utf8_no_bom(path, json.dumps(data, indent=2))
 
 
-def write_page_json(page_dir: Path, page_id: str, display_name: str) -> None:
-    (page_dir / "page.json").write_text(
+def write_page_json(page_dir: Path, page_id: str, display_name: str, *, width: int, height: int) -> None:
+    write_text_utf8_no_bom(
+        page_dir / "page.json",
         json.dumps(
             {
                 "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.1.0/schema.json",
                 "name": page_id,
                 "displayName": display_name,
                 "displayOption": "ActualSize",
-                "height": PAGE_H,
-                "width": PAGE_W,
+                "height": height,
+                "width": width,
                 "objects": {
                     "background": [
                         {
@@ -489,7 +610,6 @@ def write_page_json(page_dir: Path, page_id: str, display_name: str) -> None:
             },
             indent=2,
         ),
-        encoding="utf-8",
     )
 
 
@@ -501,9 +621,10 @@ def main() -> None:
     profile_page.mkdir(parents=True, exist_ok=True)
     overview_page.mkdir(parents=True, exist_ok=True)
 
-    write_page_json(profile_page, profile_id, "Concept Profile")
-    write_page_json(overview_page, overview_id, "Governance Overview")
-    (REPORT / "pages" / "pages.json").write_text(
+    write_page_json(profile_page, profile_id, "Concept Profile", width=PAGE_PROFILE_W, height=PAGE_PROFILE_H)
+    write_page_json(overview_page, overview_id, "Governance Overview", width=PAGE_OVERVIEW_W, height=PAGE_OVERVIEW_H)
+    write_text_utf8_no_bom(
+        REPORT / "pages" / "pages.json",
         json.dumps(
             {
                 "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/pagesMetadata/1.1.0/schema.json",
@@ -512,7 +633,6 @@ def main() -> None:
             },
             indent=2,
         ),
-        encoding="utf-8",
     )
 
     THEME_DIR.mkdir(parents=True, exist_ok=True)

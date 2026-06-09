@@ -221,4 +221,4 @@ Many **INV COLUMN** values match the L2 columns and semantic_ids already in this
 - **Insurance**: inpid, inpn, inpfdt, inpldt, ptsid, infn, inmn, inln → Coverage.identifier, plan name, dates, subscriber.
 - **PCP / providers**: pcpid, pcpidt → Encounter.participant / PCP.
 
-You can use this mapping to add rows to **ddc-ccda_catalog.parquet** (CCD XPath → semantic_id or INV COLUMN → semantic_id) so Excel stewardship views and the notebook viewer show CCD mappings alongside ADT for the same elements.
+You can use this mapping to add rows to **ddc-ccda_catalog.parquet** (CCD XPath → semantic_id or INV COLUMN → semantic_id) so Excel stewardship views and the Power BI viewer show CCD mappings alongside ADT for the same elements.

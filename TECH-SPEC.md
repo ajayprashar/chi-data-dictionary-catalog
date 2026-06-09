@@ -125,7 +125,7 @@ This repo implements the CHI workflow as a **2-layer model**:
 1. **Partner intake** stays in the partner workbook.
    - External/source-system field inventories, code sets, and context notes belong in the intake workbook, not in the core `ddc-*` governance tables.
 2. **CHI governance** is the controlled semantic layer.
-   - The governed model is authored in Excel/CSV, represented in parquet, and reviewed in Excel or the Jupyter notebook viewer.
+   - The governed model is authored in Excel, represented in parquet, and reviewed in Power BI (read-only) or Excel; Jupyter is optional for ad-hoc queries.
    - `ddc-master_patient_catalog`, `ddc-master_patient_dictionary`, and `ddc-business_rules` are the primary governance tables.
 
 For implementation purposes, governed artifacts are grouped as:
@@ -412,8 +412,9 @@ flowchart TB
     end
 
     subgraph Review["STEWARD REVIEW"]
-        ExcelReview["Excel workbooks and combined CSV exports"]
-        Notebook["chi-data-dictionary-catalog.ipynb DuckDB viewer"]
+        ExcelReview["Excel workbooks"]
+        PBI["Power BI PBIP read-only viewer"]
+        Notebook["Jupyter optional ad-hoc"]
     end
 
     Excel --> Split
@@ -424,9 +425,11 @@ flowchart TB
     Build --> CCDA
     Catalog --> ExcelReview
     Dictionary --> ExcelReview
-    ADT --> Notebook
-    CCDA --> Notebook
-    Avail --> Notebook
+    Catalog --> PBI
+    Dictionary --> PBI
+    Avail --> PBI
+    Catalog --> Notebook
+    Dictionary --> Notebook
     Segments --> ExcelReview
     Events --> ExcelReview
 ```
@@ -443,7 +446,7 @@ flowchart TB
 | **ddc-data_source_availability.parquet** | Optional. Source-to-semantic_id availability matrix. |
 | **scripts/** | `split_to_catalog_and_dictionary.py`, `generate_intake_workbook.py`, `build_adt_catalog_from_mapping.py`, `build_ccda_catalog_from_mapping.py`, `build_data_source_availability.py` |
 | **data/** | Mapping CSVs, feed profiles (segments, event types) |
-| **docs/** | `excel-workbook-guide.md`, `adding-data-sources.md`, `cmt-adt-feed-and-master-patient.md`, `jupyter-duckdb-parquet-setup.md` |
+| **docs/** | `excel-workbook-guide.md`, `power-bi-concept-profile-setup.md`, `adding-data-sources.md`, `cmt-adt-feed-and-master-patient.md`, `jupyter-duckdb-parquet-setup.md` |
 | **workbooks/** | `chi-partner-intake-workbook.xlsx`, `chi-steward-workbook.xlsx` (working documents) |
 
 ### 2.2.1 Table Naming Guide (plain language)
@@ -947,7 +950,7 @@ The documentation is session-state-driven (not an expander). A button opens the 
 
 1. Build/rebuild canonical parquet via split and mapping scripts.
 2. Build standards inventory parquet via `build_standards_inventories.py`.
-3. Review and steward in Excel workbooks or query parquet with the Jupyter notebook.
+3. Review in Power BI (after import) or steward in Excel workbooks; Jupyter is optional for ad-hoc parquet queries.
 4. `semantic_id` remains the canonical join key across all standards layers.
 
 ### 6.8 Error Handling
@@ -1101,4 +1104,5 @@ This preserves data fidelity while reducing long-term table count.
 | **data/README.md** | Data artifacts overview |
 | **docs/adding-data-sources.md** | How to add feed profiles |
 | **docs/cmt-adt-feed-and-master-patient.md** | CMT ADT and Master Patient alignment |
-| **docs/jupyter-duckdb-parquet-setup.md** | Jupyter + DuckDB setup |
+| **docs/power-bi-concept-profile-setup.md** | Power BI PBIP viewer (primary read surface) |
+| **docs/jupyter-duckdb-parquet-setup.md** | Optional ad-hoc DuckDB queries over Parquet |

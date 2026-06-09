@@ -34,6 +34,7 @@ In Power BI Desktop:
 | Symptom | Fix |
 |---------|-----|
 | Text too small / hard to read | Set zoom to **100%**; pages are laid out at Actual size with 12–13pt table text. |
+| UTF-8 BOM error on open | PBIP JSON must be UTF-8 **without** BOM. Do not edit with PowerShell `Set-Content -Encoding utf8`; use Python or VS Code “UTF-8” (not “UTF-8 with BOM”). |
 | Yellow banner: *"Some tables have incomplete or no data"* | Click **Refresh now** (or **Home → Refresh**). Parquet must exist at `C:\AI\chi-data-dictionary-catalog\ddc-*.parquet`. |
 | Red error icons on measures | Close the report, reopen `chi-data-dictionary-catalog.pbip`. KPI measures live under `ddc-master_patient_catalog` → **Governance KPIs** (not a separate metrics table). |
 | Source shows wrong `source_id` | Run `import_steward_workbook_to_parquet.py`, then Refresh. |

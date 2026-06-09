@@ -66,13 +66,13 @@ Primary use case: **review, validation, and discussion of metadata**.
 
 ## Solution Overview
 
-*   Metadata authored in **Excel**
-*   Manually exported to **open, portable files**
-*   Lightweight local application renders metadata as:
-    *   A **catalog record view** (one element at a time)
-    *   A linked **data dictionary table** (field‑level details)
+*   Metadata **authored** in **Excel** (`chi-steward-workbook.xlsx`)
+*   Saved to **open, portable Parquet files** in the project folder
+*   **Presented** in **Power BI Desktop** (read-only PBIP report) as:
+    *   A **Concept Profile** — one `semantic_id` at a time (catalog + dictionary + sources)
+    *   A **Governance Overview** — portfolio KPIs and full concept table
 
-This approach keeps Excel as the **source of truth** while eliminating Excel as the **user interface**.
+Excel remains the **authoring surface**; Power BI is the **review and discovery surface**. A Jupyter notebook is available only for optional ad-hoc DuckDB queries over Parquet.
 
 ***
 
@@ -94,69 +94,59 @@ This mirrors enterprise metadata patterns while remaining simple.
 
 *   **ddc-master_patient_catalog.parquet** — Master patient catalog (Semantic ID, element name, description, classification, ruleset category, HIPAA/FHIR/consent governance tags).
 *   **ddc-master_patient_dictionary.parquet** — Master patient dictionary (Semantic ID plus FHIR paths, survivorship logic, data quality notes, and other definition/rule columns).
-*   Source data is authored in Excel; a single combined export is split into these two Parquet files by the project script (see *Data pipeline* below).
+*   Source data is authored in the steward Excel workbook and imported to these Parquet files (see *Data pipeline* below).
 *   Optional **message-format catalogs** for interoperability demonstrations:
     *   `ddc-hl7_adt_catalog.parquet` — Example HL7 ADT field mappings (PID segment for a few core demographics).
     *   `ddc-ccda_catalog.parquet` — Example CCD/CCDA XML paths for the same master patient elements.
 
 ### Data pipeline
 
-1. Author or edit metadata in Excel (one sheet or linked sheets).
-2. Export a single combined CSV (e.g., one row per USCDI element with all catalog and dictionary columns).
-3. Run the project script to split the CSV into **ddc-master_patient_catalog.parquet** and **ddc-master_patient_dictionary.parquet**:
-   `python scripts/split_to_catalog_and_dictionary.py <combined_export.csv>`
-4. The local viewer reads both Parquet files and joins on Semantic ID to present a record‑centric view.
-5. For querying the Parquet files in Jupyter with DuckDB (Python), see **docs/jupyter-duckdb-parquet-setup.md**.
+1. Author or edit metadata in **`workbooks/chi-steward-workbook.xlsx`** (`Catalog`, `Dictionary`, `Source_Availability` sheets).
+2. Import workbook changes to Parquet:
+   `python scripts/import_steward_workbook_to_parquet.py`
+3. Open **`workbooks/pbip/chi-data-dictionary-catalog.pbip`** in Power BI Desktop and **Refresh** to load the latest catalog and dictionary (joined on Semantic ID).
+4. Optional — regenerate the workbook from Parquet after script rebuilds:
+   `python scripts/generate_steward_workbook.py`
+5. Optional — legacy CSV split or ad-hoc queries: `scripts/split_to_catalog_and_dictionary.py`, or Jupyter + DuckDB (**docs/jupyter-duckdb-parquet-setup.md**).
 
 ***
 
 ## Portability & Deployment
 
 *   **Single‑folder app**: All artifacts live under one project folder (this directory). Copying or zipping this folder copies the entire POC.
-*   **No machine‑specific paths**: Scripts and notebooks rely on relative paths from the project root. The same folder layout works on any Windows PC.
-*   **Local runtime only**: The viewer uses an in‑process DuckDB engine and Parquet files. No external database, web server, or licensed platform is required.
+*   **No machine‑specific paths**: Scripts and the Power BI model use Parquet files in the project folder. The same folder layout works on any Windows PC.
+*   **Local runtime**: Parquet files are the portable data layer. Power BI Desktop reads them directly; no external database or web server is required.
 *   **Reproducible setup**:
     *   Create a local virtual environment in the project folder.
     *   Install dependencies from `requirements.txt`.
-    *   Build parquet artifacts from Excel/CSV (or use the Jupyter notebook `chi-data-dictionary-catalog.ipynb`) from this folder.
+    *   Edit the steward workbook, run `import_steward_workbook_to_parquet.py`, then open or refresh the PBIP report (**docs/power-bi-concept-profile-setup.md**).
 *   **Mobility requirement**: A user can move the POC to a new machine by copying the folder, recreating the virtual environment, and reinstalling from `requirements.txt`—no additional configuration files, registries, or services.
 
 ***
 
-## Viewer UX (Excel-first POC)
+## Viewer UX (Excel authors, Power BI presents)
 
-The primary steward surface is Excel workbooks for intake and governance, with the Jupyter notebook (`chi-data-dictionary-catalog.ipynb`) providing a local record-centric viewer over parquet for the **Community Health Insights (CHI)** data model.
+**Authoring:** stewards edit `chi-steward-workbook.xlsx` (and optionally the partner intake workbook when onboarding a source).
+
+**Presentation:** stakeholders open the PBIP report in Power BI Desktop (**docs/power-bi-concept-profile-setup.md**). After Excel edits, run the import script and **Refresh** in Power BI.
+
+### Report pages
+
+| Page | Purpose |
+|------|---------|
+| **Concept Profile** | Select one `semantic_id` — USCDI identity, FHIR mapping, survivorship, and source availability on one screen |
+| **Governance Overview** | Portfolio KPIs (total, approved, pending, demographics pilot), classification/approval charts, full catalog table |
 
 ### Key user workflows
 
-*   **Find an element quickly**: Type a `semantic_id`, USCDI element name, description, or FHIR path and immediately jump to that element.
-*   **Filter by FHIR resource**: Narrow to a specific FHIR resource (e.g., `Patient`, `Observation`) and browse only those elements.
-*   **Review one element in depth**: See all relevant catalog and dictionary metadata for a selected element on a single screen, grouped into logical sections.
-*   **Scan for gaps and risks**: Identify elements that are missing FHIR mappings, have low coverage, or are marked as sensitive/PII.
+*   **Review one element in depth**: Use the Concept Profile slicer to pick a `semantic_id` and see catalog + dictionary + sources together.
+*   **Scan portfolio health**: Use Governance Overview KPIs and charts to spot pending approvals and demographics pilot progress.
+*   **Browse the full catalog**: Scroll or filter the catalog table on Governance Overview.
+*   **Author changes**: Return to Excel, edit Catalog/Dictionary/Source_Availability, import to Parquet, refresh Power BI.
 
-### Search, filters, and layout
+### Optional: Jupyter notebook
 
-*   **Global search**: A search box that matches across `semantic_id`, `uscdi_element`, `uscdi_description`, and `fhir_r4_path`, updating results as the user types.
-*   **Filters** (multi‑select where applicable):
-    *   FHIR resource (derived from `fhir_r4_path`, e.g., `Patient`, `Observation`, `Encounter`).
-    *   `classification` (e.g., Master Demographics, SDOH).
-    *   `ruleset_category` (e.g., Static Identity, Dynamic Identity).
-    *   `hipaa_category`, `fhir_security_label`, and `consent_category`.
-*   **Two‑pane layout**:
-    *   Left: search + filters + a scrollable list/table of matching elements (with a clear “N results” indicator).
-    *   Right: a detail view for the currently selected element.
-
-### Element detail view
-
-For the selected element (joined on `semantic_id` across catalog and dictionary), the app presents:
-
-*   **Identity & catalog block**: `semantic_id`, `uscdi_element`, `uscdi_description`, `classification`, `ruleset_category`.
-*   **FHIR mapping block**: `fhir_r4_path`, `fhir_data_type`, and derived FHIR resource name, with easy copy‑to‑clipboard behavior.
-*   **Survivorship & sourcing block**: `chi_survivorship_logic`, `innovaccer_survivorship_logic`, `data_source_rank_reference`.
-*   **Quality & governance block**: `data_quality_notes`, `hipaa_category`, `fhir_security_label`, `consent_category`, and visual flags for missing critical values (for example, no FHIR mapping or no survivorship logic).
-*   **Message‑format mappings block (optional)**: when `ddc-hl7_adt_catalog.parquet` and/or `ddc-ccda_catalog.parquet` are present, side‑by‑side tables show how the same master patient element maps into HL7 ADT segments/fields and CCD/CCDA XML paths.
-
-The overall experience should let CHI stewards and architects use the app as a **practical management tool**, not just a static viewer.
+`chi-data-dictionary-catalog.ipynb` supports ad-hoc DuckDB queries over Parquet for developers and stewards who need custom SQL. It is not the primary stakeholder viewer.
 
 ***
 

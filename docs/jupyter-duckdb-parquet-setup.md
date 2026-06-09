@@ -1,5 +1,7 @@
 # Jupyter Notebooks with DuckDB and Parquet (Python)
 
+**Optional ad-hoc queries only.** The primary read surface for stakeholders is Power BI (`docs/power-bi-concept-profile-setup.md`). Use this notebook when you need custom SQL over Parquet during development or stewardship.
+
 This document describes how to run Jupyter notebooks that query Parquet files using DuckDB, and how to reproduce the environment.
 
 ---
