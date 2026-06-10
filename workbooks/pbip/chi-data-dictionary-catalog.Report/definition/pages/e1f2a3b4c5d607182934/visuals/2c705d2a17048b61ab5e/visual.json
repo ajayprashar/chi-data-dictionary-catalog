@@ -1,13 +1,13 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
-  "name": "5b56d41a2e0c28d56990",
+  "name": "2c705d2a17048b61ab5e",
   "position": {
     "x": 32,
-    "y": 1038,
-    "z": 9,
-    "height": 36,
+    "y": 480,
+    "z": 5,
+    "height": 48,
     "width": 1856,
-    "tabOrder": 9
+    "tabOrder": 5
   },
   "visual": {
     "visualType": "textbox",
@@ -19,9 +19,10 @@
               {
                 "textRuns": [
                   {
-                    "value": "Read-only | docs/product-vision.md | docs/sources-of-truth.md | docs/shie-standards-reference.md",
+                    "value": "Demographics pilot (Approved): Patient.race, Patient.ethnicity, Patient.language, Patient.gender_id, Patient.birth_sex",
                     "textStyle": {
                       "fontSize": "12pt",
+                      "fontWeight": "bold",
                       "color": "#000000"
                     }
                   }
@@ -32,7 +33,6 @@
         }
       ]
     },
-    "drillFilterOtherVisuals": true,
     "visualContainerObjects": {
       "background": [
         {
@@ -40,7 +40,18 @@
             "show": {
               "expr": {
                 "Literal": {
-                  "Value": "false"
+                  "Value": "true"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#FFC000'"
+                    }
+                  }
                 }
               }
             }
@@ -53,7 +64,18 @@
             "show": {
               "expr": {
                 "Literal": {
-                  "Value": "false"
+                  "Value": "true"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#0047AB'"
+                    }
+                  }
                 }
               }
             }
@@ -66,34 +88,35 @@
             "top": {
               "expr": {
                 "Literal": {
-                  "Value": "0D"
+                  "Value": "10D"
                 }
               }
             },
             "bottom": {
               "expr": {
                 "Literal": {
-                  "Value": "0D"
+                  "Value": "10D"
                 }
               }
             },
             "left": {
               "expr": {
                 "Literal": {
-                  "Value": "0D"
+                  "Value": "14D"
                 }
               }
             },
             "right": {
               "expr": {
                 "Literal": {
-                  "Value": "0D"
+                  "Value": "14D"
                 }
               }
             }
           }
         }
       ]
-    }
+    },
+    "drillFilterOtherVisuals": true
   }
 }

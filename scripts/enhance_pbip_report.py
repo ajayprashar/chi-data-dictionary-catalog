@@ -9,6 +9,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "data"))
 from pbip_layout_constants import (  # noqa: E402
     CONTENT_W,
     DEFAULT_LANDING_PAGE_ID,
@@ -935,19 +936,23 @@ def write_page_json(page_dir: Path, page_id: str, display_name: str, *, width: i
 
 def main() -> None:
     from add_pbip_start_here_page import START_HERE_PAGE_ID, START_HERE_DISPLAY_NAME
+    from pbip_report_manifest import PAGE_FIELD_GUIDE
 
     start_id = START_HERE_PAGE_ID
+    field_guide_id = PAGE_FIELD_GUIDE
     profile_id = "abc963c80ac5ed2deeb4"
     standards_id = "d4e5f6a7b8c901234567"
     overview_id = "c8f1a2b3d4e5f6071829"
     start_page = REPORT / "pages" / start_id
+    field_guide_page = REPORT / "pages" / field_guide_id
     profile_page = REPORT / "pages" / profile_id
     standards_page = REPORT / "pages" / standards_id
     overview_page = REPORT / "pages" / overview_id
-    for p in (start_page, profile_page, standards_page, overview_page):
+    for p in (start_page, field_guide_page, profile_page, standards_page, overview_page):
         p.mkdir(parents=True, exist_ok=True)
 
     write_page_json(start_page, start_id, START_HERE_DISPLAY_NAME, width=PAGE_PROFILE_W, height=PAGE_PROFILE_H)
+    write_page_json(field_guide_page, field_guide_id, "Field guide", width=PAGE_PROFILE_W, height=PAGE_PROFILE_H)
     write_page_json(profile_page, profile_id, "Concept Profile", width=PAGE_PROFILE_W, height=PAGE_PROFILE_H)
     write_page_json(standards_page, standards_id, "Standards & Contexts", width=PAGE_PROFILE_W, height=PAGE_PROFILE_H)
     write_page_json(overview_page, overview_id, "Governance Overview", width=PAGE_OVERVIEW_W, height=PAGE_OVERVIEW_H)
@@ -956,7 +961,7 @@ def main() -> None:
         json.dumps(
             {
                 "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/pagesMetadata/1.1.0/schema.json",
-                "pageOrder": [start_id, profile_id, standards_id, overview_id],
+                "pageOrder": [start_id, field_guide_id, profile_id, standards_id, overview_id],
                 "activePageName": DEFAULT_LANDING_PAGE_ID,
             },
             indent=2,
@@ -968,8 +973,15 @@ def main() -> None:
     write_chi_theme()
     update_report_json()
     from add_pbip_start_here_page import build_start_here_page
+    from add_pbip_documentation_page import build_field_guide_page, write_guide_table_tmdl
+    from add_pbip_documentation_page import sync_model_tmdl as sync_guide_model
+    from generate_pbip_model_guide import generate as generate_guide
 
+    generate_guide()
+    write_guide_table_tmdl()
+    sync_guide_model()
     build_start_here_page(start_page)
+    build_field_guide_page(field_guide_page)
     build_concept_profile_page(profile_page)
     build_standards_contexts_page(standards_page)
     build_overview_page(overview_page)

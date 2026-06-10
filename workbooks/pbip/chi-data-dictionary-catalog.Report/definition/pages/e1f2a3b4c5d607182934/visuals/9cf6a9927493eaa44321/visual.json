@@ -1,13 +1,13 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
-  "name": "5d637a7f91776d6ac312",
+  "name": "9cf6a9927493eaa44321",
   "position": {
     "x": 32,
-    "y": 736,
-    "z": 7,
-    "height": 96,
-    "width": 1856,
-    "tabOrder": 7
+    "y": 140,
+    "z": 3,
+    "height": 328,
+    "width": 920,
+    "tabOrder": 3
   },
   "visual": {
     "visualType": "textbox",
@@ -19,31 +19,9 @@
               {
                 "textRuns": [
                   {
-                    "value": "Edit workbooks/chi-steward-workbook.xlsx",
+                    "value": "This application is CHI's read surface for governed patient concepts (semantic_id). It shows what CHI stewards have approved, how each concept maps to USCDI and US Core, which terminology bindings apply, and where attributes appear in HL7 ADT, C-CDA, and FHIR.",
                     "textStyle": {
-                      "fontSize": "11pt",
-                      "color": "#000000"
-                    }
-                  }
-                ]
-              },
-              {
-                "textRuns": [
-                  {
-                    "value": "-> python scripts/import_steward_workbook_to_parquet.py",
-                    "textStyle": {
-                      "fontSize": "11pt",
-                      "color": "#000000"
-                    }
-                  }
-                ]
-              },
-              {
-                "textRuns": [
-                  {
-                    "value": "-> Refresh Power BI -> git commit",
-                    "textStyle": {
-                      "fontSize": "11pt",
+                      "fontSize": "12pt",
                       "color": "#000000"
                     }
                   }
@@ -62,9 +40,9 @@
               {
                 "textRuns": [
                   {
-                    "value": "Docs: docs/operational-runbook.md, docs/sources-of-truth.md",
+                    "value": "Excel is the authoring surface; parquet is the published machine copy; Power BI is for discovery and review.",
                     "textStyle": {
-                      "fontSize": "11pt",
+                      "fontSize": "12pt",
                       "color": "#000000"
                     }
                   }
@@ -89,7 +67,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Update cycle'"
+                  "Value": "'Purpose'"
                 }
               }
             },

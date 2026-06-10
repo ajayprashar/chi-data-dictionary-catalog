@@ -30,9 +30,10 @@ SOURCES_LINES = [
 
 HOW_TO_USE_LINES = [
     "1. Start here - purpose and sources of truth (this page).",
-    "2. Standards & Contexts - default landing: terminology, crosswalk, ADT/CCDA per semantic_id.",
-    "3. Concept Profile - governance, FHIR implementation, survivorship, source availability.",
-    "4. Governance Overview - portfolio KPIs and full concept list.",
+    "2. Field guide - column purpose, Catalog vs Dictionary layer, and HIE interoperability role (slicers).",
+    "3. Standards & Contexts - default landing: terminology, crosswalk, ADT/CCDA per semantic_id.",
+    "4. Concept Profile - governance, FHIR implementation, survivorship, source availability.",
+    "5. Governance Overview - portfolio KPIs and full concept list.",
     "",
     "Tip: Use the semantic_id slicer on Standards & Contexts or Concept Profile to drill into one concept.",
 ]

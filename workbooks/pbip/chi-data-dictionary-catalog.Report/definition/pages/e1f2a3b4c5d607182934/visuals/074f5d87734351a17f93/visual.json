@@ -1,13 +1,13 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
-  "name": "32c47e257a27ff087aae",
+  "name": "074f5d87734351a17f93",
   "position": {
-    "x": 968,
-    "y": 140,
-    "z": 4,
-    "height": 328,
-    "width": 920,
-    "tabOrder": 4
+    "x": 32,
+    "y": 540,
+    "z": 6,
+    "height": 184,
+    "width": 1856,
+    "tabOrder": 6
   },
   "visual": {
     "visualType": "textbox",
@@ -19,15 +19,51 @@
               {
                 "textRuns": [
                   {
-                    "value": "National standards - ",
+                    "value": "1. Start here - purpose and sources of truth (this page).",
                     "textStyle": {
                       "fontSize": "12pt",
-                      "color": "#000000",
-                      "fontWeight": "bold"
+                      "color": "#000000"
                     }
-                  },
+                  }
+                ]
+              },
+              {
+                "textRuns": [
                   {
-                    "value": "USCDI (what), US Core + FHIR R4 (how), HL7 / LOINC / SNOMED / BCP 47 / CDCREC (codes). Authoritative externally; cited by URL and OID in this catalog.",
+                    "value": "2. Field guide - column purpose, Catalog vs Dictionary layer, and HIE interoperability role (slicers).",
+                    "textStyle": {
+                      "fontSize": "12pt",
+                      "color": "#000000"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "3. Standards & Contexts - default landing: terminology, crosswalk, ADT/CCDA per semantic_id.",
+                    "textStyle": {
+                      "fontSize": "12pt",
+                      "color": "#000000"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "4. Concept Profile - governance, FHIR implementation, survivorship, source availability.",
+                    "textStyle": {
+                      "fontSize": "12pt",
+                      "color": "#000000"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "5. Governance Overview - portfolio KPIs and full concept list.",
                     "textStyle": {
                       "fontSize": "12pt",
                       "color": "#000000"
@@ -48,102 +84,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "DAP (Innovaccer) - ",
-                    "textStyle": {
-                      "fontSize": "12pt",
-                      "color": "#000000",
-                      "fontWeight": "bold"
-                    }
-                  },
-                  {
-                    "value": "enterprise terminology and clinical value sets at scale. Referenced, not duplicated here (see TECH-SPEC).",
-                    "textStyle": {
-                      "fontSize": "12pt",
-                      "color": "#000000"
-                    }
-                  }
-                ]
-              },
-              {
-                "textRuns": [
-                  {
-                    "value": "",
-                    "textStyle": {
-                      "fontSize": "6pt"
-                    }
-                  }
-                ]
-              },
-              {
-                "textRuns": [
-                  {
-                    "value": "CHI steward workbook - ",
-                    "textStyle": {
-                      "fontSize": "12pt",
-                      "color": "#000000",
-                      "fontWeight": "bold"
-                    }
-                  },
-                  {
-                    "value": "governed metadata CHI signs: approval_status, survivorship, value set bindings, crosswalk rows. Published via import script + git.",
-                    "textStyle": {
-                      "fontSize": "12pt",
-                      "color": "#000000"
-                    }
-                  }
-                ]
-              },
-              {
-                "textRuns": [
-                  {
-                    "value": "",
-                    "textStyle": {
-                      "fontSize": "6pt"
-                    }
-                  }
-                ]
-              },
-              {
-                "textRuns": [
-                  {
-                    "value": "Operational feeds - ",
-                    "textStyle": {
-                      "fontSize": "12pt",
-                      "color": "#000000",
-                      "fontWeight": "bold"
-                    }
-                  },
-                  {
-                    "value": "CMT, county survivorship SQL, partner source strings. Mapped to standards in Source_Value_Crosswalk; they are inputs, not national truth.",
-                    "textStyle": {
-                      "fontSize": "12pt",
-                      "color": "#000000"
-                    }
-                  }
-                ]
-              },
-              {
-                "textRuns": [
-                  {
-                    "value": "",
-                    "textStyle": {
-                      "fontSize": "6pt"
-                    }
-                  }
-                ]
-              },
-              {
-                "textRuns": [
-                  {
-                    "value": "semantic_id - ",
-                    "textStyle": {
-                      "fontSize": "12pt",
-                      "color": "#000000",
-                      "fontWeight": "bold"
-                    }
-                  },
-                  {
-                    "value": "stable spine joining catalog, dictionary, terminology, crosswalk, and message context.",
+                    "value": "Tip: Use the semantic_id slicer on Standards & Contexts or Concept Profile to drill into one concept.",
                     "textStyle": {
                       "fontSize": "12pt",
                       "color": "#000000"
@@ -170,7 +111,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Sources of truth'"
+                  "Value": "'How to use this report'"
                 }
               }
             },

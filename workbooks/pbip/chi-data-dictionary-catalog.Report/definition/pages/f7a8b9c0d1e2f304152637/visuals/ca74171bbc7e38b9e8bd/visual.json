@@ -1,54 +1,147 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
-  "name": "88caedb9e3a6465830ed",
+  "name": "ca74171bbc7e38b9e8bd",
   "position": {
     "x": 32,
     "y": 140,
     "z": 3,
-    "height": 328,
+    "height": 100,
     "width": 920,
     "tabOrder": 3
   },
   "visual": {
-    "visualType": "textbox",
+    "visualType": "slicer",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ddc-application_guide"
+                    }
+                  },
+                  "Property": "page_display_name"
+                }
+              },
+              "queryRef": "ddc-application_guide.page_display_name",
+              "nativeQueryRef": "page_display_name",
+              "active": true
+            }
+          ]
+        }
+      }
+    },
     "objects": {
+      "data": [
+        {
+          "properties": {
+            "mode": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Dropdown'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "header": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "items": [
+        {
+          "properties": {
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "13D"
+                }
+              }
+            },
+            "fontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#000000'"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "selection": [
+        {
+          "properties": {
+            "selectAllCheckboxEnabled": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ],
       "general": [
         {
           "properties": {
-            "paragraphs": [
-              {
-                "textRuns": [
+            "filter": {
+              "filter": {
+                "Version": 2,
+                "From": [
                   {
-                    "value": "This application is CHI's read surface for governed patient concepts (semantic_id). It shows what CHI stewards have approved, how each concept maps to USCDI and US Core, which terminology bindings apply, and where attributes appear in HL7 ADT, C-CDA, and FHIR.",
-                    "textStyle": {
-                      "fontSize": "12pt",
-                      "color": "#000000"
-                    }
+                    "Name": "g",
+                    "Entity": "ddc-application_guide",
+                    "Type": 0
                   }
-                ]
-              },
-              {
-                "textRuns": [
+                ],
+                "Where": [
                   {
-                    "value": "",
-                    "textStyle": {
-                      "fontSize": "6pt"
-                    }
-                  }
-                ]
-              },
-              {
-                "textRuns": [
-                  {
-                    "value": "Excel is the authoring surface; parquet is the published machine copy; Power BI is for discovery and review.",
-                    "textStyle": {
-                      "fontSize": "12pt",
-                      "color": "#000000"
+                    "Condition": {
+                      "In": {
+                        "Expressions": [
+                          {
+                            "Column": {
+                              "Expression": {
+                                "SourceRef": {
+                                  "Source": "g"
+                                }
+                              },
+                              "Property": "page_display_name"
+                            }
+                          }
+                        ],
+                        "Values": [
+                          [
+                            {
+                              "Literal": {
+                                "Value": "'Standards & Contexts'"
+                              }
+                            }
+                          ]
+                        ]
+                      }
                     }
                   }
                 ]
               }
-            ]
+            }
           }
         }
       ]
@@ -67,14 +160,14 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Purpose'"
+                  "Value": "'Filter by report page'"
                 }
               }
             },
             "fontSize": {
               "expr": {
                 "Literal": {
-                  "Value": "14D"
+                  "Value": "13D"
                 }
               }
             },
@@ -83,7 +176,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#FFFFFF'"
+                      "Value": "'#000000'"
                     }
                   }
                 }
@@ -94,7 +187,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#0047AB'"
+                      "Value": "'#FFC000'"
                     }
                   }
                 }

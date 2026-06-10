@@ -1,0 +1,37 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
+  "name": "81ef29c7bb4161c07d29",
+  "position": {
+    "x": 32,
+    "y": 248,
+    "z": 5,
+    "height": 100,
+    "width": 1856,
+    "tabOrder": 5
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Layers: Catalog = WHAT (USCDI) | Dictionary = HOW (FHIR/US Core) | Terminology/Crosswalk = WHICH codes | Message context = WHERE (ADT/CCDA) | Sources = feed coverage. Authoring: chi-steward-workbook.xlsx \u2192 import script.",
+                    "textStyle": {
+                      "fontSize": "11pt",
+                      "color": "#000000"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

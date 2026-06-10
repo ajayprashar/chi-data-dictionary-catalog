@@ -1,13 +1,13 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
-  "name": "f717431ea2fb1b423991",
+  "name": "761b17876e4cdcd23ebe",
   "position": {
     "x": 32,
-    "y": 80,
-    "z": 2,
-    "height": 44,
-    "width": 1750,
-    "tabOrder": 2
+    "y": 1038,
+    "z": 9,
+    "height": 36,
+    "width": 1856,
+    "tabOrder": 9
   },
   "visual": {
     "visualType": "textbox",
@@ -19,10 +19,10 @@
               {
                 "textRuns": [
                   {
-                    "value": "Governed catalog + dictionary aligned to US interoperability standards (SHIE / CHI)",
+                    "value": "Read-only | docs/product-vision.md | docs/sources-of-truth.md | docs/shie-standards-reference.md",
                     "textStyle": {
-                      "fontSize": "13pt",
-                      "color": "#FFFFFF"
+                      "fontSize": "12pt",
+                      "color": "#000000"
                     }
                   }
                 ]

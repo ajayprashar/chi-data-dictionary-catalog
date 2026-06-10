@@ -1,0 +1,166 @@
+table ddc-application_guide
+	lineageTag: 9040eef49dd4b9675249
+
+	column guide_id
+		dataType: string
+		lineageTag: 23888045274501323d87
+		summarizeBy: none
+		sourceColumn: guide_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column page_id
+		dataType: string
+		lineageTag: f16d6012fee90ad779c5
+		summarizeBy: none
+		sourceColumn: page_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column page_display_name
+		dataType: string
+		lineageTag: 7ae7ec217781bea7a907
+		summarizeBy: none
+		sourceColumn: page_display_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column page_purpose
+		dataType: string
+		lineageTag: ab069e061607e52e150b
+		summarizeBy: none
+		sourceColumn: page_purpose
+
+		annotation SummarizationSetBy = Automatic
+
+	column page_interop_summary
+		dataType: string
+		lineageTag: ba98c19e83d8bcd5ed87
+		summarizeBy: none
+		sourceColumn: page_interop_summary
+
+		annotation SummarizationSetBy = Automatic
+
+	column visual_title
+		dataType: string
+		lineageTag: b7b28bb72c0562027bed
+		summarizeBy: none
+		sourceColumn: visual_title
+
+		annotation SummarizationSetBy = Automatic
+
+	column sort_order
+		dataType: string
+		lineageTag: d71f71cdd9d6d09f68da
+		summarizeBy: none
+		sourceColumn: sort_order
+
+		annotation SummarizationSetBy = Automatic
+
+	column semantic_model_table
+		dataType: string
+		lineageTag: de377ddcb900e678d9a2
+		summarizeBy: none
+		sourceColumn: semantic_model_table
+
+		annotation SummarizationSetBy = Automatic
+
+	column column_name
+		dataType: string
+		lineageTag: 5bb3ad386e4cdc51e302
+		summarizeBy: none
+		sourceColumn: column_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column layer
+		dataType: string
+		lineageTag: 539db7e1e2fb1bda40a7
+		summarizeBy: none
+		sourceColumn: layer
+
+		annotation SummarizationSetBy = Automatic
+
+	column layer_question
+		dataType: string
+		lineageTag: 3f2e069fd9b64ec50342
+		summarizeBy: none
+		sourceColumn: layer_question
+
+		annotation SummarizationSetBy = Automatic
+
+	column purpose_short
+		dataType: string
+		lineageTag: d8be94da365388a71c85
+		summarizeBy: none
+		sourceColumn: purpose_short
+
+		annotation SummarizationSetBy = Automatic
+
+	column interop_role
+		dataType: string
+		lineageTag: 554c80ea906535294315
+		summarizeBy: none
+		sourceColumn: interop_role
+
+		annotation SummarizationSetBy = Automatic
+
+	column standards_touchpoint
+		dataType: string
+		lineageTag: 8134d3286a06021d494f
+		summarizeBy: none
+		sourceColumn: standards_touchpoint
+
+		annotation SummarizationSetBy = Automatic
+
+	column exchange_formats
+		dataType: string
+		lineageTag: 1f612787a0a4bb02abe1
+		summarizeBy: none
+		sourceColumn: exchange_formats
+
+		annotation SummarizationSetBy = Automatic
+
+	column excel_sheet
+		dataType: string
+		lineageTag: b799bbeeb372be786bdf
+		summarizeBy: none
+		sourceColumn: excel_sheet
+
+		annotation SummarizationSetBy = Automatic
+
+	column editable_in_excel
+		dataType: string
+		lineageTag: 17c1efb30903596ae714
+		summarizeBy: none
+		sourceColumn: editable_in_excel
+
+		annotation SummarizationSetBy = Automatic
+
+	column pilot_example
+		dataType: string
+		lineageTag: de7b3705964ca7d67124
+		summarizeBy: none
+		sourceColumn: pilot_example
+
+		annotation SummarizationSetBy = Automatic
+
+	column doc_ref
+		dataType: string
+		lineageTag: 88364807f1abcfd08bbb
+		summarizeBy: none
+		sourceColumn: doc_ref
+
+		annotation SummarizationSetBy = Automatic
+
+	partition ddc-application_guide = m
+		mode: import
+		source =
+				let
+				    Source = Parquet.Document(File.Contents("C:\AI\chi-data-dictionary-catalog\ddc-application_guide.parquet"), [Compression=null, LegacyColumnNameEncoding=false, MaxDepth=null])
+				in
+				    Source
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table

@@ -24,7 +24,7 @@ Edit `chi-steward-workbook.xlsx` → import to parquet → review in Power BI (*
 
 **POC goal:** prove governed catalog + dictionary + standards + message contexts (ADT/CDA/FHIR) on one `semantic_id`.
 
-**Pilot status:** `docs/demographics-pilot-plan.md` · **Standards:** `docs/shie-standards-reference.md`
+**Pilot status:** `docs/demographics-pilot-plan.md` · **Standards:** `docs/shie-standards-reference.md` · **FAQ:** `docs/faq.md` (catalog vs dictionary, PBIP pages)
 
 ### Governance workflow
 

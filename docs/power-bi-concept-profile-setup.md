@@ -13,15 +13,20 @@ The report includes four pages:
 | Page | Purpose |
 |------|---------|
 | **Start here** | Purpose, sources-of-truth layers, how to navigate the report (static text) |
+| **Field guide** | In-report column reference — layer (Catalog/Dictionary/Context), interoperability role, Excel source (slicers) |
 | **Concept Profile** | One `semantic_id` — governance, FHIR/US Core, **survivorship**, sources |
 | **Standards & Contexts** | Same slicer — FHIR/terminology notes, value sets, crosswalk, **HL7 ADT**, **C-CDA** (no survivorship column on FHIR table) |
 | **Governance Overview** | Portfolio KPIs, classification/approval charts, full concept table |
 
 Add or refresh **Start here** only: `python scripts/add_pbip_start_here_page.py` (does not rebuild other pages).
 
+Regenerate **Field guide** (parquet + page): `python scripts/generate_pbip_model_guide.py` then `python scripts/add_pbip_documentation_page.py`.
+
 **Default landing page:** **Standards & Contexts** (opens on load). **Start here** remains the first tab for orientation.
 
 Semantic model tables: catalog, dictionary, source availability, **ADT catalog**, **CCDA catalog**, **value set members**, **source crosswalk** (joined on `semantic_id`).
+
+**Pages are task lenses, not catalog-vs-dictionary tabs.** The catalog/dictionary split is per column and per source table; pages mix both by design. See **`docs/faq.md`**.
 
 After steward Excel edits: `python scripts/import_steward_workbook_to_parquet.py` → **Refresh** in Power BI.
 
@@ -60,6 +65,8 @@ In Power BI Desktop:
 | Source shows wrong `source_id` | Run `import_steward_workbook_to_parquet.py`, then Refresh. |
 | **Unable to save document** / invalid path when saving `.pbix` | Not caused by repo cleanup. This project uses **PBIP + TMDL + PBIR**; **Save a copy → PBIX** is unreliable on some Desktop builds (especially Microsoft Store, June 2026). Use the **demo package** below instead of fighting PBIX export. |
 | Report opens but has no data | Parquet must be at `C:\AI\chi-data-dictionary-catalog\ddc-*.parquet` (hardcoded in the model). Refresh after parquets are in place. |
+| **Transform data** → query preview: `Container exited unexpectedly` **0x80131623** | **Not corrupt parquet.** Known Power BI Mashup crash when previewing parquet queries inside PBIP (common on **Microsoft Store** app, **US Gov cloud**, June 2026). **Close Power Query** without Apply if broken; use **Home → Refresh** on the report canvas instead. Do not use Transform data for routine demos. Try **EXE installer**, clear `%LocalAppData%\Microsoft\Power BI Desktop\Cache`, or re-run `python scripts/package_pbi_demo.py` (rewrites parquets to Parquet 1.0). |
+| **Unable to save auto recovery file** / invalid path in `...\Power BI Desktop Store App\TempSaves\` | **Not corrupt PBIP.** Store-app auto-recovery cannot write its temp `.pbix`. Click **Close** and demo anyway — switch to **Report** view → **Home → Refresh**. On demo PC: **File → Options → Global → Auto recovery** → uncheck; or use the **EXE** installer. Repo sets `"enableAutoRecovery": false` in `chi-data-dictionary-catalog.pbip`. |
 
 ---
 
@@ -75,7 +82,7 @@ python scripts/package_pbi_demo.py
 
 Writes `workbooks/chi-ddc-demo-YYYY-MM-DD.zip` containing:
 
-- 7 `ddc-*.parquet` files (repo root)
+- 7 `ddc-*.parquet` files (rewritten to Parquet 1.0 for Desktop compatibility)
 - `workbooks/chi-steward-workbook.xlsx` and `workbooks/chi-partner-intake-workbook.xlsx`
 - `workbooks/pbip/` (report + semantic model; excludes local `.pbi` cache)
 

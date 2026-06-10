@@ -1,13 +1,13 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
-  "name": "83ec4f67704a75d8acea",
+  "name": "54acd7b3c60ea17aba5d",
   "position": {
     "x": 32,
-    "y": 20,
-    "z": 1,
-    "height": 56,
-    "width": 1200,
-    "tabOrder": 1
+    "y": 80,
+    "z": 2,
+    "height": 40,
+    "width": 1750,
+    "tabOrder": 2
   },
   "visual": {
     "visualType": "textbox",
@@ -19,11 +19,10 @@
               {
                 "textRuns": [
                   {
-                    "value": "CHI Data Dictionary Catalog",
+                    "value": "Understand each column: layer (Catalog/Dictionary/Context), interoperability role, and Excel source",
                     "textStyle": {
-                      "fontSize": "28pt",
-                      "color": "#FFFFFF",
-                      "fontWeight": "bold"
+                      "fontSize": "13pt",
+                      "color": "#FFFFFF"
                     }
                   }
                 ]

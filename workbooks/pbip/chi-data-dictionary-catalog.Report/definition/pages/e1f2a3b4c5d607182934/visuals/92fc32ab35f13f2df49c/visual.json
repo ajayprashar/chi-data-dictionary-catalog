@@ -1,13 +1,13 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
-  "name": "cf27d3bbf6241e3fcd37",
+  "name": "92fc32ab35f13f2df49c",
   "position": {
     "x": 32,
-    "y": 540,
-    "z": 6,
-    "height": 184,
+    "y": 736,
+    "z": 7,
+    "height": 96,
     "width": 1856,
-    "tabOrder": 6
+    "tabOrder": 7
   },
   "visual": {
     "visualType": "textbox",
@@ -19,9 +19,9 @@
               {
                 "textRuns": [
                   {
-                    "value": "1. Start here - purpose and sources of truth (this page).",
+                    "value": "Edit workbooks/chi-steward-workbook.xlsx",
                     "textStyle": {
-                      "fontSize": "12pt",
+                      "fontSize": "11pt",
                       "color": "#000000"
                     }
                   }
@@ -30,9 +30,9 @@
               {
                 "textRuns": [
                   {
-                    "value": "2. Standards & Contexts - default landing: terminology, crosswalk, ADT/CCDA per semantic_id.",
+                    "value": "-> python scripts/import_steward_workbook_to_parquet.py",
                     "textStyle": {
-                      "fontSize": "12pt",
+                      "fontSize": "11pt",
                       "color": "#000000"
                     }
                   }
@@ -41,20 +41,9 @@
               {
                 "textRuns": [
                   {
-                    "value": "3. Concept Profile - governance, FHIR implementation, survivorship, source availability.",
+                    "value": "-> Refresh Power BI -> git commit",
                     "textStyle": {
-                      "fontSize": "12pt",
-                      "color": "#000000"
-                    }
-                  }
-                ]
-              },
-              {
-                "textRuns": [
-                  {
-                    "value": "4. Governance Overview - portfolio KPIs and full concept list.",
-                    "textStyle": {
-                      "fontSize": "12pt",
+                      "fontSize": "11pt",
                       "color": "#000000"
                     }
                   }
@@ -73,9 +62,9 @@
               {
                 "textRuns": [
                   {
-                    "value": "Tip: Use the semantic_id slicer on Standards & Contexts or Concept Profile to drill into one concept.",
+                    "value": "Docs: docs/operational-runbook.md, docs/sources-of-truth.md",
                     "textStyle": {
-                      "fontSize": "12pt",
+                      "fontSize": "11pt",
                       "color": "#000000"
                     }
                   }
@@ -100,7 +89,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'How to use this report'"
+                  "Value": "'Update cycle'"
                 }
               }
             },
