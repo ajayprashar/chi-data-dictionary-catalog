@@ -16,7 +16,10 @@ from openpyxl import Workbook
 from openpyxl.styles import Alignment, Font
 from openpyxl.worksheet.worksheet import Worksheet
 
+REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(0, str(REPO_ROOT))
+from data.partner_crosswalk_template import CROSSWALK_COLUMNS, build_template_rows  # noqa: E402
 from excel_workbook_common import (
     add_excel_table,
     autosize_columns,
@@ -31,6 +34,7 @@ PARTNER_SHEETS = {
     "Source_Summary",
     "Field_Inventory",
     "Code_Values",
+    "Crosswalk_Template",
     "Keys_and_Relationships",
     "Open_Questions",
 }
@@ -41,6 +45,7 @@ TABLE_INDEX_ROWS = [
     ("chi_intake_source_summary", "Source_Summary", "Partner", "Intake flow"),
     ("chi_intake_field_inventory", "Field_Inventory", "Partner", "Intake flow"),
     ("chi_intake_code_values", "Code_Values", "Partner", "Intake flow"),
+    ("chi_intake_crosswalk_template", "Crosswalk_Template", "Partner", "Intake flow"),
     ("chi_intake_keys_relationships", "Keys_and_Relationships", "Partner", "Intake flow"),
     ("chi_intake_open_questions", "Open_Questions", "Partner", "Intake flow"),
     ("chi_intake_curation_bridge", "CHI_Curation_Bridge", "CHI", "CHI bridge"),
@@ -63,6 +68,11 @@ FIELD_INVENTORY_GUIDE_ROWS = [
     ("updated_when", "When the value is set or changed in the source."),
     ("notes", "Join keys, history behavior, or mapping hints for CHI."),
 ]
+
+def _crosswalk_template_intake_rows() -> list[list[str]]:
+    """Partner-facing rows: same columns as steward Source_Value_Crosswalk."""
+    return [[row[col] for col in CROSSWALK_COLUMNS] for row in build_template_rows()]
+
 
 INTAKE_TABLES: list[tuple[str, str, list[str], list[list[str]]]] = [
     (
@@ -146,12 +156,26 @@ INTAKE_TABLES: list[tuple[str, str, list[str], list[list[str]]]] = [
                 "Race category code for the person at booking",
                 "code",
                 "Optional",
-                "2054-5",
-                "OMB race categories; see Code_Values if you maintain a local list",
+                "A",
+                "Local race list; map to CHI standards in Crosswalk_Template",
                 "false",
                 "true",
                 "At intake or booking",
                 "Example demographics field. Add ethnicity, language, and sex fields the same way.",
+            ],
+            [
+                "GenderIdentity",
+                "person.csv",
+                "Gender Identity",
+                "Self-reported gender identity (not sex at birth / SexID)",
+                "code",
+                "Optional",
+                "FEMALE",
+                "See Crosswalk_Template — maps to Patient.gender_id, not birth sex",
+                "false",
+                "true",
+                "At intake when collected",
+                "Distinct from SexID or administrative sex fields.",
             ],
         ],
     ),
@@ -174,6 +198,12 @@ INTAKE_TABLES: list[tuple[str, str, list[str], list[list[str]]]] = [
             "active",
             "Example code row.",
         ]],
+    ),
+    (
+        "Crosswalk_Template",
+        "chi_intake_crosswalk_template",
+        list(CROSSWALK_COLUMNS),
+        _crosswalk_template_intake_rows(),
     ),
     (
         "Keys_and_Relationships",
@@ -286,6 +316,12 @@ LOOKUP_ROWS = [
         "ddc-ccda_catalog | ddc-data_source_availability | ddc-fhir_inventory | ddc-business_rules",
     ),
     ("load_action", "create_or_update"),
+    ("mapping_type", "exact | rollup | exclude"),
+    ("approval_status", "draft | Approved"),
+    (
+        "target_governance_table (crosswalk)",
+        "ddc-source_value_crosswalk (Source_Value_Crosswalk sheet in steward workbook)",
+    ),
 ]
 
 
@@ -332,8 +368,14 @@ def add_intake_guide_sheet(wb: Workbook) -> None:
         ("1", "Source_Summary", "One row per source: contacts, format, refresh cadence, identifiers."),
         ("2", "Field_Inventory", "One row per field you may share. See column guide below."),
         ("3", "Code_Values", "Local code lists referenced by fields in Field_Inventory."),
-        ("4", "Keys_and_Relationships", "How records join (booking to person, encounter to patient, etc.)."),
-        ("5", "Open_Questions", "Blockers and clarifications for CHI follow-up."),
+        (
+            "4",
+            "Crosswalk_Template",
+            "How your local codes map to CHI standards (example: GenderIdentity → Patient.gender_id). "
+            "Replace example rows; keep source_id as partner_intake until CHI assigns yours.",
+        ),
+        ("5", "Keys_and_Relationships", "How records join (booking to person, encounter to patient, etc.)."),
+        ("6", "Open_Questions", "Blockers and clarifications for CHI follow-up."),
     ]
     ws["A4"] = "Intake flow"
     ws["A4"].font = Font(bold=True)
@@ -363,6 +405,7 @@ def add_intake_guide_sheet(wb: Workbook) -> None:
         "Source_Summary has a real source_id, business owner, and technical contact.",
         "Field_Inventory lists every identifier, demographics, and clinical field you plan to share.",
         "Code_Values documents any local code lists referenced in Field_Inventory.",
+        "Crosswalk_Template maps local codes to CHI semantic_id and standard target codes (see docs/partner-crosswalk-template.md).",
         "Keys_and_Relationships explains how person, encounter, and event records join.",
         "Open_Questions has no unresolved blockers marked open without an owner.",
         "Example rows (jail booking sample) are replaced or clearly marked as examples.",
@@ -416,15 +459,15 @@ def add_readme_sheet(wb: Workbook) -> None:
             "Open Intake_Guide for the step-by-step flow and Field_Inventory column definitions.",
             "Complete Source_Summary with real source metadata (replace the jail example row).",
             "Add one Field_Inventory row per export field; use the RaceCode example as a demographics template.",
-            "Document code lists in Code_Values and record joins in Keys_and_Relationships.",
+            "Document code lists in Code_Values; add crosswalk rows in Crosswalk_Template where you know local → standard mappings.",
+            "Record joins in Keys_and_Relationships.",
             "Log blockers in Open_Questions, then review the Before you submit checklist on Intake_Guide.",
         ],
     )
 
 
 def main() -> None:
-    repo_root = Path(__file__).resolve().parent.parent
-    out_dir = repo_root / "workbooks"
+    out_dir = REPO_ROOT / "workbooks"
     out_dir.mkdir(parents=True, exist_ok=True)
     out_path = out_dir / OUT_NAME
 

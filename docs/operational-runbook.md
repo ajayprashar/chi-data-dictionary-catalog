@@ -165,6 +165,7 @@ When HL7 expansions or county survivorship mappings change in repo scripts:
 python scripts/build_value_set_members.py --write-cache
 python scripts/seed_county_master_crosswalk.py
 python scripts/seed_gender_identity_terminology.py
+python scripts/seed_partner_crosswalk_template.py
 python scripts/enrich_parquet_for_pbi.py
 python scripts/generate_steward_workbook.py
 ```

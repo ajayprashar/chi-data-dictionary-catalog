@@ -358,6 +358,7 @@ Copy this block when curating; check off in **Steward_Queue** or here as you go.
 - [x] Survivorship logic reviewed on Dictionary
 - [x] Source_Availability: at least one source with non-`unknown` availability
 - [x] Value_Set_Bindings → HL7 `gender-identity` ValueSet; 5 governed answer codes (SNOMED + UNK + asked-declined)
+- [x] Partner crosswalk template seeded (`source_id` = `partner_intake`, `draft`) — see `docs/partner-crosswalk-template.md`
 - [ ] Power BI Concept Profile verified after import
 
 ### `Patient.birth_sex`

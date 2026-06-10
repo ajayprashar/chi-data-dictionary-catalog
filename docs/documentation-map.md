@@ -31,6 +31,8 @@ Use this page as the index for which documents are actively maintained versus ke
   - SHIE governed standards (USCDI, US Core, CDCREC, BCP 47, NullFlavor) mapped to demographics pilot `semantic_id`s.
 - `docs/crosswalk-model.md`
   - Value set bindings, governed members, and source crosswalk tables (production terminology layer).
+- `docs/partner-crosswalk-template.md`
+  - Partner intake crosswalk pattern (local source codes → governed standards); `partner_intake` draft rows.
 - `docs/cmt-adt-feed-and-master-patient.md`
   - CMT ADT profile and how it maps into the catalog model.
 - `docs/adding-data-sources.md`

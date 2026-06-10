@@ -18,3 +18,10 @@ County survivorship **source → standard** mappings:
 - **`scripts/seed_county_master_crosswalk.py`** — validates and writes `ddc-source_value_crosswalk.parquet`
 
 See **docs/crosswalk-model.md** (responsible design section).
+
+Partner intake crosswalk (local codes → governed standards):
+
+- **`partner_crosswalk_template.py`** — starter rows for `partner_intake` (`draft`)
+- **`scripts/seed_partner_crosswalk_template.py`** — merges into crosswalk parquet without overwriting `county_master`
+
+See **docs/partner-crosswalk-template.md**.

@@ -149,3 +149,17 @@ Rows ship with `approval_status` = `draft` until the steward validates in Excel 
 **Still separate:** CMT ADT `PID-10` / `PID-22` CE codes (often low fill) — add under `source_id` = `cmt` when a validated ADT code list is available.
 
 Set `approval_status` to `Approved` when mappings are steward-signed.
+
+---
+
+## Partner crosswalk template (`partner_intake`)
+
+When a **partner** onboards (jail, clinic, ADT feed), they document local codes in **`chi-partner-intake-workbook.xlsx`** → **Crosswalk_Template** sheet. CHI copies approved rows into steward **Source_Value_Crosswalk** with the real `source_id`.
+
+| Item | Location |
+|------|----------|
+| Example mappings (gender identity + pattern race row) | `data/partner_crosswalk_template.py` |
+| Seed into parquet (draft rows, does not touch `county_master`) | `python scripts/seed_partner_crosswalk_template.py` |
+| Partner how-to | `docs/partner-crosswalk-template.md` |
+
+Template rows ship with `approval_status` = `draft` and `source_id` = `partner_intake` so Power BI shows the pattern before a steward signs partner-specific mappings.

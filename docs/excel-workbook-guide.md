@@ -135,6 +135,8 @@ See **Table_Index** sheet for the full map. Naming pattern: `chi_{artifact}` in 
 
 Use when onboarding an external source (jail, HMIS, etc.). Not required for the demographics POC.
 
+**Crosswalk_Template** — partner documents local code → CHI standard mappings (same columns as steward **Source_Value_Crosswalk**). See **`docs/partner-crosswalk-template.md`**.
+
 Each data sheet is a named Excel Table (`chi_intake_*`). Allowed values are in **Lookup_Lists** (no dropdown validations).
 
 | Excel Table | Sheet tab |
@@ -142,6 +144,7 @@ Each data sheet is a named Excel Table (`chi_intake_*`). Allowed values are in *
 | `chi_intake_source_summary` | Source_Summary |
 | `chi_intake_field_inventory` | Field_Inventory |
 | `chi_intake_code_values` | Code_Values |
+| `chi_intake_crosswalk_template` | Crosswalk_Template |
 | `chi_intake_keys_relationships` | Keys_and_Relationships |
 | `chi_intake_open_questions` | Open_Questions |
 | `chi_intake_curation_bridge` | CHI_Curation_Bridge |
