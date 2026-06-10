@@ -1,13 +1,13 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
-  "name": "06dd5122752656439f47",
+  "name": "86be5cb357f6bd128ca3",
   "position": {
     "x": 32,
-    "y": 20,
-    "z": 1,
-    "height": 56,
-    "width": 1200,
-    "tabOrder": 1
+    "y": 80,
+    "z": 2,
+    "height": 40,
+    "width": 1750,
+    "tabOrder": 2
   },
   "visual": {
     "visualType": "textbox",
@@ -19,11 +19,10 @@
               {
                 "textRuns": [
                   {
-                    "value": "Report field guide",
+                    "value": "Page summary + column reference: layer, interoperability role, standards URL, Excel source",
                     "textStyle": {
-                      "fontSize": "28pt",
-                      "color": "#FFFFFF",
-                      "fontWeight": "bold"
+                      "fontSize": "13pt",
+                      "color": "#FFFFFF"
                     }
                   }
                 ]

@@ -20,6 +20,7 @@ from pbip_report_manifest import (  # noqa: E402
     LAYER_QUESTIONS,
     PAGES,
     VISUALS,
+    resolve_standards_url,
 )
 
 
@@ -42,6 +43,7 @@ def build_guide_rows() -> list[dict]:
                     "page_display_name": page["page_display_name"],
                     "page_purpose": page["page_purpose"],
                     "page_interop_summary": page["page_interop_summary"],
+                    "primary_audience": page.get("primary_audience", ""),
                     "visual_title": visual["visual_title"],
                     "sort_order": str(sort_order),
                     "semantic_model_table": visual["semantic_model_table"],
@@ -51,6 +53,7 @@ def build_guide_rows() -> list[dict]:
                     "purpose_short": meta["purpose_short"],
                     "interop_role": meta["interop_role"],
                     "standards_touchpoint": meta["standards_touchpoint"],
+                    "standards_url": resolve_standards_url(meta["standards_touchpoint"], meta),
                     "exchange_formats": meta["exchange_formats"],
                     "excel_sheet": meta["excel_sheet"],
                     "editable_in_excel": meta["editable_in_excel"],
@@ -69,6 +72,10 @@ def generate(out_path: Path | None = None) -> Path:
     return out
 
 
+def default_field_rows(rows: list[dict]) -> list[dict]:
+    return [r for r in rows if r["purpose_short"] == DEFAULT_FIELD["purpose_short"]]
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -78,10 +85,35 @@ def main() -> None:
         default=REPO / GUIDE_PARQUET,
         help="Output parquet path",
     )
+    parser.add_argument(
+        "--skip-validate",
+        action="store_true",
+        help="Do not compare manifest to live PBIP visual.json projections",
+    )
+    parser.add_argument(
+        "--strict",
+        action="store_true",
+        help="Exit non-zero if manifest/PBIP validation fails",
+    )
     args = parser.parse_args()
+    if not args.skip_validate:
+        from validate_pbip_manifest import validate_manifest  # noqa: E402
+
+        errors = validate_manifest()
+        if errors:
+            print("Manifest vs PBIP validation issues:")
+            for err in errors:
+                print(f"  - {err}")
+            if args.strict:
+                raise SystemExit(1)
+        else:
+            print("Manifest vs PBIP validation: OK")
     rows = build_guide_rows()
     out = generate(args.output.resolve())
+    defaults = default_field_rows(rows)
     print(f"Wrote {len(rows)} guide rows to {out}")
+    if defaults:
+        print(f"  {len(defaults)} row(s) still use DEFAULT_FIELD prose — extend FIELD_GUIDE in pbip_report_manifest.py")
 
 
 if __name__ == "__main__":

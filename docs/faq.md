@@ -99,11 +99,12 @@ Stable spine joining catalog, dictionary, terminology, crosswalk, ADT/CCDA, and 
 
 ## Where is the in-report field guide?
 
-Open the **Field guide** tab in Power BI. Use slicers to pick a report page and table/visual; the detail table explains each column’s layer (Catalog / Dictionary / Context), interoperability role, and Excel authoring sheet.
+Open the **Field guide** tab in Power BI. Use slicers to pick a report page and table/visual. **Summary cards** show page purpose, interoperability summary, and primary audience; the detail table explains each column’s layer, role, standards URL, and Excel authoring sheet.
 
 Regenerate after layout changes:
 
 ```powershell
+python scripts/validate_pbip_manifest.py
 python scripts/generate_pbip_model_guide.py
 python scripts/add_pbip_documentation_page.py
 ```

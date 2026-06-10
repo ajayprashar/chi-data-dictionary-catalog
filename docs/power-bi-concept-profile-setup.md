@@ -20,7 +20,15 @@ The report includes four pages:
 
 Add or refresh **Start here** only: `python scripts/add_pbip_start_here_page.py` (does not rebuild other pages).
 
-Regenerate **Field guide** (parquet + page): `python scripts/generate_pbip_model_guide.py` then `python scripts/add_pbip_documentation_page.py`.
+Regenerate **Field guide** (parquet + page):
+
+```powershell
+python scripts/validate_pbip_manifest.py
+python scripts/generate_pbip_model_guide.py
+python scripts/add_pbip_documentation_page.py
+```
+
+The Field guide tab includes **page summary cards** (purpose, interoperability summary, audience) plus column detail with `standards_url`. After changing PBIP table columns, update `data/pbip_report_manifest.py` so validation stays green.
 
 **Default landing page:** **Standards & Contexts** (opens on load). **Start here** remains the first tab for orientation.
 

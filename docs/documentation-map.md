@@ -27,7 +27,7 @@ Use this page as the index for which documents are actively maintained versus ke
 - `docs/faq.md`
   - Catalog vs dictionary, PBIP pages vs tables, where to edit vs read (steward and demo audiences).
 - `data/pbip_report_manifest.py`
-  - Source manifest for in-report Field guide (`ddc-application_guide.parquet`); regenerate via `scripts/generate_pbip_model_guide.py`.
+  - Source manifest for in-report Field guide (`ddc-application_guide.parquet`); validate with `scripts/validate_pbip_manifest.py`; regenerate via `scripts/generate_pbip_model_guide.py`.
 - `docs/jupyter-duckdb-parquet-setup.md`
   - Optional ad-hoc DuckDB queries over Parquet (not the primary viewer).
 - `docs/cleanup-methodology.md`

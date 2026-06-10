@@ -1,13 +1,13 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
-  "name": "891aa91258551d90fc6b",
+  "name": "33901bcfecb08876dec3",
   "position": {
     "x": 32,
-    "y": 364,
-    "z": 6,
-    "height": 652,
+    "y": 420,
+    "z": 9,
+    "height": 596,
     "width": 1856,
-    "tabOrder": 6
+    "tabOrder": 9
   },
   "visual": {
     "visualType": "tableEx",
@@ -98,6 +98,20 @@
               },
               "queryRef": "ddc-application_guide.standards_touchpoint",
               "nativeQueryRef": "standards_touchpoint"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ddc-application_guide"
+                    }
+                  },
+                  "Property": "standards_url"
+                }
+              },
+              "queryRef": "ddc-application_guide.standards_url",
+              "nativeQueryRef": "standards_url"
             },
             {
               "field": {

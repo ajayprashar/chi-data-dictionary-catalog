@@ -251,7 +251,8 @@ When SharePoint becomes available, move the workbook and published parquet to a 
 | `generate_steward_workbook.py` | After parquet rebuilt by other scripts | Maintainer |
 | `seed_demographics_pilot.py` | Re-seed pilot content from plan text | Maintainer only |
 | `enhance_pbip_report.py` | PBIP full layout regen (includes Field guide) | Maintainer only |
-| `generate_pbip_model_guide.py` | Regenerate `ddc-application_guide.parquet` from manifest | Maintainer; after manifest or column changes |
+| `generate_pbip_model_guide.py` | Regenerate `ddc-application_guide.parquet` from manifest (runs manifest validation) | Maintainer; after manifest or column changes |
+| `validate_pbip_manifest.py` | Compare manifest VISUALS to live PBIP `visual.json` columns | Maintainer; before/after layout edits |
 | `add_pbip_documentation_page.py` | Field guide PBIP tab + semantic model table | Maintainer; after guide parquet regen |
 | `add_pbip_start_here_page.py` | Start here tab (purpose + sources of truth) | Maintainer; safe to re-run |
 | `patch_pbip_readability.py` | Slicer width, table word wrap, FHIR columns, vertical layout | Maintainer; safe to re-run |
