@@ -1,140 +1,54 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
-  "name": "d4fa502e50dfb0d451b9",
+  "name": "88caedb9e3a6465830ed",
   "position": {
     "x": 32,
     "y": 140,
     "z": 3,
-    "height": 120,
+    "height": 328,
     "width": 920,
     "tabOrder": 3
   },
   "visual": {
-    "visualType": "slicer",
-    "query": {
-      "queryState": {
-        "Values": {
-          "projections": [
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "ddc-master_patient_catalog"
-                    }
-                  },
-                  "Property": "semantic_id"
-                }
-              },
-              "queryRef": "ddc-master_patient_catalog.semantic_id",
-              "nativeQueryRef": "semantic_id",
-              "active": true
-            }
-          ]
-        }
-      }
-    },
+    "visualType": "textbox",
     "objects": {
-      "data": [
-        {
-          "properties": {
-            "mode": {
-              "expr": {
-                "Literal": {
-                  "Value": "'Dropdown'"
-                }
-              }
-            }
-          }
-        }
-      ],
-      "header": [
-        {
-          "properties": {
-            "show": {
-              "expr": {
-                "Literal": {
-                  "Value": "false"
-                }
-              }
-            }
-          }
-        }
-      ],
-      "items": [
-        {
-          "properties": {
-            "fontColor": {
-              "solid": {
-                "color": {
-                  "expr": {
-                    "Literal": {
-                      "Value": "'#000000'"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      ],
-      "selection": [
-        {
-          "properties": {
-            "selectAllCheckboxEnabled": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            }
-          }
-        }
-      ],
       "general": [
         {
           "properties": {
-            "filter": {
-              "filter": {
-                "Version": 2,
-                "From": [
+            "paragraphs": [
+              {
+                "textRuns": [
                   {
-                    "Name": "d",
-                    "Entity": "ddc-master_patient_catalog",
-                    "Type": 0
+                    "value": "This application is CHI's read surface for governed patient concepts (semantic_id). It shows what CHI stewards have approved, how each concept maps to USCDI and US Core, which terminology bindings apply, and where attributes appear in HL7 ADT, C-CDA, and FHIR.",
+                    "textStyle": {
+                      "fontSize": "12pt",
+                      "color": "#000000"
+                    }
                   }
-                ],
-                "Where": [
+                ]
+              },
+              {
+                "textRuns": [
                   {
-                    "Condition": {
-                      "In": {
-                        "Expressions": [
-                          {
-                            "Column": {
-                              "Expression": {
-                                "SourceRef": {
-                                  "Source": "d"
-                                }
-                              },
-                              "Property": "semantic_id"
-                            }
-                          }
-                        ],
-                        "Values": [
-                          [
-                            {
-                              "Literal": {
-                                "Value": "'Patient.ethnicity'"
-                              }
-                            }
-                          ]
-                        ]
-                      }
+                    "value": "",
+                    "textStyle": {
+                      "fontSize": "6pt"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "Excel is the authoring surface; parquet is the published machine copy; Power BI is for discovery and review.",
+                    "textStyle": {
+                      "fontSize": "12pt",
+                      "color": "#000000"
                     }
                   }
                 ]
               }
-            }
+            ]
           }
         }
       ]
@@ -153,7 +67,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Select governed concept (semantic_id)'"
+                  "Value": "'Purpose'"
                 }
               }
             },
@@ -169,7 +83,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#000000'"
+                      "Value": "'#FFFFFF'"
                     }
                   }
                 }
@@ -180,7 +94,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#FFC000'"
+                      "Value": "'#0047AB'"
                     }
                   }
                 }
@@ -243,14 +157,14 @@
             "top": {
               "expr": {
                 "Literal": {
-                  "Value": "14D"
+                  "Value": "10D"
                 }
               }
             },
             "bottom": {
               "expr": {
                 "Literal": {
-                  "Value": "14D"
+                  "Value": "10D"
                 }
               }
             },

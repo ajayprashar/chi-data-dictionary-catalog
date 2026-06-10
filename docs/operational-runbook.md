@@ -114,7 +114,7 @@ python scripts/import_steward_workbook_to_parquet.py
 
 6. Open PBIP → **Home → Refresh**.
 7. Spot-check **Concept Profile** and **Standards & Contexts** for at least one changed `semantic_id`. On **Standards & Contexts**, confirm:
-   - **Governed value set codes** shows ~21 rows (OMB rollup + pilot codes), not 900+ HL7 detailed race codes.
+   - **Governed value set codes** shows ~26 rows (OMB rollup + pilot codes incl. gender identity), not 900+ HL7 detailed race codes.
    - **HL7 ADT context** shows one row per CE field (`PID-10`, `PID-22`, `PID-16`) with `hl7_ce_encoding` like `PID-22.1^PID-22.2`.
 8. Commit (see [Git commit policy](#git-commit-policy)).
 9. Notify reviewers: “Published — please `git pull` and Refresh.”
@@ -249,7 +249,10 @@ When SharePoint becomes available, move the workbook and published parquet to a 
 | `import_steward_workbook_to_parquet.py` | **Every publish** | Publisher |
 | `generate_steward_workbook.py` | After parquet rebuilt by other scripts | Maintainer |
 | `seed_demographics_pilot.py` | Re-seed pilot content from plan text | Maintainer only |
-| `enhance_pbip_report.py` | PBIP layout/theme changes | Maintainer only |
+| `enhance_pbip_report.py` | PBIP full layout regen (maintainer) | Maintainer only |
+| `add_pbip_start_here_page.py` | Start here tab (purpose + sources of truth) | Maintainer; safe to re-run |
+| `patch_pbip_readability.py` | Slicer width, table word wrap, FHIR columns, vertical layout | Maintainer; safe to re-run |
+| `seed_demographics_pilot.py` | Multiline `data_quality_notes` / survivorship for five pilots | After note edits |
 | `build_*` / `split_*` / `build_standards_inventories.py` | Mapping CSV or schema rebuilds | Maintainer only |
 
 Stewards should only need **import** for daily work.

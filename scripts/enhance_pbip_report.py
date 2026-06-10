@@ -5,7 +5,25 @@ from __future__ import annotations
 
 import json
 import secrets
+import sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from pbip_layout_constants import (  # noqa: E402
+    CONTENT_W,
+    DEFAULT_LANDING_PAGE_ID,
+    FHIR_STANDARDS_COLUMNS,
+    FHIR_STANDARDS_TABLE_H,
+    PAGE_MARGIN,
+    SLICER_H_PROFILE,
+    SLICER_H_STANDARDS,
+    SLICER_W,
+    STANDARDS_HALF_TABLE_H,
+    STANDARDS_HEADER_H,
+    STANDARDS_LAYER_H,
+    STANDARDS_TABLE_GAP,
+    standards_page_y_positions,
+)
 
 REPO = Path(__file__).resolve().parent.parent
 PBIP = REPO / "workbooks" / "pbip"
@@ -191,8 +209,16 @@ def card_format(*, value_pt: int = 26, label_pt: int = 12) -> dict:
     }
 
 
-def table_format(*, header_pt: int = 12, value_pt: int = 12) -> dict:
+def table_format(*, header_pt: int = 12, value_pt: int = 12, word_wrap: bool = True) -> dict:
     """Column header row uses light blue + navy text; container title stays dark blue (see container_title)."""
+    value_props: dict = {
+        "fontSize": lit_pt(value_pt),
+        "fontColorPrimary": {"solid": {"color": lit_str(TEXT_BLACK)}},
+        "backColorPrimary": {"solid": {"color": lit_str(TEXT_WHITE)}},
+        "backColorSecondary": {"solid": {"color": lit_str(BG_LIGHT)}},
+    }
+    if word_wrap:
+        value_props["wordWrap"] = lit_bool(True)
     return {
         "columnHeaders": [
             {
@@ -205,16 +231,7 @@ def table_format(*, header_pt: int = 12, value_pt: int = 12) -> dict:
                 }
             }
         ],
-        "values": [
-            {
-                "properties": {
-                    "fontSize": lit_pt(value_pt),
-                    "fontColorPrimary": {"solid": {"color": lit_str(TEXT_BLACK)}},
-                    "backColorPrimary": {"solid": {"color": lit_str(TEXT_WHITE)}},
-                    "backColorSecondary": {"solid": {"color": lit_str(BG_LIGHT)}},
-                }
-            }
-        ],
+        "values": [{"properties": value_props}],
         "grid": [
             {
                 "properties": {
@@ -424,11 +441,11 @@ def clear_visuals(page_dir: Path) -> None:
 def build_concept_profile_page(page_dir: Path) -> None:
     clear_visuals(page_dir)
     w, h = PAGE_PROFILE_W, PAGE_PROFILE_H
-    margin = 32
-    content_w = w - (margin * 2)
+    margin = PAGE_MARGIN
+    content_w = CONTENT_W
     header_h = 128
     slicer_y = header_h + 12
-    slicer_h = 132
+    slicer_h = SLICER_H_PROFILE
     cards_y = slicer_y + slicer_h + 16
     card_h = 156
     tables_y = cards_y + card_h + 20
@@ -448,7 +465,7 @@ def build_concept_profile_page(page_dir: Path) -> None:
             "Concept profile — catalog, dictionary, and source availability on one semantic_id",
             size="13pt", color=TEXT_WHITE, transparent=True,
         ),
-        slicer_dropdown(vid(), margin, slicer_y, content_w, slicer_h, 3, CATALOG, "semantic_id", "Patient.race"),
+        slicer_dropdown(vid(), margin, slicer_y, SLICER_W, slicer_h, 3, CATALOG, "semantic_id", "Patient.race"),
         *[
             card(
                 vid(),
@@ -500,19 +517,20 @@ def build_concept_profile_page(page_dir: Path) -> None:
 def build_standards_contexts_page(page_dir: Path) -> None:
     clear_visuals(page_dir)
     w, h = PAGE_PROFILE_W, PAGE_PROFILE_H
-    margin = 32
-    content_w = w - (margin * 2)
-    header_h = 128
+    margin = PAGE_MARGIN
+    content_w = CONTENT_W
+    header_h = STANDARDS_HEADER_H
     layer_y = header_h + 8
-    layer_h = 72
-    slicer_y = layer_y + layer_h + 12
-    slicer_h = 120
-    tables_y = slicer_y + slicer_h + 16
-    fhir_h = 170
-    codes_y = tables_y + fhir_h + 12
-    codes_h = 200
-    adt_ccda_y = codes_y + codes_h + 12
-    adt_h = 200
+    layer_h = STANDARDS_LAYER_H
+    layout = standards_page_y_positions()
+    slicer_y = layout["slicer_y"]
+    slicer_h = SLICER_H_STANDARDS
+    tables_y = layout["fhir_y"]
+    fhir_h = FHIR_STANDARDS_TABLE_H
+    codes_y = layout["codes_y"]
+    codes_h = STANDARDS_HALF_TABLE_H
+    adt_ccda_y = layout["adt_y"]
+    adt_h = STANDARDS_HALF_TABLE_H
     footer_h = 52
     half_w = (content_w - 16) // 2
     visuals = [
@@ -532,10 +550,10 @@ def build_standards_contexts_page(page_dir: Path) -> None:
             STANDARDS_LAYER_TEXT,
             size="12pt", color=TEXT_BLACK,
         ),
-        slicer_dropdown(vid(), margin, slicer_y, content_w, slicer_h, 4, CATALOG, "semantic_id", "Patient.race"),
+        slicer_dropdown(vid(), margin, slicer_y, SLICER_W, slicer_h, 4, CATALOG, "semantic_id", "Patient.race"),
         table_ex(
             vid(), margin, tables_y, content_w, fhir_h, 5, DICTIONARY,
-            ["semantic_id", "fhir_r4_path", "fhir_profile", "data_quality_notes", "chi_survivorship_logic"],
+            FHIR_STANDARDS_COLUMNS,
             title="FHIR R4 + US Core (Dictionary)",
         ),
         table_ex(
@@ -834,6 +852,7 @@ def write_chi_theme() -> None:
                             "fontColorPrimary": {"solid": {"color": TEXT_BLACK}},
                             "backColorPrimary": {"solid": {"color": TEXT_WHITE}},
                             "backColorSecondary": {"solid": {"color": BG_LIGHT}},
+                            "wordWrap": True,
                         }
                     ],
                     "grid": [
@@ -915,16 +934,20 @@ def write_page_json(page_dir: Path, page_id: str, display_name: str, *, width: i
 
 
 def main() -> None:
+    from add_pbip_start_here_page import START_HERE_PAGE_ID, START_HERE_DISPLAY_NAME
+
+    start_id = START_HERE_PAGE_ID
     profile_id = "abc963c80ac5ed2deeb4"
     standards_id = "d4e5f6a7b8c901234567"
     overview_id = "c8f1a2b3d4e5f6071829"
+    start_page = REPORT / "pages" / start_id
     profile_page = REPORT / "pages" / profile_id
     standards_page = REPORT / "pages" / standards_id
     overview_page = REPORT / "pages" / overview_id
-    profile_page.mkdir(parents=True, exist_ok=True)
-    standards_page.mkdir(parents=True, exist_ok=True)
-    overview_page.mkdir(parents=True, exist_ok=True)
+    for p in (start_page, profile_page, standards_page, overview_page):
+        p.mkdir(parents=True, exist_ok=True)
 
+    write_page_json(start_page, start_id, START_HERE_DISPLAY_NAME, width=PAGE_PROFILE_W, height=PAGE_PROFILE_H)
     write_page_json(profile_page, profile_id, "Concept Profile", width=PAGE_PROFILE_W, height=PAGE_PROFILE_H)
     write_page_json(standards_page, standards_id, "Standards & Contexts", width=PAGE_PROFILE_W, height=PAGE_PROFILE_H)
     write_page_json(overview_page, overview_id, "Governance Overview", width=PAGE_OVERVIEW_W, height=PAGE_OVERVIEW_H)
@@ -933,8 +956,8 @@ def main() -> None:
         json.dumps(
             {
                 "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/pagesMetadata/1.1.0/schema.json",
-                "pageOrder": [profile_id, standards_id, overview_id],
-                "activePageName": profile_id,
+                "pageOrder": [start_id, profile_id, standards_id, overview_id],
+                "activePageName": DEFAULT_LANDING_PAGE_ID,
             },
             indent=2,
         ),
@@ -944,6 +967,9 @@ def main() -> None:
     sync_semantic_model()
     write_chi_theme()
     update_report_json()
+    from add_pbip_start_here_page import build_start_here_page
+
+    build_start_here_page(start_page)
     build_concept_profile_page(profile_page)
     build_standards_contexts_page(standards_page)
     build_overview_page(overview_page)

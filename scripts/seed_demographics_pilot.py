@@ -37,20 +37,20 @@ CATALOG_UPDATES: dict[str, dict[str, str]] = {
 DICTIONARY_UPDATES: dict[str, dict[str, str]] = {
     "Patient.race": {
         "chi_survivorship_logic": (
-            "County: CDC PHIN Race/Ethnicity v1.3 OMB rollup (R1–R5, R9, Multi-Racial). "
-            "Detail trumps rollup (e.g. Japanese > Asian). "
-            "Exclude Unknown, DTS, Other Race from aggregates. Self-report first; "
-            "else reliability-tiered (FQHC/community > BH > hospital > payer). "
-            "Multi-racial when consistent across sources. Alert on unmapped values for curation."
+            "County: CDC PHIN OMB rollup (R1–R5, R9, Multi-Racial)\n"
+            "Detail trumps rollup (e.g. Japanese > Asian)\n"
+            "Exclude Unknown, DTS, Other Race from aggregates\n"
+            "Self-report first; else reliability-tiered (FQHC/community > BH > hospital > payer)\n"
+            "Multi-racial when consistent; alert on unmapped values"
         ),
         "data_quality_notes": (
-            "Terminology: CDCREC OID urn:oid:2.16.840.1.113883.6.238; HL7 Race Value Set "
-            "(terminology.hl7.org/ValueSet-v3-Race). US Core us-core-race: ombCategory (required), "
-            "detailed (optional), text. Example ombCategory codes: 1002-5 AI/AN, 2028-9 Asian, "
-            "2054-5 Black, 2076-8 NH/PI, 2106-3 White, 2131-1 Other. "
-            "Non-values: HL7 NullFlavor OID urn:oid:2.16.840.1.113883.5.1008 - unknown, declined, "
-            "and missing are distinct. Reporting rollup: OMB/CDC PHIN v1.3 + county Table 5. "
-            "28+ source race values; granularity varies by source."
+            "Terminology: CDCREC urn:oid:2.16.840.1.113883.6.238\n"
+            "Value set: HL7 v3-Race\n"
+            "US Core: us-core-race ombCategory (required), detailed (optional), text\n"
+            "OMB examples: 1002-5, 2028-9, 2054-5, 2076-8, 2106-3, 2131-1\n"
+            "NullFlavor: unknown, declined, missing are distinct\n"
+            "Reporting: OMB/CDC PHIN v1.3 + county Table 5\n"
+            "Sources: 28+ race values; granularity varies"
         ),
         "data_source_rank_reference": (
             "CMT expanded pop. Reliability tiers 1–3. Highland #1, Alliance #7, Housing #20 (Mark Table 2)."
@@ -58,18 +58,20 @@ DICTIONARY_UPDATES: dict[str, dict[str, str]] = {
     },
     "Patient.ethnicity": {
         "chi_survivorship_logic": (
-            "County: CDC OMB ethnicity rollup (Hispanic or Latino / Not Hispanic or Latino). "
-            "Detail trumps rollup (e.g. Mexican, Cuban > Hispanic or Latino). "
-            "Exclude Unknown, declined, and patient-refused from aggregates. "
-            "Self-report first; reliability-tiered fallback."
+            "County: CDC OMB ethnicity rollup (Hispanic or Latino / Not Hispanic or Latino)\n"
+            "Detail trumps rollup (e.g. Mexican, Cuban > Hispanic or Latino)\n"
+            "Exclude Unknown, declined, patient-refused from aggregates\n"
+            "Self-report first; reliability-tiered fallback"
         ),
         "data_quality_notes": (
-            "Terminology: CDCREC OID urn:oid:2.16.840.1.113883.6.238; HL7 Ethnicity Value Set "
-            "(terminology.hl7.org/ValueSet-v3-Ethnicity). US Core us-core-ethnicity extension. "
-            "Example codes: 2135-2 Hispanic or Latino, 2186-5 Not Hispanic or Latino; "
-            "detail (Mexican, Cuban) maps to rollup. "
-            "Non-values: HL7 NullFlavor - do not collapse unknown, declined, patient-refused. "
-            "Reporting: OMB E1/E2 + county Table 5. 7+ source values; Housing high coverage."
+            "Terminology: CDCREC urn:oid:2.16.840.1.113883.6.238\n"
+            "Value set: HL7 v3-Ethnicity\n"
+            "US Core: us-core-ethnicity extension\n"
+            "OMB examples: 2135-2 Hispanic or Latino, 2186-5 Not Hispanic or Latino\n"
+            "Detail (Mexican, Cuban) maps to rollup\n"
+            "NullFlavor: do not collapse unknown, declined, patient-refused\n"
+            "Reporting: OMB E1/E2 + county Table 5\n"
+            "Sources: 7+ values; Housing high coverage"
         ),
         "data_source_rank_reference": (
             "CMT expanded pop. Reliability tiers 1–3. Highland #1, Alliance #7, Housing #20 (Mark Table 2)."
@@ -77,46 +79,52 @@ DICTIONARY_UPDATES: dict[str, dict[str, str]] = {
     },
     "Patient.language": {
         "chi_survivorship_logic": (
-            "County: ISO 639 detail preferred over macrolanguage rollup (e.g. Japanese > Asian group). "
-            "Preferred/self-reported language wins when timestamped. "
-            "Exclude undetermined and declined-to-specify from aggregates. "
-            "Interpreter/clinical context may override when documented."
+            "County: ISO 639 detail preferred over macrolanguage (e.g. Japanese > Asian group)\n"
+            "Preferred/self-reported language wins when timestamped\n"
+            "Exclude undetermined and declined-to-specify from aggregates\n"
+            "Interpreter/clinical context may override when documented"
         ),
         "data_quality_notes": (
-            "Terminology: BCP 47 urn:ietf:bcp:47 is primary FHIR binding for Patient.communication.language "
-            "(RFC 5646). ISO 639 lists are stewardship/crosswalk only, not primary exchange binding. "
-            "HL7 Languages value set for reference. Exclude undetermined (und) and declined from aggregates. "
-            "County Table 4 – Language Groupings. 112+ source values; critical for Mam-speaking outreach."
+            "Terminology: BCP 47 urn:ietf:bcp:47 (RFC 5646)\n"
+            "FHIR: Patient.communication.language (primary binding)\n"
+            "ISO 639: stewardship/crosswalk only, not primary exchange\n"
+            "Exclude: undetermined (und) and declined from aggregates\n"
+            "County: Table 4 Language Groupings\n"
+            "Sources: 112+ values; critical for Mam-speaking outreach"
         ),
         "data_source_rank_reference": "Highland #1 (broad language capture); St Rose #17 per Mark Table 2.",
     },
     "Patient.gender_id": {
         "chi_survivorship_logic": (
-            "County: Gender identity is self-reported; patient preference always wins. "
-            "Most recent valid value with timestamp. US Core v5+ Observation (LOINC 76691-5). "
-            "Rollup for visuals may collapse transition labels per equity policy — detail retained for drill-through. "
-            "Do not apply CMT SexID survivorship here; that governs birth sex."
+            "County: Gender identity is self-reported; patient preference wins\n"
+            "Most recent valid value with timestamp\n"
+            "US Core: Observation LOINC 76691-5\n"
+            "Equity rollup may collapse transition labels; detail kept for drill-through\n"
+            "Not CMT SexID — that governs Patient.birth_sex only"
         ),
         "data_quality_notes": (
-            "US Core: Observation LOINC 76691-5; answers bind HL7 gender-identity ValueSet (SNOMED minimum set, extensible). "
-            "SNOMED CT OID urn:oid:2.16.840.1.113883.6.96. "
-            "Distinct from Patient.birth_sex (us-core-birthsex / CMT SexID). "
-            "Table 2 – Gender Groupings applies to SBR administrative rollup only, not this identity element."
+            "US Core: Observation LOINC 76691-5\n"
+            "Answers: HL7 gender-identity ValueSet (SNOMED minimum, extensible)\n"
+            "OID: urn:oid:2.16.840.1.113883.6.96\n"
+            "Not: Patient.birth_sex / CMT SexID\n"
+            "County Table 2: SBR administrative rollup only — not this element"
         ),
         "data_source_rank_reference": "Patient-facing and community sources prioritized over administrative SexID.",
     },
     "Patient.birth_sex": {
         "chi_survivorship_logic": (
-            "County: CMT SexID logic — ignore Unknown (U) as null at master level. "
-            "Most recently modified among valid values. Reliability-weighted when sources conflict; UMPI matching. "
-            "Clinical/legal sources may trump self-report per policy. "
-            "SBR rollup: Male to Female → Female, Female to Male → Male (Table 2)."
+            "County: CMT SexID — ignore Unknown (U) as null at master level\n"
+            "Most recently modified among valid values\n"
+            "Reliability-weighted when sources conflict; UMPI matching\n"
+            "Clinical/legal sources may trump self-report per policy\n"
+            "SBR rollup: Male to Female → Female, Female to Male → Male (Table 2)"
         ),
         "data_quality_notes": (
-            "US Core: us-core-birthsex extension on Patient. Administrative sex codes — not CDCREC race/ethnicity. "
-            "NullFlavor: Unknown (U) treated as null at master level. "
-            "UMPI matching field; not interchangeable with gender identity (LOINC 76691-5). "
-            "County Table 2 – Gender Groupings for SBR rollup (e.g. Male to Female → Female)."
+            "US Core: us-core-birthsex extension on Patient\n"
+            "Administrative sex codes — not CDCREC race/ethnicity\n"
+            "NullFlavor: Unknown (U) treated as null at master level\n"
+            "UMPI matching; not interchangeable with gender identity (LOINC 76691-5)\n"
+            "County Table 2 Gender Groupings for SBR rollup"
         ),
         "data_source_rank_reference": (
             "Verato UMPI match field; hospital registration over low-reliability EMS sources."

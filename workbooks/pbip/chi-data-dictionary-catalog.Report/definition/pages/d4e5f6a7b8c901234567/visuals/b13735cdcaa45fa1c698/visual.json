@@ -3,9 +3,9 @@
   "name": "b13735cdcaa45fa1c698",
   "position": {
     "x": 32,
-    "y": 356,
+    "y": 344,
     "z": 5,
-    "height": 170,
+    "height": 248,
     "width": 1856,
     "tabOrder": 5
   },
@@ -70,20 +70,6 @@
               },
               "queryRef": "ddc-master_patient_dictionary.data_quality_notes",
               "nativeQueryRef": "data_quality_notes"
-            },
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "ddc-master_patient_dictionary"
-                    }
-                  },
-                  "Property": "chi_survivorship_logic"
-                }
-              },
-              "queryRef": "ddc-master_patient_dictionary.chi_survivorship_logic",
-              "nativeQueryRef": "chi_survivorship_logic"
             }
           ]
         }
@@ -172,6 +158,13 @@
                       "Value": "'#FFF9E6'"
                     }
                   }
+                }
+              }
+            },
+            "wordWrap": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
                 }
               }
             }

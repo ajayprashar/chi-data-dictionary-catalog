@@ -20,7 +20,7 @@ Edit `chi-steward-workbook.xlsx` → import to parquet → review in Power BI (*
 | `Catalog` + `Dictionary` + `Source_Availability` + `ADT_Mappings` + `CCDA_Mappings` | See `docs/power-bi-concept-profile-setup.md` | Partner intake workbook |
 | `Concept_Explorer` sheet | Jupyter notebook (`chi-data-dictionary-catalog.ipynb`) for ad-hoc DuckDB queries only | Full 28-source coverage |
 | `import_steward_workbook_to_parquet.py` | | Azure DevOps, Innovaccer DEM |
-| 5 demographics attributes | | FHIR inventory curation |
+| 5 demographics attributes | `workbooks/chi-partner-intake-workbook.xlsx` when onboarding partners | FHIR inventory curation |
 
 **POC goal:** prove governed catalog + dictionary + standards + message contexts (ADT/CDA/FHIR) on one `semantic_id`.
 
@@ -67,9 +67,12 @@ Terminology and crosswalk rebuild (see `docs/crosswalk-model.md`):
 python scripts/build_value_set_members.py --write-cache
 python scripts/seed_county_master_crosswalk.py
 python scripts/seed_gender_identity_terminology.py
+python scripts/seed_partner_crosswalk_template.py
 python scripts/enrich_parquet_for_pbi.py
 python scripts/generate_steward_workbook.py
 ```
+
+PBIP layout (maintainers): `python scripts/add_pbip_start_here_page.py` · `python scripts/patch_pbip_readability.py`
 
 ---
 
@@ -121,6 +124,7 @@ python scripts/generate_intake_workbook.py
 ### Documentation
 
 - `docs/product-vision.md` — north star (governance + standards + ADT/CDA/FHIR contexts)
+- `docs/sources-of-truth.md` — layered authority (US standards, DAP, CHI publish, crosswalk)
 - `docs/demographics-pilot-plan.md` — pilot status, phased plan, per-attribute checklist
 - `docs/shie-standards-reference.md` — SHIE standards (CDCREC, US Core, BCP 47) → pilot attributes
 - `docs/crosswalk-model.md` — value set bindings, governed codes, source crosswalk tables

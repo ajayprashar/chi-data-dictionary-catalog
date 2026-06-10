@@ -8,6 +8,8 @@ Use this page as the index for which documents are actively maintained versus ke
 
 - `docs/product-vision.md`
   - North star: governed catalog + dictionary, healthcare standards, ADT/CDA/FHIR contexts.
+- `docs/sources-of-truth.md`
+  - Layered authority: US standards, DAP, CHI steward publish, operational crosswalk; aligned with PBIP Start here.
 - `README.md`
   - Entry point for the operating model, pipeline commands, and core files.
 - `TECH-SPEC.md`

@@ -8,19 +8,34 @@ Read-only **governed catalog and dictionary viewer** (see `docs/product-vision.m
 workbooks/pbip/chi-data-dictionary-catalog.pbip
 ```
 
-The report includes three pages:
+The report includes four pages:
 
 | Page | Purpose |
 |------|---------|
-| **Concept Profile** | One `semantic_id` — governance, FHIR/US Core, survivorship, sources |
-| **Standards & Contexts** | Same slicer — terminology notes, **HL7 ADT** fields, **C-CDA** paths, layered standards banner |
+| **Start here** | Purpose, sources-of-truth layers, how to navigate the report (static text) |
+| **Concept Profile** | One `semantic_id` — governance, FHIR/US Core, **survivorship**, sources |
+| **Standards & Contexts** | Same slicer — FHIR/terminology notes, value sets, crosswalk, **HL7 ADT**, **C-CDA** (no survivorship column on FHIR table) |
 | **Governance Overview** | Portfolio KPIs, classification/approval charts, full concept table |
+
+Add or refresh **Start here** only: `python scripts/add_pbip_start_here_page.py` (does not rebuild other pages).
+
+**Default landing page:** **Standards & Contexts** (opens on load). **Start here** remains the first tab for orientation.
 
 Semantic model tables: catalog, dictionary, source availability, **ADT catalog**, **CCDA catalog**, **value set members**, **source crosswalk** (joined on `semantic_id`).
 
 After steward Excel edits: `python scripts/import_steward_workbook_to_parquet.py` → **Refresh** in Power BI.
 
 **Maintainers only** (regenerate report layout): `python scripts/enhance_pbip_report.py`
+
+**Readability layout** (slicer width, FHIR table word wrap, multiline-friendly tables) without a full regen:
+
+```powershell
+python scripts/patch_pbip_readability.py
+```
+
+Layout constants live in `scripts/pbip_layout_constants.py` — keep in sync with `enhance_pbip_report.py`. After a full `enhance_pbip_report.py` run, re-run `patch_pbip_readability.py` if needed.
+
+Pilot dictionary notes use `\n` line breaks in `scripts/seed_demographics_pilot.py`; re-seed with `python scripts/seed_demographics_pilot.py` and publish import when notes change.
 
 ### Readability (zoom and page size)
 

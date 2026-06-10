@@ -41,6 +41,8 @@ For **prove catalog + dictionary before buying a platform**, this is reasonable 
 
 Excel does **not** update parquet when you save. The import script is the explicit **publish** step so reviewers and Power BI always consume a deliberate snapshot.
 
+For long **Dictionary** fields (`data_quality_notes`, `chi_survivorship_logic`), use line breaks (Alt+Enter in Excel) so Power BI tables wrap cleanly.
+
 ```mermaid
 flowchart LR
     Steward["chi-steward-workbook.xlsx"]

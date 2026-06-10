@@ -15,7 +15,7 @@ North star for the **chi-data-dictionary-catalog** project.
 ```text
 USCDI              →  WHAT must be collected        (Catalog)
 US Core + FHIR R4  →  HOW it is represented         (Dictionary: fhir_r4_path, fhir_profile)
-Terminology        →  WHICH coded values are valid  (Dictionary: data_quality_notes; Value_Sets future)
+Terminology        →  WHICH coded values are valid  (Value_Set_Bindings / Members; Dictionary notes)
 HL7 v2 ADT         →  WHERE in ADT feeds            (ddc-hl7_adt_catalog / ADT_Mappings)
 C-CDA              →  WHERE in clinical documents   (ddc-ccda_catalog / CCDA_Mappings)
 NullFlavor         →  WHEN there is no value        (survivorship + terminology notes)
@@ -52,12 +52,21 @@ Governance         →  WHO approved it               (Catalog: steward, approva
 
 ---
 
+## Sources of truth
+
+National standards (USCDI, US Core, HL7 terminologies) are authoritative **externally**. DAP is authoritative for **enterprise terminology at scale**. CHI steward workbook + published parquet is authoritative for **governed metadata CHI signs**. County and partner source strings are **inputs** mapped via crosswalk — not standards.
+
+Detail: **`docs/sources-of-truth.md`**.
+
+---
+
 ## Power BI pages
 
 | Page | Purpose |
 |------|---------|
-| **Concept Profile** | One `semantic_id`: governance + dictionary + sources |
-| **Standards & Contexts** | Same slicer: FHIR/US Core + terminology + ADT + CCDA tables |
+| **Start here** | Purpose, sources-of-truth layers, how to use the report |
+| **Concept Profile** | One `semantic_id`: governance + dictionary + survivorship + sources |
+| **Standards & Contexts** | Same slicer: FHIR/US Core notes + value sets + crosswalk + ADT + CCDA |
 | **Governance Overview** | Portfolio KPIs and full catalog |
 
 ---
@@ -79,4 +88,5 @@ Edit chi-steward-workbook.xlsx  →  import_steward_workbook_to_parquet.py  → 
 ```
 
 Optional re-seed: `python scripts/seed_demographics_pilot.py` then `python scripts/generate_steward_workbook.py`  
-PBIP layout (maintainers): `python scripts/enhance_pbip_report.py`
+PBIP **Start here** page only: `python scripts/add_pbip_start_here_page.py`  
+PBIP full layout (maintainers): `python scripts/enhance_pbip_report.py` then `python scripts/patch_pbip_readability.py`

@@ -248,12 +248,12 @@ python scripts/generate_steward_workbook.py
 |------------|----------------------|----------------------------|
 | Catalog `data_steward`, `approval_status` | Profile cards | (via slicer filter) |
 | Catalog consent/HIPAA | Business & USCDI governance table | — |
-| Dictionary FHIR + terminology | Implementation table (`fhir_profile`, `data_quality_notes`) | FHIR + terminology table |
-| Dictionary survivorship | `chi_survivorship_logic` | Same table |
+| Dictionary FHIR + terminology | Implementation table (`fhir_profile`, `data_quality_notes`, survivorship) | FHIR table (`fhir_r4_path`, `fhir_profile`, `data_quality_notes` only — multiline) |
+| Dictionary survivorship | `chi_survivorship_logic` | Concept Profile only (not Standards FHIR table) |
 | ADT_Mappings rows | — | HL7 ADT table (CE pairs merged: `PID-10`, `PID-22`, `PID-16` show `.1^ .2` encoding) |
 | CCDA_Mappings rows | — | C-CDA XML path table |
 | Value_Set_Members (Excel: full HL7 expansion) | — | Governed value set codes — **PBIP defaults to OMB rollup + pilot codes** (~21 rows; detailed race codes in Excel) |
-| Source_Value_Crosswalk | — | Source → standard code map (e.g. `cmt`) |
+| Source_Value_Crosswalk | — | Source → standard code map (`county_master`, `partner_intake`) |
 | Source_Availability | Source availability table | — |
 
 See **`docs/product-vision.md`** for the layered standards model.
