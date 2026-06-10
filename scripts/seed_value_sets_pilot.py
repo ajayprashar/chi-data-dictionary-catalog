@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""Seed demographics pilot value set bindings, members, and starter source crosswalk rows."""
+"""Seed demographics pilot value set bindings and members.
+
+Source crosswalk: scripts/seed_county_master_crosswalk.py
+"""
 
 from __future__ import annotations
 
@@ -45,22 +48,6 @@ MEMBER_COLUMNS = [
     "binding_strength",
     "active",
     "sort_order",
-    "notes",
-]
-
-CROSSWALK_COLUMNS = [
-    "source_id",
-    "source_field",
-    "source_code",
-    "source_display",
-    "semantic_id",
-    "target_code_system_oid",
-    "target_code",
-    "target_display",
-    "mapping_type",
-    "approval_status",
-    "effective_from",
-    "effective_to",
     "notes",
 ]
 
@@ -277,89 +264,21 @@ MEMBERS: list[dict[str, str]] = [
     ],
 ]
 
-# Starter crosswalk — replace source_code values with validated CMT code list from partner intake.
-CROSSWALK_STARTER: list[dict[str, str]] = [
-    {
-        "source_id": "cmt",
-        "source_field": "PID-10",
-        "source_code": "EXAMPLE_B",
-        "source_display": "CMT race code (replace with validated list)",
-        "semantic_id": "Patient.race",
-        "target_code_system_oid": CDCREC_OID,
-        "target_code": "2054-5",
-        "target_display": "Black or African American",
-        "mapping_type": "rollup",
-        "approval_status": "draft",
-        "effective_from": "",
-        "effective_to": "",
-        "notes": "POC placeholder — populate from CMT race code inventory / county Table 5",
-    },
-    {
-        "source_id": "cmt",
-        "source_field": "PID-22",
-        "source_code": "EXAMPLE_H",
-        "source_display": "CMT ethnicity code (replace with validated list)",
-        "semantic_id": "Patient.ethnicity",
-        "target_code_system_oid": CDCREC_OID,
-        "target_code": "2135-2",
-        "target_display": "Hispanic or Latino",
-        "mapping_type": "rollup",
-        "approval_status": "draft",
-        "effective_from": "",
-        "effective_to": "",
-        "notes": "POC placeholder — populate from CMT ethnicity code inventory",
-    },
-    {
-        "source_id": "cmt",
-        "source_field": "PID-15",
-        "source_code": "en",
-        "source_display": "English",
-        "semantic_id": "Patient.language",
-        "target_code_system_oid": BCP47_OID,
-        "target_code": "en",
-        "target_display": "English",
-        "mapping_type": "exact",
-        "approval_status": "draft",
-        "effective_from": "",
-        "effective_to": "",
-        "notes": "Example exact map when CMT sends BCP 47 or ISO-aligned language code",
-    },
-    {
-        "source_id": "cmt",
-        "source_field": "PID-8",
-        "source_code": "M",
-        "source_display": "Male",
-        "semantic_id": "Patient.birth_sex",
-        "target_code_system_oid": "http://hl7.org/fhir/us/core/CodeSystem/birthsex",
-        "target_code": "M",
-        "target_display": "Male",
-        "mapping_type": "exact",
-        "approval_status": "draft",
-        "effective_from": "",
-        "effective_to": "",
-        "notes": "Administrative sex / SexID — not gender identity",
-    },
-]
-
-
 def main() -> None:
     root = Path(__file__).resolve().parent.parent
 
     bindings = pd.DataFrame(BINDINGS, columns=BINDING_COLUMNS)
     members = pd.DataFrame(MEMBERS, columns=MEMBER_COLUMNS)
-    crosswalk = pd.DataFrame(CROSSWALK_STARTER, columns=CROSSWALK_COLUMNS)
 
     bindings_path = root / "ddc-value_set_binding.parquet"
     members_path = root / "ddc-value_set_member.parquet"
-    crosswalk_path = root / "ddc-source_value_crosswalk.parquet"
 
     bindings.to_parquet(bindings_path, index=False)
     members.to_parquet(members_path, index=False)
-    crosswalk.to_parquet(crosswalk_path, index=False)
 
     print(f"Wrote {bindings_path} ({len(bindings)} rows)")
     print(f"Wrote {members_path} ({len(members)} rows)")
-    print(f"Wrote {crosswalk_path} ({len(crosswalk)} rows)")
+    print("Crosswalk: run scripts/seed_county_master_crosswalk.py (not overwritten here)")
     for sid in PILOT_IDS:
         n = len(members[members["semantic_id"] == sid])
         print(f"  {sid}: {n} governed member row(s)")

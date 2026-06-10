@@ -68,9 +68,9 @@ flowchart LR
 
 | Column | Example |
 |--------|---------|
-| `source_id` | `cmt` |
-| `source_field` | `PID-10` |
-| `source_code` | *(validated CMT code)* |
+| `source_id` | `county_master` (survivorship) or `cmt` (ADT field) |
+| `source_field` | `Race`, `Ethnicity`, `Language`, `SexID` or `PID-10`, etc. |
+| `source_code` | Local source string (e.g. `Japanese`, `Mexican`, `eng`) |
 | `target_code` | `2054-5` |
 | `mapping_type` | `exact` / `rollup` / `exclude` |
 | `approval_status` | `draft` until steward validates |
@@ -80,15 +80,20 @@ flowchart LR
 ## Publish ritual
 
 ```powershell
-# Expand Race / Ethnicity from HL7 (optional; preserves nullflavor rows):
+# Governed CDCREC codes from HL7 (optional; preserves nullflavor rows):
 python scripts/build_value_set_members.py --write-cache
 
-# Re-seed pilot bindings from script (maintainers only — overwrites binding/crosswalk seed):
+# County survivorship crosswalk (Table 4/5/2 → standard codes):
+python scripts/seed_county_master_crosswalk.py
+
+# Pilot value set bindings + member seed (maintainers — does not overwrite crosswalk):
 python scripts/seed_value_sets_pilot.py
+
+# Regenerate steward workbook after parquet rebuilds:
+python scripts/generate_steward_workbook.py
 
 # Or edit Value_Set_* / Source_Value_Crosswalk sheets in Excel, then:
 python scripts/import_steward_workbook_to_parquet.py
-python scripts/generate_steward_workbook.py      # optional reverse sync
 ```
 
 Refresh Power BI → **Standards & Contexts** shows **Governed value set** and **Source crosswalk** tables.
@@ -109,11 +114,19 @@ For production clinical expansion, reference DAP by ID in `authority_reference` 
 
 ---
 
-## CMT crosswalk next step
+## County master crosswalk (`county_master`)
 
-Starter rows in `ddc-source_value_crosswalk.parquet` are **draft placeholders**. Replace `EXAMPLE_*` `source_code` values with the validated CMT code list from:
+`scripts/seed_county_master_crosswalk.py` seeds **local source strings** from the SHIE master-demographics survivorship workbook (Table 4 language, Table 5 race/ethnicity, Table 2 SexID) into `ddc-source_value_crosswalk.parquet`:
 
-- Partner intake workbook `Code_Values` sheet, or
-- County survivorship Table 4/5 mappings
+| `source_field` | `semantic_id` | Maps to |
+|----------------|---------------|---------|
+| `Race` | `Patient.race` | CDCREC OMB rollup codes |
+| `Ethnicity` | `Patient.ethnicity` | CDCREC OMB rollup codes |
+| `Language` | `Patient.language` | BCP 47 tags |
+| `SexID` | `Patient.birth_sex` | US Core birth sex (`M`/`F`) — **not** `Patient.gender_id` |
+
+Rows ship with `approval_status` = `draft` until the steward validates in Excel and publishes.
+
+**Still separate:** CMT ADT `PID-10` / `PID-22` CE codes (often low fill) — add under `source_id` = `cmt` when a validated ADT code list is available.
 
 Set `approval_status` to `Approved` when mappings are steward-signed.

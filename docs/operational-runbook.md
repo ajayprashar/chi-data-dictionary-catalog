@@ -155,6 +155,18 @@ Steward publish: Patient.race, Patient.ethnicity — approval + survivorship rev
 
 **Do not commit:** `.venv/`, `node_modules/`, local PBIP cache, secrets.
 
+### Maintainer terminology rebuild (rare)
+
+When HL7 expansions or county survivorship mappings change in repo scripts:
+
+```powershell
+python scripts/build_value_set_members.py --write-cache
+python scripts/seed_county_master_crosswalk.py
+python scripts/generate_steward_workbook.py
+```
+
+Steward reviews `Source_Value_Crosswalk` in Excel (`approval_status` starts as `draft`), then normal publish: import → Refresh → commit.
+
 ---
 
 ## Production checklist — close Phase 1 (five demographics)

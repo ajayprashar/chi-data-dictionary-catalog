@@ -57,8 +57,9 @@ Create a governed **Data Catalog** and **Data Dictionary** for five demographics
 | Pilot rows with FHIR path in Dictionary | **5 / 5** |
 | Pilot rows with survivorship logic in Dictionary | **5 / 5** (SHIE county summaries seeded) |
 | Source links with non-`unknown` availability | **5 / 5** (`cmt`, `partial`) |
+| County master crosswalk seeded (`county_master`) | **Yes** — `scripts/seed_county_master_crosswalk.py`; steward review pending (`draft`) |
 
-The repo proves the **model and workflow**. The missing work is **stewardship of content** in Excel — not more tooling.
+The repo proves the **model and workflow**. Remaining Phase 1 work: **steward sign-off** on crosswalk rows and Power BI verification — not more platform tooling.
 
 ---
 
@@ -229,7 +230,14 @@ For SBR rollup: map Male to Female → Female, Female to Male → Male per count
 5. **Steward_Queue** → `steward_action_notes` (used for), `curation_status` when done.
 6. Save → `python scripts/import_steward_workbook_to_parquet.py` → Power BI **Refresh**.
 
-**Re-seed from plan text (parquet + workbook):** `python scripts/seed_demographics_pilot.py` then `python scripts/generate_steward_workbook.py`
+**Re-seed from plan text (parquet + workbook):**
+
+```powershell
+python scripts/seed_demographics_pilot.py
+python scripts/build_value_set_members.py --write-cache   # optional HL7 expand
+python scripts/seed_county_master_crosswalk.py
+python scripts/generate_steward_workbook.py
+```
 
 **Suggested pilot order:** `Patient.race` (template) → ethnicity → language → gender_id → birth_sex.
 

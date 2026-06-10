@@ -11,3 +11,5 @@ Archived on 2026-03-04:
 - **`<source_id>_feed_segments.csv`** and **`<source_id>_feed_event_types.csv`** — Feed profile per data source (e.g. **cmt_feed_segments.csv** / **cmt_feed_event_types.csv** for CMT ADT). The app discovers all `*_feed_segments.csv` in `data/` and shows one sidebar expander per source. Same column shape for every source. See **docs/adding-data-sources.md** when adding new sources.
 
 See **docs/cmt-adt-feed-and-master-patient.md** for how these support the Master Patient effort.
+
+County survivorship **source → standard** mappings live in `scripts/seed_county_master_crosswalk.py` (output: `ddc-source_value_crosswalk.parquet`). See **docs/crosswalk-model.md**.
