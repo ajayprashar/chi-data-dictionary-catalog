@@ -12,4 +12,9 @@ Archived on 2026-03-04:
 
 See **docs/cmt-adt-feed-and-master-patient.md** for how these support the Master Patient effort.
 
-County survivorship **source → standard** mappings live in `scripts/seed_county_master_crosswalk.py` (output: `ddc-source_value_crosswalk.parquet`). See **docs/crosswalk-model.md**.
+County survivorship **source → standard** mappings:
+
+- **`county_survivorship_mappings.py`** — curated extract from master-demographics SQL (Table 4/5/2)
+- **`scripts/seed_county_master_crosswalk.py`** — validates and writes `ddc-source_value_crosswalk.parquet`
+
+See **docs/crosswalk-model.md** (responsible design section).

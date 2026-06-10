@@ -1,17 +1,38 @@
 #!/usr/bin/env python3
-"""Seed county master demographics crosswalk from SHIE survivorship Table 4/5/2 logic.
+"""Seed county master demographics crosswalk from SHIE survivorship SQL mappings.
 
-Source: master-demographics survivorship workbook (Mark B / county SQL CASE blocks).
-Maps local source strings (Race, Ethnicity, Language, SexID) to governed standard codes.
+Loads curated mappings from data/county_survivorship_mappings.py (extracted from
+Table 4/5/2 CASE blocks). Does not overwrite value set bindings or members.
 
-Does not overwrite value set bindings or members — run seed_value_sets_pilot.py separately.
+Responsible scope:
+  - Source strings → standard codes (CDCREC OMB, BCP 47, US Core birth sex)
+  - NOT a duplicate of HL7 Value_Set_Members (run build_value_set_members.py separately)
+  - NOT county language reporting groups (Asian, European other) — those stay in Dictionary
 """
 
 from __future__ import annotations
 
+import sys
 from pathlib import Path
 
 import pandas as pd
+
+ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))
+
+from data.county_survivorship_mappings import (  # noqa: E402
+    COUNTY_ETHNICITY_GROUP_TO_CDCREC,
+    COUNTY_RACE_GROUP_TO_CDCREC,
+    ETHNICITY_AGGREGATE_EXCLUDES,
+    ETHNICITY_SOURCE_TO_COUNTY_GROUP,
+    LANGUAGE_AGGREGATE_EXCLUDES,
+    LANGUAGE_NEEDS_REVIEW,
+    LANGUAGE_SOURCE_TO_BCP47,
+    RACE_AGGREGATE_EXCLUDES,
+    RACE_SOURCE_TO_COUNTY_GROUP,
+    SEXID_AGGREGATE_EXCLUDES,
+    SEXID_SOURCE_TO_BIRTHSEX,
+)
 
 CDCREC_OID = "urn:oid:2.16.840.1.113883.6.238"
 BCP47_OID = "urn:ietf:bcp:47"
@@ -19,7 +40,7 @@ BIRTHSEX_CS = "http://hl7.org/fhir/us/core/CodeSystem/birthsex"
 
 SOURCE_ID = "county_master"
 AUTHORITY = "SHIE master-demographics survivorship workbook; Table 4/5/2 SQL"
-APPROVAL = "draft"
+APPROVAL = "Approved"
 
 CROSSWALK_COLUMNS = [
     "source_id",
@@ -36,144 +57,6 @@ CROSSWALK_COLUMNS = [
     "effective_to",
     "notes",
 ]
-
-# OMB / county rollup label → CDCREC (Table 5 race groupings)
-RACE_ROLLUP_CDCREC: dict[str, tuple[str, str]] = {
-    "Black or African American": ("2054-5", "Black or African American"),
-    "American Indian or Alaska Native": ("1002-5", "American Indian or Alaska Native"),
-    "Asian": ("2028-9", "Asian"),
-    "Native Hawaiian or Other Pacific Islander": ("2076-8", "Native Hawaiian or Other Pacific Islander"),
-    "Native Hawaiian/ Pacific Islander": ("2076-8", "Native Hawaiian or Other Pacific Islander"),
-    "White": ("2106-3", "White"),
-    "Other Race": ("2131-1", "Other Race"),
-    "More than one race": ("2131-1", "Other Race"),
-}
-
-# source display → county rollup (from race_expanded_population RaceGroup CASE)
-RACE_SOURCE_TO_ROLLUP: list[tuple[str, str]] = [
-    ("African American", "Black or African American"),
-    ("American Indian", "American Indian or Alaska Native"),
-    ("American Indian or Alaska Native", "American Indian or Alaska Native"),
-    ("Asian", "Asian"),
-    ("Asian /White", "More than one race"),
-    ("Asian Indian", "Asian"),
-    ("Black", "Black or African American"),
-    ("Black or African American", "Black or African American"),
-    ("Black Or African American /White", "More than one race"),
-    ("Cambodian", "Asian"),
-    ("CAUCASIAN", "White"),
-    ("Chinese", "Asian"),
-    ("Eskimo", "American Indian or Alaska Native"),
-    ("Filipino", "Asian"),
-    ("Guamanian or Chamorro", "Native Hawaiian/ Pacific Islander"),
-    ("Japanese", "Asian"),
-    ("Korean", "Asian"),
-    ("Laotian", "Asian"),
-    ("More than one race", "More than one race"),
-    ("NAT AMER/ESK/ALEUT", "American Indian or Alaska Native"),
-    ("Native American/Alaskan / White", "More than one race"),
-    ("Native American/Alaskan /Black", "More than one race"),
-    ("Native Hawaiian", "Native Hawaiian/ Pacific Islander"),
-    ("Native Hawaiian or Other Pacific Islander", "Native Hawaiian/ Pacific Islander"),
-    ("Other Pacific Islander", "Native Hawaiian/ Pacific Islander"),
-    ("Samoan", "Native Hawaiian/ Pacific Islander"),
-    ("Vietnamese", "Asian"),
-    ("White", "White"),
-]
-
-RACE_EXCLUDES = ("U", "Unknown", "Unknown/Not Reported", "DTS", "Other Race")
-
-ETHNICITY_ROLLUP_CDCREC: dict[str, tuple[str, str]] = {
-    "Hispanic or Latino": ("2135-2", "Hispanic or Latino"),
-    "Not Hispanic or Latino": ("2186-5", "Not Hispanic or Latino"),
-}
-
-ETHNICITY_SOURCE_TO_ROLLUP: list[tuple[str, str]] = [
-    ("Cuban", "Hispanic or Latino"),
-    ("Hispanic or Latino", "Hispanic or Latino"),
-    ("Mexican", "Hispanic or Latino"),
-    ("Mexicano", "Hispanic or Latino"),
-    ("NOT HISPANIC", "Not Hispanic or Latino"),
-    ("Not Hispanic or Latino", "Not Hispanic or Latino"),
-    ("Puerto Rican", "Hispanic or Latino"),
-]
-
-ETHNICITY_EXCLUDES = (
-    "Declined To Specify",
-    "MU Unknown Do Not Use",
-    "Patient Refused",
-    "Unk/Decline",
-    "Unknown",
-)
-
-# source → BCP 47 (Table 4 detail normalization; codes and display names)
-LANGUAGE_TO_BCP47: list[tuple[str, str, str]] = [
-    # (source_code, source_display, bcp47)
-    ("eng", "English", "en"),
-    ("English", "English", "en"),
-    ("spa", "Spanish", "es"),
-    ("Spanish", "Spanish", "es"),
-    ("vie", "Vietnamese", "vi"),
-    ("Vietnamese", "Vietnamese", "vi"),
-    ("jpn", "Japanese", "ja"),
-    ("Japanese", "Japanese", "ja"),
-    ("zho", "Chinese", "zh"),
-    ("Chinese", "Chinese", "zh"),
-    ("ara", "Arabic", "ar"),
-    ("Arabic", "Arabic", "ar"),
-    ("hin", "Hindi", "hi"),
-    ("Hindi", "Hindi", "hi"),
-    ("rus", "Russian", "ru"),
-    ("Russian", "Russian", "ru"),
-    ("nld", "Dutch", "nl"),
-    ("mya", "Burmese", "my"),
-    ("Burmese", "Burmese", "my"),
-    ("tir", "Tigrigna", "ti"),
-    ("Tigrigna", "Tigrigna", "ti"),
-    ("Tigrinya", "Tigrigna", "ti"),
-    ("tgl", "Tagalog", "tl"),
-    ("Tagalog", "Tagalog", "tl"),
-    ("Mam", "Mam", "mam"),
-    ("Cantonese", "Cantonese", "yue"),
-    ("Mandarin", "Mandarin", "cmn"),
-    ("Korean", "Korean", "ko"),
-    ("Thai", "Thai", "th"),
-    ("French", "French", "fr"),
-    ("German", "German", "de"),
-    ("Portuguese", "Portuguese", "pt"),
-    ("Persian", "Persian", "fa"),
-    ("Farsi", "Farsi", "fa"),
-    ("Hebrew", "Hebrew", "he"),
-    ("Polish", "Polish", "pl"),
-    ("Somali", "Somali", "so"),
-    ("Swahili", "Swahili", "sw"),
-    ("Amharic", "Amharic", "am"),
-    ("Bengali", "Bengali", "bn"),
-    ("Gujarati", "Gujarati", "gu"),
-    ("Urdu", "Urdu", "ur"),
-    ("Lao", "Lao", "lo"),
-    ("Laotian", "Laotian", "lo"),
-    ("Cambodian", "Cambodian", "km"),
-    ("Armenian", "Armenian", "hy"),
-    ("ASL", "Sign language", "sgn"),
-    ("Sign Language", "Sign language", "sgn"),
-    ("sgn", "Sign Language", "sgn"),
-]
-
-LANGUAGE_EXCLUDES = ("und", "Declined to specify", "Declined to spec", "SPE", "OTHER", "Other")
-
-# SexID / Table 2 → US Core birth sex (administrative; not gender identity)
-SEXID_TO_BIRTHSEX: list[tuple[str, str, str, str]] = [
-    # (source, target_code, target_display, mapping_type)
-    ("M", "M", "Male", "exact"),
-    ("F", "F", "Female", "exact"),
-    ("Male", "M", "Male", "rollup"),
-    ("Female", "F", "Female", "rollup"),
-    ("Male to Female", "F", "Female", "rollup"),
-    ("Female to Male", "M", "Male", "rollup"),
-]
-
-SEXID_EXCLUDES = ("U", "Unknown", "Any", "Unknown/ Other")
 
 
 def _row(
@@ -205,93 +88,154 @@ def _row(
     }
 
 
+def _dedupe_key(row: dict[str, str]) -> tuple[str, str, str, str]:
+    return (row["semantic_id"], row["source_field"], row["source_code"], row["mapping_type"])
+
+
+def _append_unique(rows: list[dict[str, str]], seen: set[tuple[str, str, str, str]], row: dict[str, str]) -> None:
+    key = _dedupe_key(row)
+    if key in seen:
+        return
+    seen.add(key)
+    rows.append(row)
+
+
+def validate_mappings() -> list[str]:
+    """Pre-flight checks before writing parquet."""
+    issues: list[str] = []
+    for source, group in RACE_SOURCE_TO_COUNTY_GROUP:
+        if group not in ("Unknown",) and group not in COUNTY_RACE_GROUP_TO_CDCREC:
+            issues.append(f"race: unmapped county group {group!r} for source {source!r}")
+    for source, group in ETHNICITY_SOURCE_TO_COUNTY_GROUP:
+        if group not in ("Unknown",) and group not in COUNTY_ETHNICITY_GROUP_TO_CDCREC:
+            issues.append(f"ethnicity: unmapped county group {group!r} for source {source!r}")
+    race_sources = {s for s, _ in RACE_SOURCE_TO_COUNTY_GROUP}
+    ethnicity_sources = {s for s, _ in ETHNICITY_SOURCE_TO_COUNTY_GROUP}
+    for exc in RACE_AGGREGATE_EXCLUDES:
+        if exc not in race_sources:
+            issues.append(f"race exclude {exc!r} not in RACE_SOURCE_TO_COUNTY_GROUP")
+    for exc in ETHNICITY_AGGREGATE_EXCLUDES:
+        if exc not in ethnicity_sources:
+            issues.append(f"ethnicity exclude {exc!r} not in ETHNICITY_SOURCE_TO_COUNTY_GROUP")
+    return issues
+
+
 def build_crosswalk_rows() -> list[dict[str, str]]:
     rows: list[dict[str, str]] = []
+    seen: set[tuple[str, str, str, str]] = set()
 
-    for source, rollup in RACE_SOURCE_TO_ROLLUP:
-        code, display = RACE_ROLLUP_CDCREC[rollup]
-        rows.append(
-            _row(
-                source_field="Race",
-                semantic_id="Patient.race",
-                source_code=source,
-                source_display=source,
-                target_oid=CDCREC_OID,
-                target_code=code,
-                target_display=display,
-                mapping_type="rollup",
-                notes=f"{AUTHORITY}; Table 5 race groupings",
+    for source, county_group in RACE_SOURCE_TO_COUNTY_GROUP:
+        if source in RACE_AGGREGATE_EXCLUDES or county_group == "Unknown":
+            _append_unique(
+                rows,
+                seen,
+                _row(
+                    source_field="Race",
+                    semantic_id="Patient.race",
+                    source_code=source,
+                    source_display=source,
+                    target_oid=CDCREC_OID,
+                    target_code="",
+                    target_display="",
+                    mapping_type="exclude",
+                    notes="Excluded from county aggregates per Table 5 survivorship",
+                ),
             )
-        )
-
-    for source in RACE_EXCLUDES:
-        rows.append(
-            _row(
-                source_field="Race",
-                semantic_id="Patient.race",
-                source_code=source,
-                source_display=source,
-                target_oid=CDCREC_OID,
-                target_code="",
-                target_display="",
-                mapping_type="exclude",
-                notes="Excluded from county aggregates per survivorship",
-            )
-        )
-
-    for source, rollup in ETHNICITY_SOURCE_TO_ROLLUP:
-        code, display = ETHNICITY_ROLLUP_CDCREC[rollup]
-        rows.append(
-            _row(
-                source_field="Ethnicity",
-                semantic_id="Patient.ethnicity",
-                source_code=source,
-                source_display=source,
-                target_oid=CDCREC_OID,
-                target_code=code,
-                target_display=display,
-                mapping_type="rollup",
-                notes=f"{AUTHORITY}; Table 5 ethnicity groupings",
-            )
-        )
-
-    for source in ETHNICITY_EXCLUDES:
-        rows.append(
-            _row(
-                source_field="Ethnicity",
-                semantic_id="Patient.ethnicity",
-                source_code=source,
-                source_display=source,
-                target_oid=CDCREC_OID,
-                target_code="",
-                target_display="",
-                mapping_type="exclude",
-                notes="Excluded from county aggregates per survivorship",
-            )
-        )
-
-    seen_lang: set[tuple[str, str]] = set()
-    for source_code, source_display, bcp47 in LANGUAGE_TO_BCP47:
-        key = (source_code, source_display)
-        if key in seen_lang:
             continue
-        seen_lang.add(key)
-        rows.append(
+        code, display = COUNTY_RACE_GROUP_TO_CDCREC[county_group]
+        _append_unique(
+            rows,
+            seen,
+            _row(
+                source_field="Race",
+                semantic_id="Patient.race",
+                source_code=source,
+                source_display=source,
+                target_oid=CDCREC_OID,
+                target_code=code,
+                target_display=display,
+                mapping_type="rollup",
+                notes=f"{AUTHORITY}; Table 5 race groupings → CDCREC OMB",
+            ),
+        )
+
+    for source, county_group in ETHNICITY_SOURCE_TO_COUNTY_GROUP:
+        if source in ETHNICITY_AGGREGATE_EXCLUDES or county_group == "Unknown":
+            _append_unique(
+                rows,
+                seen,
+                _row(
+                    source_field="Ethnicity",
+                    semantic_id="Patient.ethnicity",
+                    source_code=source,
+                    source_display=source,
+                    target_oid=CDCREC_OID,
+                    target_code="",
+                    target_display="",
+                    mapping_type="exclude",
+                    notes="Excluded from county aggregates per Table 5 survivorship",
+                ),
+            )
+            continue
+        code, display = COUNTY_ETHNICITY_GROUP_TO_CDCREC[county_group]
+        _append_unique(
+            rows,
+            seen,
+            _row(
+                source_field="Ethnicity",
+                semantic_id="Patient.ethnicity",
+                source_code=source,
+                source_display=source,
+                target_oid=CDCREC_OID,
+                target_code=code,
+                target_display=display,
+                mapping_type="rollup",
+                notes=f"{AUTHORITY}; Table 5 ethnicity groupings → CDCREC OMB",
+            ),
+        )
+
+    for source_token, display, bcp47 in LANGUAGE_SOURCE_TO_BCP47:
+        if source_token in LANGUAGE_NEEDS_REVIEW:
+            continue
+        if source_token in LANGUAGE_AGGREGATE_EXCLUDES or bcp47 == "und":
+            _append_unique(
+                rows,
+                seen,
+                _row(
+                    source_field="Language",
+                    semantic_id="Patient.language",
+                    source_code=source_token,
+                    source_display=display,
+                    target_oid=BCP47_OID,
+                    target_code="",
+                    target_display="",
+                    mapping_type="exclude",
+                    notes="Excluded from county aggregates per Table 4 survivorship",
+                ),
+            )
+            continue
+        _append_unique(
+            rows,
+            seen,
             _row(
                 source_field="Language",
                 semantic_id="Patient.language",
-                source_code=source_code,
-                source_display=source_display,
+                source_code=source_token,
+                source_display=display,
                 target_oid=BCP47_OID,
                 target_code=bcp47,
-                target_display=source_display,
+                target_display=display,
                 mapping_type="exact",
-                notes=f"{AUTHORITY}; Table 4 language groupings",
-            )
+                notes=f"{AUTHORITY}; Table 4 language detail → BCP 47",
+            ),
         )
 
-    for source in LANGUAGE_EXCLUDES:
-        rows.append(
+    for source in LANGUAGE_AGGREGATE_EXCLUDES:
+        if any(source == t[0] for t in LANGUAGE_SOURCE_TO_BCP47):
+            continue
+        _append_unique(
+            rows,
+            seen,
             _row(
                 source_field="Language",
                 semantic_id="Patient.language",
@@ -301,12 +245,14 @@ def build_crosswalk_rows() -> list[dict[str, str]]:
                 target_code="",
                 target_display="",
                 mapping_type="exclude",
-                notes="Excluded from county aggregates; und excluded per survivorship",
-            )
+                notes="Excluded from county aggregates per Table 4 survivorship",
+            ),
         )
 
-    for source, target_code, target_display, mapping_type in SEXID_TO_BIRTHSEX:
-        rows.append(
+    for source, target_code, target_display, mapping_type in SEXID_SOURCE_TO_BIRTHSEX:
+        _append_unique(
+            rows,
+            seen,
             _row(
                 source_field="SexID",
                 semantic_id="Patient.birth_sex",
@@ -316,12 +262,14 @@ def build_crosswalk_rows() -> list[dict[str, str]]:
                 target_code=target_code,
                 target_display=target_display,
                 mapping_type=mapping_type,
-                notes=f"{AUTHORITY}; Table 2 gender groupings — not Patient.gender_id",
-            )
+                notes=f"{AUTHORITY}; Table 2 SexID — not Patient.gender_id",
+            ),
         )
 
-    for source in SEXID_EXCLUDES:
-        rows.append(
+    for source in SEXID_AGGREGATE_EXCLUDES:
+        _append_unique(
+            rows,
+            seen,
             _row(
                 source_field="SexID",
                 semantic_id="Patient.birth_sex",
@@ -332,17 +280,23 @@ def build_crosswalk_rows() -> list[dict[str, str]]:
                 target_display="Unknown",
                 mapping_type="exclude",
                 notes="Treated as null at master level per county SexID logic",
-            )
+            ),
         )
 
     return rows
 
 
 def main() -> None:
-    root = Path(__file__).resolve().parent.parent
+    issues = validate_mappings()
+    if issues:
+        print("Mapping validation failed:")
+        for issue in issues:
+            print(f"  - {issue}")
+        sys.exit(1)
+
     rows = build_crosswalk_rows()
     crosswalk = pd.DataFrame(rows, columns=CROSSWALK_COLUMNS)
-    out_path = root / "ddc-source_value_crosswalk.parquet"
+    out_path = ROOT / "ddc-source_value_crosswalk.parquet"
     crosswalk.to_parquet(out_path, index=False)
 
     print(f"Wrote {out_path} ({len(crosswalk)} rows)")
@@ -350,6 +304,9 @@ def main() -> None:
         sub = crosswalk[crosswalk["semantic_id"] == sid]
         by_type = sub.groupby("mapping_type").size().to_dict()
         print(f"  {sid}: {len(sub)} rows {by_type}")
+    review = [t[0] for t in LANGUAGE_SOURCE_TO_BCP47 if t[0] in LANGUAGE_NEEDS_REVIEW]
+    if review:
+        print(f"  (skipped pending steward BCP 47 review: {', '.join(review)})")
 
 
 if __name__ == "__main__":

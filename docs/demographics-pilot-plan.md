@@ -57,9 +57,10 @@ Create a governed **Data Catalog** and **Data Dictionary** for five demographics
 | Pilot rows with FHIR path in Dictionary | **5 / 5** |
 | Pilot rows with survivorship logic in Dictionary | **5 / 5** (SHIE county summaries seeded) |
 | Source links with non-`unknown` availability | **5 / 5** (`cmt`, `partial`) |
-| County master crosswalk seeded (`county_master`) | **Yes** — `scripts/seed_county_master_crosswalk.py`; steward review pending (`draft`) |
+| County master crosswalk (`county_master`) | **186 rows Approved** — full Table 4/5/2 SQL via `data/county_survivorship_mappings.py` |
+| `Value_Set_Members` (race/ethnicity HL7 expand) | **936 rows** — `build_value_set_members.py` |
 
-The repo proves the **model and workflow**. Remaining Phase 1 work: **steward sign-off** on crosswalk rows and Power BI verification — not more platform tooling.
+Remaining Phase 1 work: **Power BI Refresh** and Concept Profile sign-off per attribute (manual in Desktop).
 
 ---
 
