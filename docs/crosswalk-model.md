@@ -86,6 +86,9 @@ python scripts/build_value_set_members.py --write-cache
 # County survivorship crosswalk (Table 4/5/2 → standard codes):
 python scripts/seed_county_master_crosswalk.py
 
+# PBIP readability (CE field merge + hide HL7 detailed codes in report load):
+python scripts/enrich_parquet_for_pbi.py
+
 # Pilot value set bindings + member seed (maintainers — does not overwrite crosswalk):
 python scripts/seed_value_sets_pilot.py
 

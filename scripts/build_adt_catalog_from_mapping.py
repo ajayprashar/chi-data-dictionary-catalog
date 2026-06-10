@@ -89,6 +89,15 @@ def main() -> None:
     df.to_parquet(args.output, index=False)
     print(f"Wrote {len(df)} rows to {args.output}")
 
+    import sys
+
+    scripts_dir = Path(__file__).resolve().parent
+    if str(scripts_dir) not in sys.path:
+        sys.path.insert(0, str(scripts_dir))
+    from enrich_parquet_for_pbi import enrich_adt
+
+    enrich_adt(args.output)
+
 
 if __name__ == "__main__":
     main()

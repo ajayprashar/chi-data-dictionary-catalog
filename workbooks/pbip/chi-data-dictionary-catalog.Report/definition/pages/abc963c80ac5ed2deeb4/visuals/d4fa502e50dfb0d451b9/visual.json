@@ -99,7 +99,7 @@
                 "Version": 2,
                 "From": [
                   {
-                    "Name": "c",
+                    "Name": "d",
                     "Entity": "ddc-master_patient_catalog",
                     "Type": 0
                   }
@@ -113,7 +113,7 @@
                             "Column": {
                               "Expression": {
                                 "SourceRef": {
-                                  "Source": "c"
+                                  "Source": "d"
                                 }
                               },
                               "Property": "semantic_id"
@@ -124,7 +124,7 @@
                           [
                             {
                               "Literal": {
-                                "Value": "'Patient.race'"
+                                "Value": "'Patient.ethnicity'"
                               }
                             }
                           ]

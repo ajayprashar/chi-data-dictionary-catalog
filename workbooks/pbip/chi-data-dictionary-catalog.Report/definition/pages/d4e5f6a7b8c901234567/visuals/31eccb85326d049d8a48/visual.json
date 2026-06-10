@@ -115,6 +115,23 @@
             }
           ]
         }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "ddc-value_set_member"
+                  }
+                },
+                "Property": "display"
+              }
+            },
+            "direction": "Ascending"
+          }
+        ]
       }
     },
     "objects": {
@@ -277,7 +294,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Governed value set codes'"
+                  "Value": "'Governed value set codes (OMB rollup & pilot; full HL7 expansion in Excel)'"
                 }
               }
             },

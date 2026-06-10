@@ -51,11 +51,11 @@
                       "Entity": "ddc-hl7_adt_catalog"
                     }
                   },
-                  "Property": "field_id"
+                  "Property": "hl7_ce_encoding"
                 }
               },
-              "queryRef": "ddc-hl7_adt_catalog.field_id",
-              "nativeQueryRef": "field_id"
+              "queryRef": "ddc-hl7_adt_catalog.hl7_ce_encoding",
+              "nativeQueryRef": "hl7_ce_encoding"
             },
             {
               "field": {
@@ -277,7 +277,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'HL7 v2 ADT context'"
+                  "Value": "'HL7 v2 ADT context (CE fields merged: .1 code ^ .2 text)'"
                 }
               }
             },

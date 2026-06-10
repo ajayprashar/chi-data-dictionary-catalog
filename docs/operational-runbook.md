@@ -113,7 +113,9 @@ python scripts/import_steward_workbook_to_parquet.py
 ```
 
 6. Open PBIP → **Home → Refresh**.
-7. Spot-check **Concept Profile** and **Standards & Contexts** for at least one changed `semantic_id`.
+7. Spot-check **Concept Profile** and **Standards & Contexts** for at least one changed `semantic_id`. On **Standards & Contexts**, confirm:
+   - **Governed value set codes** shows ~21 rows (OMB rollup + pilot codes), not 900+ HL7 detailed race codes.
+   - **HL7 ADT context** shows one row per CE field (`PID-10`, `PID-22`, `PID-16`) with `hl7_ce_encoding` like `PID-22.1^PID-22.2`.
 8. Commit (see [Git commit policy](#git-commit-policy)).
 9. Notify reviewers: “Published — please `git pull` and Refresh.”
 
@@ -162,6 +164,7 @@ When HL7 expansions or county survivorship mappings change in repo scripts:
 ```powershell
 python scripts/build_value_set_members.py --write-cache
 python scripts/seed_county_master_crosswalk.py
+python scripts/enrich_parquet_for_pbi.py
 python scripts/generate_steward_workbook.py
 ```
 

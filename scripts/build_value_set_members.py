@@ -284,6 +284,14 @@ def build_members(
         out_path = repo_root / "ddc-value_set_member.parquet"
         members.to_parquet(out_path, index=False)
         print(f"Wrote {out_path} ({len(members)} rows total)")
+        import sys
+
+        scripts_dir = Path(__file__).resolve().parent
+        if str(scripts_dir) not in sys.path:
+            sys.path.insert(0, str(scripts_dir))
+        from enrich_parquet_for_pbi import enrich_members
+
+        enrich_members(out_path)
 
     return members
 
