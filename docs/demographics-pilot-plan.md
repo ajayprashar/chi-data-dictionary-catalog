@@ -357,6 +357,7 @@ Copy this block when curating; check off in **Steward_Queue** or here as you go.
 - [x] FHIR path reviewed on Dictionary
 - [x] Survivorship logic reviewed on Dictionary
 - [x] Source_Availability: at least one source with non-`unknown` availability
+- [x] Value_Set_Bindings → HL7 `gender-identity` ValueSet; 5 governed answer codes (SNOMED + UNK + asked-declined)
 - [ ] Power BI Concept Profile verified after import
 
 ### `Patient.birth_sex`

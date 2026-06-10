@@ -109,7 +109,7 @@ Refresh Power BI → **Standards & Contexts** shows **Governed value set** and *
 |--------|----------------|------|
 | Race / ethnicity | [HL7 Race/Ethnicity ValueSet](https://terminology.hl7.org/) | Expanding beyond OMB pilot subset |
 | Language | BCP 47 / IANA | Large language crosswalk from partner intake |
-| Gender identity | US Core + LOINC 76691-5 answer codes | After partner code inventory |
+| Gender identity | HL7 `gender-identity` minimum set (SNOMED) + partner extensions | Minimum set seeded; source-string crosswalk when partner inventory arrives |
 | **ICD-10-CM / ICD-9** | CMS / NLM / **DAP** | Clinical concepts (problems, diagnoses) — **not demographics pilot** |
 | SNOMED / LOINC clinical | **DAP** | Clinical attributes |
 

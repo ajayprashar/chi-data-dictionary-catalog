@@ -23,6 +23,8 @@ NULLFLAVOR_OID = "urn:oid:2.16.840.1.113883.5.1008"
 BCP47_OID = "urn:ietf:bcp:47"
 SNOMED_OID = "urn:oid:2.16.840.1.113883.6.96"
 LOINC_OID = "urn:oid:2.16.840.1.113883.6.1"
+DAR_CS = "http://terminology.hl7.org/CodeSystem/data-absent-reason"
+GENDER_IDENTITY_VS = "http://terminology.hl7.org/ValueSet/gender-identity"
 
 BINDING_COLUMNS = [
     "semantic_id",
@@ -94,15 +96,15 @@ BINDINGS: list[dict[str, str]] = [
     {
         "semantic_id": "Patient.gender_id",
         "binding_role": "primary",
-        "value_set_name": "US Core Gender Identity Observation",
-        "value_set_url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-social-history",
-        "code_system_oid": LOINC_OID,
-        "code_system_name": "LOINC",
-        "binding_strength": "required",
-        "fhir_element": "Observation.code (LOINC 76691-5)",
-        "authority_reference": "docs/shie-standards-reference.md",
+        "value_set_name": "HL7 Gender Identity (minimum set)",
+        "value_set_url": GENDER_IDENTITY_VS,
+        "code_system_oid": SNOMED_OID,
+        "code_system_name": "SNOMED CT",
+        "binding_strength": "extensible",
+        "fhir_element": "Observation.valueCodeableConcept (LOINC 76691-5)",
+        "authority_reference": "docs/shie-standards-reference.md#gender-identity-minimum-set",
         "approval_status": "Approved",
-        "notes": "Answer values often SNOMED-coded; expand members from US Core / partner intake.",
+        "notes": "LOINC 76691-5 identifies the observation; answers bind HL7 gender-identity ValueSet (SNOMED + DAR/nullflavor). Not CMT SexID.",
     },
     {
         "semantic_id": "Patient.birth_sex",
@@ -242,6 +244,67 @@ MEMBERS: list[dict[str, str]] = [
         "active": "true",
         "sort_order": "90",
         "notes": "Excluded from county aggregates per survivorship",
+    },
+    # Patient.gender_id — HL7 minimum gender identity (SNOMED + non-answers)
+    {
+        "semantic_id": "Patient.gender_id",
+        "code_system_oid": SNOMED_OID,
+        "code": "446141000124107",
+        "display": "Female gender identity",
+        "member_type": "standard",
+        "binding_role": "primary",
+        "binding_strength": "extensible",
+        "active": "true",
+        "sort_order": "1",
+        "notes": "HL7 gender-identity minimum set; US Core extensible binding",
+    },
+    {
+        "semantic_id": "Patient.gender_id",
+        "code_system_oid": SNOMED_OID,
+        "code": "446151000124109",
+        "display": "Male gender identity",
+        "member_type": "standard",
+        "binding_role": "primary",
+        "binding_strength": "extensible",
+        "active": "true",
+        "sort_order": "2",
+        "notes": "HL7 gender-identity minimum set",
+    },
+    {
+        "semantic_id": "Patient.gender_id",
+        "code_system_oid": SNOMED_OID,
+        "code": "33791000087105",
+        "display": "Non-binary gender identity",
+        "member_type": "standard",
+        "binding_role": "primary",
+        "binding_strength": "extensible",
+        "active": "true",
+        "sort_order": "3",
+        "notes": "HL7 gender-identity minimum set; county equity rollup may map to Other",
+    },
+    {
+        "semantic_id": "Patient.gender_id",
+        "code_system_oid": NULLFLAVOR_OID,
+        "code": "UNK",
+        "display": "Unknown",
+        "member_type": "nullflavor",
+        "binding_role": "nullflavor",
+        "binding_strength": "example",
+        "active": "true",
+        "sort_order": "10",
+        "notes": "HL7 v3 NullFlavor; not a gender identity answer",
+    },
+    {
+        "semantic_id": "Patient.gender_id",
+        "code_system_oid": DAR_CS,
+        "code": "asked-declined",
+        "display": "Asked but declined",
+        "member_type": "exclude",
+        "binding_role": "primary",
+        "binding_strength": "example",
+        "active": "true",
+        "sort_order": "20",
+        "notes": "FHIR Data Absent Reason; exclude from equity aggregates",
     },
     # Patient.birth_sex — US Core birth sex
     *[

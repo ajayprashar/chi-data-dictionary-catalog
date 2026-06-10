@@ -98,9 +98,9 @@ DICTIONARY_UPDATES: dict[str, dict[str, str]] = {
             "Do not apply CMT SexID survivorship here; that governs birth sex."
         ),
         "data_quality_notes": (
-            "US Core: Observation LOINC 76691-5; profile us-core-observation-social-history. "
-            "SNOMED CT OID urn:oid:2.16.840.1.113883.6.96 where coded clinical bindings apply. "
-            "Distinct from Patient.birth_sex (us-core-birthsex / SexID). "
+            "US Core: Observation LOINC 76691-5; answers bind HL7 gender-identity ValueSet (SNOMED minimum set, extensible). "
+            "SNOMED CT OID urn:oid:2.16.840.1.113883.6.96. "
+            "Distinct from Patient.birth_sex (us-core-birthsex / CMT SexID). "
             "Table 2 – Gender Groupings applies to SBR administrative rollup only, not this identity element."
         ),
         "data_source_rank_reference": "Patient-facing and community sources prioritized over administrative SexID.",

@@ -86,6 +86,26 @@ Detail examples: Mexican, Cuban, Puerto Rican → rollup Hispanic or Latino per 
 
 ---
 
+## Gender identity minimum set (`Patient.gender_id`)
+
+**Observation code (concept):** LOINC `76691-5` — *Gender identity* (`Observation.code`).
+
+**Answer values:** [HL7 Gender Identity ValueSet](http://terminology.hl7.org/ValueSet/gender-identity) — minimum SNOMED set (extensible per US Core). Not interchangeable with `Patient.birth_sex` / CMT `SexID`.
+
+| Code | System | Display | Member role |
+|------|--------|---------|-------------|
+| 446141000124107 | SNOMED CT | Female gender identity | Standard answer |
+| 446151000124109 | SNOMED CT | Male gender identity | Standard answer |
+| 33791000087105 | SNOMED CT | Non-binary gender identity | Standard answer |
+| UNK | HL7 NullFlavor | Unknown | Non-answer |
+| asked-declined | FHIR Data Absent Reason | Asked but declined | Exclude from aggregates |
+
+County **Table 2 – Gender Groupings** applies to SBR / `SexID` rollup only, not this element. Partner-specific identity codes (e.g. Two-Spirit) extend the ValueSet after intake — not in county_master crosswalk today.
+
+**Re-seed members (preserves race/ethnicity expansion):** `python scripts/seed_gender_identity_terminology.py`
+
+---
+
 ## NullFlavor (race / ethnicity)
 
 Do not treat these as the same reporting bucket:
