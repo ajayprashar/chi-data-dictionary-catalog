@@ -155,11 +155,16 @@ This section is a rolling summary. Re-evaluate when schema, join logic, interope
 - [OK] Survivorship enhancements (`tie_breaker_rule`, `conflict_detection_enabled`, `manual_override_allowed`)
 - [OK] Data source availability table (links sources to semantic IDs)
 
+**Implemented after initial POC (demographics pilot):**
+- [OK] Value set bindings and governed members (`ddc-value_set_binding`, `ddc-value_set_member`) — see `docs/crosswalk-model.md`
+- [OK] Source crosswalk (`ddc-source_crosswalk`) — county master + partner intake template rows
+- [OK] PBIP semantic model and multi-page report (Start here, Concept Profile, Standards & Contexts, Governance Overview)
+
 **Deferred to production:**
 - Field-level provenance tracking (source + timestamp per value) — runtime data, not metadata schema
 - Machine-readable source hierarchy — current text format sufficient for POC
-- Terminology/value set tables — Domain 3, beyond demographics scope
-- Clinical data elements — beyond current POC scope
+- Full clinical code-system hosting in-repo — DAP remains authoritative; CHI carries bindings and crosswalk intent only
+- Clinical data elements beyond demographics pilot scope
 
 See **docs/archive/EVALUATION.md** for detailed scoring, compliance assessment (USCDI v4/v5, FHIR US Core, Carequality, CommonWell), and production roadmap.
 
@@ -189,7 +194,7 @@ The CHI metadata catalog architecture was designed to address several strategic 
 | **Dictionary stays separate from message specs** | L3 survivorship rules are independent of interoperability. Partner-specific rules belong in a crosswalk (future), not the core dictionary. |
 | **Link via semantic_id** | The `semantic_id` (e.g., `Patient.name_first`, `Patient.birth_date`) is the universal join key. Master catalog ↔ dictionary is 1:1; master catalog ↔ message catalogs is 1:many. |
 | **Crosswalks for output, not input** | Inbound: everyone's data is normalized to L3 using catalog + dictionary. Outbound: L3 is customized per partner using catalogs + crosswalk. |
-| **POC scope** | Value-set tables, FHIR catalog, and interoperability crosswalk are strategically deferred. The current POC proves the model with the core master tables, optional message-format catalogs, and a source availability table for documentation/review. |
+| **POC scope** | Demographics pilot: core master tables, message-format catalogs (ADT/CCDA), source availability, value set members, and source crosswalk — published to parquet and exposed in PBIP. Broader clinical domains and enterprise terminology hosting remain out of scope for this repo. |
 
 ### 1.3 What Was Explicitly Rejected
 
@@ -444,10 +449,12 @@ flowchart TB
 | **ddc-hl7_adt_catalog.parquet** | Optional. ADT field mappings. |
 | **ddc-ccda_catalog.parquet** | Optional. CCD/CCDA XML mappings. |
 | **ddc-data_source_availability.parquet** | Optional. Source-to-semantic_id availability matrix. |
-| **scripts/** | `split_to_catalog_and_dictionary.py`, `generate_intake_workbook.py`, `build_adt_catalog_from_mapping.py`, `build_ccda_catalog_from_mapping.py`, `build_data_source_availability.py` |
-| **data/** | Mapping CSVs, feed profiles (segments, event types) |
-| **docs/** | `excel-workbook-guide.md`, `power-bi-concept-profile-setup.md`, `adding-data-sources.md`, `cmt-adt-feed-and-master-patient.md`, `jupyter-duckdb-parquet-setup.md` |
-| **workbooks/** | `chi-partner-intake-workbook.xlsx`, `chi-steward-workbook.xlsx` (working documents) |
+| **ddc-value_set_binding.parquet**, **ddc-value_set_member.parquet** | Terminology bindings and governed members (demographics pilot). |
+| **ddc-source_crosswalk.parquet** | Local source codes → governed standards. |
+| **scripts/** | Publish: `import_steward_workbook_to_parquet.py`, `generate_steward_workbook.py`. Maintainer: `build_value_set_members.py`, `seed_*`, `enrich_parquet_for_pbi.py`, PBIP scripts. Optional rebuild: `split_to_catalog_and_dictionary.py`, `build_*_catalog_from_mapping.py`, `build_data_source_availability.py`. |
+| **data/** | Mapping CSVs, feed profiles (segments, event types), terminology cache |
+| **docs/** | See `docs/documentation-map.md` (canonical vs reference vs archive). |
+| **workbooks/** | `chi-steward-workbook.xlsx`, `chi-partner-intake-workbook.xlsx`; PBIP under `workbooks/pbip/` |
 
 ### 2.2.1 Table Naming Guide (plain language)
 

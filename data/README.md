@@ -1,27 +1,31 @@
 # Data artifacts for CMT ADT and Master Patient
 
-Archived on 2026-03-04:
-- Active CSV inputs were moved to `data/archive/2026-03-04/`.
-- Build scripts include fallback support to this archive location.
-- To reactivate, copy needed files back into `data/` or pass explicit `--mapping` paths.
+**Active mapping CSVs** were archived on 2026-03-04 under `data/archive/2026-03-04/`. Build scripts resolve paths with archive fallback unless you pass `--mapping` or copy files back to `data/`.
 
-- **ccd_to_semantic_id_mapping.csv** — Maps CCD section, INV column (optional), entry type, and representative XML path to `semantic_id` and FHIR path. Used by `scripts/build_ccda_catalog_from_mapping.py` to build **ddc-ccda_catalog.parquet**. Aligns with **ccd_interface_mapping.md** (INV focus).
-- **datasource_counts_by_account.csv** — Reference: record counts by AccountID and enterprise name for a given period (e.g. 2/2026). Add new rows or new period columns when refreshing counts; use for source-volume context and reporting.
-- **l2_to_semantic_id_mapping.csv** — Maps CMT ADT L2 column names (and Segment/HL7 Field) to master patient `semantic_id` and FHIR path. Used by `scripts/build_adt_catalog_from_mapping.py` to build or extend `ddc-hl7_adt_catalog.parquet`. Includes PID, PV1, PV2, PD1, IN1, DG1. Rows that use `Encounter.*`, `Coverage.*`, or `Condition.*` appear in ADT catalog/inventory outputs when those elements exist in the master catalog.
-- **`<source_id>_feed_segments.csv`** and **`<source_id>_feed_event_types.csv`** — Feed profile per data source (e.g. **cmt_feed_segments.csv** / **cmt_feed_event_types.csv** for CMT ADT). The app discovers all `*_feed_segments.csv` in `data/` and shows one sidebar expander per source. Same column shape for every source. See **docs/adding-data-sources.md** when adding new sources.
+## Archived CSV inputs (`data/archive/2026-03-04/`)
 
-See **docs/cmt-adt-feed-and-master-patient.md** for how these support the Master Patient effort.
+| File | Used by |
+|------|---------|
+| `ccd_to_semantic_id_mapping.csv` | `scripts/build_ccda_catalog_from_mapping.py` -> `ddc-ccda_catalog.parquet` |
+| `l2_to_semantic_id_mapping.csv` | `scripts/build_adt_catalog_from_mapping.py` -> `ddc-hl7_adt_catalog.parquet` |
+| `cmt_feed_segments.csv`, `cmt_feed_event_types.csv` | `scripts/build_data_source_availability.py` |
+| `datasource_counts_by_account.csv` | Reference counts (not loaded by PBIP) |
 
-County survivorship **source → standard** mappings:
+Aligns with `ccd_interface_mapping.md` for CCD paths.
 
-- **`county_survivorship_mappings.py`** — curated extract from master-demographics SQL (Table 4/5/2)
-- **`scripts/seed_county_master_crosswalk.py`** — validates and writes `ddc-source_value_crosswalk.parquet`
+## Python modules (curated, not CSV)
 
-See **docs/crosswalk-model.md** (responsible design section).
+| Module | Role |
+|--------|------|
+| `county_survivorship_mappings.py` | County SQL -> crosswalk seed (`scripts/seed_county_master_crosswalk.py`) |
+| `partner_crosswalk_template.py` | Partner intake example rows (`scripts/seed_partner_crosswalk_template.py`) |
 
-Partner intake crosswalk (local codes → governed standards):
+## Terminology cache (`data/terminology/`)
 
-- **`partner_crosswalk_template.py`** — starter rows for `partner_intake` (`draft`)
-- **`scripts/seed_partner_crosswalk_template.py`** — merges into crosswalk parquet without overwriting `county_master`
+HL7 `$expand` offline cache for `build_value_set_members.py --offline`. See `data/terminology/README.md`.
 
-See **docs/partner-crosswalk-template.md**.
+## Adding a new source
+
+See **`docs/adding-data-sources.md`** - add `*_feed_segments.csv` / `*_feed_event_types.csv`, rebuild source availability, update steward workbook.
+
+See **`docs/cmt-adt-feed-and-master-patient.md`** for CMT ADT context.

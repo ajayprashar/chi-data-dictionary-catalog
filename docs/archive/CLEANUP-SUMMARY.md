@@ -1,6 +1,6 @@
 # File Cleanup Summary
 
-> **Status note (historical snapshot):** This file documents a one-time cleanup event. Use `README.md` and `TECH-SPEC.md` for current project structure and active artifacts.
+> **Status note (historical snapshot):** March 2026 one-time cleanup. A follow-up repo cleanup (June 2026) removed legacy `.pbix`, `.tmp/` exports, and orphaned scripts — see `docs/cleanup-methodology.md`. Use `README.md` and `TECH-SPEC.md` for current structure.
 
 **Date:** March 4, 2026
 

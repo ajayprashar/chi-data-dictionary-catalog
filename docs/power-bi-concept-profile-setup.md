@@ -61,13 +61,23 @@ In Power BI Desktop:
 
 ---
 
-## Manual setup (if not using PBIP)
+## Legacy: manual `.pbix` (deprecated)
 
-Connect Power BI Desktop directly to the parquet files the Excel workflow already produces.
+Before PBIP, stewards could build a one-off `.pbix` by connecting to parquet manually. That path is **deprecated**:
+
+- Use **`workbooks/pbip/chi-data-dictionary-catalog.pbip`** (four pages, full semantic model).
+- Do not commit `workbooks/*.pbix` (gitignored).
+- Regenerate layout with `enhance_pbip_report.py` / `patch_pbip_readability.py` instead of hand-building visuals.
+
+If you must connect parquet manually for debugging: **Get data → Parquet** → select root `ddc-master_patient_catalog.parquet`, `ddc-master_patient_dictionary.parquet`, and `ddc-data_source_availability.parquet`; relate on `semantic_id`. You will not get ADT/CCDA/value set/crosswalk pages without adding those parquets yourself.
 
 ---
 
-## What you need running
+## Appendix: old manual build steps (historical)
+
+The steps below described a minimal three-table `.pbix`. Kept for reference only.
+
+### What you need running
 
 Only the steward round-trip you already have:
 

@@ -26,6 +26,10 @@ Use this page as the index for which documents are actively maintained versus ke
   - Power BI PBIP viewer — open, refresh, troubleshooting (read surface after Excel import).
 - `docs/jupyter-duckdb-parquet-setup.md`
   - Optional ad-hoc DuckDB queries over Parquet (not the primary viewer).
+- `docs/cleanup-methodology.md`
+  - How to audit stale docs/scripts and repeat repo cleanup safely.
+- `readme-prd.md`
+  - Product requirements digest aligned to the demographics pilot.
 
 ## Reference (domain/source-specific)
 

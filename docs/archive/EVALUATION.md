@@ -1,6 +1,6 @@
 # CHI Metadata Catalog — HIE Interoperability Best Practices Evaluation
 
-> **Status note (historical snapshot):** This document captures a point-in-time evaluation and roadmap context. Treat `README.md`, `TECH-SPEC.md`, and `docs/excel-workbook-guide.md` as the current operational source of truth.
+> **Status note (historical snapshot):** March 2026 evaluation. Terminology, value sets, crosswalk, and PBIP were implemented afterward — see `docs/crosswalk-model.md`, `docs/sources-of-truth.md`, and `docs/operational-runbook.md`. Treat `README.md` and `TECH-SPEC.md` as the current architecture contract.
 
 **Evaluation Date:** March 4, 2026
 

@@ -30,3 +30,10 @@ fhir_release_5/
 
 # Node (not used by this project)
 node_modules/
+
+# Local / generated (not published artifacts)
+.tmp/
+workbooks/*.pbix
+workbooks/pbip/**/.pbi/cache.abf
+workbooks/pbip/**/.pbi/localSettings.json
+workbooks/pbip/**/.pbi/editorSettings.json
