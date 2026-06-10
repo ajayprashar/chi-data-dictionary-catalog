@@ -58,6 +58,49 @@ In Power BI Desktop:
 | Yellow banner: *"Some tables have incomplete or no data"* | Click **Refresh now** (or **Home → Refresh**). Parquet must exist at `C:\AI\chi-data-dictionary-catalog\ddc-*.parquet`. |
 | Red error icons on measures | Close the report, reopen `chi-data-dictionary-catalog.pbip`. KPI measures live under `ddc-master_patient_catalog` → **Governance KPIs** (not a separate metrics table). |
 | Source shows wrong `source_id` | Run `import_steward_workbook_to_parquet.py`, then Refresh. |
+| **Unable to save document** / invalid path when saving `.pbix` | Not caused by repo cleanup. This project uses **PBIP + TMDL + PBIR**; **Save a copy → PBIX** is unreliable on some Desktop builds (especially Microsoft Store, June 2026). Use the **demo package** below instead of fighting PBIX export. |
+| Report opens but has no data | Parquet must be at `C:\AI\chi-data-dictionary-catalog\ddc-*.parquet` (hardcoded in the model). Refresh after parquets are in place. |
+
+---
+
+## Demonstrating on another computer
+
+**Recommended:** do **not** depend on exporting a `.pbix`. Ship PBIP + parquet instead.
+
+### Create a demo zip (on your machine)
+
+```powershell
+python scripts/package_pbi_demo.py
+```
+
+Writes `workbooks/chi-ddc-demo-YYYY-MM-DD.zip` containing:
+
+- 7 `ddc-*.parquet` files (repo root)
+- `workbooks/chi-steward-workbook.xlsx` and `workbooks/chi-partner-intake-workbook.xlsx`
+- `workbooks/pbip/` (report + semantic model; excludes local `.pbi` cache)
+
+### On the demo PC
+
+1. Extract the zip to **`C:\AI\chi-data-dictionary-catalog\`** (same path the model expects).
+2. Install [Power BI Desktop](https://www.microsoft.com/en-us/download/details.aspx?id=58494) (EXE installer preferred over Store for PBIP work).
+3. Open `workbooks\pbip\chi-data-dictionary-catalog.pbip`.
+4. **Home → Refresh**.
+5. **View → Zoom → 100%**.
+
+If you cannot use `C:\AI\chi-data-dictionary-catalog`: **Transform data → Data source settings** → point all seven parquet queries at the folder where you placed `ddc-*.parquet`.
+
+### Optional: single-file `.pbix` (often fails)
+
+Only if you need one portable file:
+
+1. Open the **repo** PBIP (`workbooks/pbip/...`), not a copy under `C:\AI\Incoming\`.
+2. **Home → Refresh** (all queries must succeed).
+3. **File → Save a copy** → `C:\Temp\chi-demo.pbix` (short path; use file picker).
+4. Disable **OneDrive save** preview feature if the dialog misbehaves.
+
+If export still fails, use the demo zip or **Publish** to a Power BI workspace and download `.pbix` from the service.
+
+**Excel workbooks** are included in the demo zip for stewardship walkthroughs. They are not required to *view* the report; running `import_steward_workbook_to_parquet.py` on the demo PC still requires a full repo clone with Python.
 
 ---
 
