@@ -1,12 +1,12 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
-  "name": "9d0e0ae670b18a25544c",
+  "name": "387abd249dc47bbf0719",
   "position": {
     "x": 32,
     "y": 140,
     "z": 3,
-    "height": 96,
-    "width": 920,
+    "height": 92,
+    "width": 608,
     "tabOrder": 3
   },
   "visual": {
@@ -131,7 +131,7 @@
                           [
                             {
                               "Literal": {
-                                "Value": "'Standards & Contexts'"
+                                "Value": "'Concept Profile'"
                               }
                             }
                           ]

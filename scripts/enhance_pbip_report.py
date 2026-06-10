@@ -13,6 +13,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "data"))
 from pbip_layout_constants import (  # noqa: E402
     CONTENT_W,
     DEFAULT_LANDING_PAGE_ID,
+    ADT_CONTEXT_COLUMNS,
+    ADT_CONTEXT_TITLE,
     FHIR_STANDARDS_COLUMNS,
     FHIR_STANDARDS_TABLE_H,
     PAGE_MARGIN,
@@ -578,8 +580,8 @@ def build_standards_contexts_page(page_dir: Path) -> None:
         ),
         table_ex(
             vid(), margin, adt_ccda_y, half_w, adt_h, 8, ADT,
-            ["semantic_id", "segment_id", "field_id", "field_name", "message_type", "mapping_status", "notes"],
-            title="HL7 v2 ADT context",
+            ADT_CONTEXT_COLUMNS,
+            title=ADT_CONTEXT_TITLE,
         ),
         table_ex(
             vid(), margin + half_w + 16, adt_ccda_y, half_w, adt_h, 9, CCDA,
@@ -973,12 +975,15 @@ def main() -> None:
     write_chi_theme()
     update_report_json()
     from add_pbip_start_here_page import build_start_here_page
-    from add_pbip_documentation_page import build_field_guide_page, write_guide_table_tmdl
+    from add_pbip_documentation_page import build_field_guide_page, write_gaps_table_tmdl, write_guide_table_tmdl
     from add_pbip_documentation_page import sync_model_tmdl as sync_guide_model
     from generate_pbip_model_guide import generate as generate_guide
+    from generate_pbip_model_guide import generate_gaps
 
     generate_guide()
+    generate_gaps()
     write_guide_table_tmdl()
+    write_gaps_table_tmdl()
     sync_guide_model()
     build_start_here_page(start_page)
     build_field_guide_page(field_guide_page)

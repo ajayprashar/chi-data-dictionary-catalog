@@ -28,6 +28,8 @@ Use this page as the index for which documents are actively maintained versus ke
   - Catalog vs dictionary, PBIP pages vs tables, where to edit vs read (steward and demo audiences).
 - `data/pbip_report_manifest.py`
   - Source manifest for in-report Field guide (`ddc-application_guide.parquet`); validate with `scripts/validate_pbip_manifest.py`; regenerate via `scripts/generate_pbip_model_guide.py`.
+- `data/pilot_curation_checks.py`
+  - Concept Profile curation checks for `ddc-application_guide_gaps.parquet` (Phase 3 steward alignment).
 - `docs/jupyter-duckdb-parquet-setup.md`
   - Optional ad-hoc DuckDB queries over Parquet (not the primary viewer).
 - `docs/cleanup-methodology.md`

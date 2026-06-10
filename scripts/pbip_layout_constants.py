@@ -26,6 +26,17 @@ DEFAULT_LANDING_PAGE_ID = STANDARDS_PAGE_ID
 SLICER_TITLE = "Select governed concept (semantic_id)"
 FHIR_STANDARDS_TITLE = "FHIR R4 + US Core (Dictionary)"
 DICT_PROFILE_TITLE = "Implementation & survivorship (FHIR + standards)"
+ADT_CONTEXT_TITLE = "HL7 v2 ADT context (CE fields merged: .1 code ^ .2 text)"
+ADT_CONTEXT_COLUMNS = [
+    "semantic_id",
+    "segment_id",
+    "field_id",
+    "hl7_ce_encoding",
+    "field_name",
+    "message_type",
+    "mapping_status",
+    "notes",
+]
 
 STANDARDS_HEADER_H = 128
 STANDARDS_LAYER_H = 72

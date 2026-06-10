@@ -99,9 +99,9 @@ Stable spine joining catalog, dictionary, terminology, crosswalk, ADT/CCDA, and 
 
 ## Where is the in-report field guide?
 
-Open the **Field guide** tab in Power BI. Use slicers to pick a report page and table/visual. **Summary cards** show page purpose, interoperability summary, and primary audience; the detail table explains each column’s layer, role, standards URL, and Excel authoring sheet.
+Open the **Field guide** tab in Power BI. Use slicers to pick a report page, table/visual, and whether the column is **editable in Excel**. **Summary cards** show page purpose, interoperability summary, and primary audience. The detail table links each column to **steward_action** (workbook sheet → import → Refresh) and **review_on_page** (usually Concept Profile). The **curation gaps** table lists missing Concept Profile fields for demographics pilots and non-Approved concepts (from live parquet).
 
-Regenerate after layout changes:
+Regenerate after layout or steward publish:
 
 ```powershell
 python scripts/validate_pbip_manifest.py

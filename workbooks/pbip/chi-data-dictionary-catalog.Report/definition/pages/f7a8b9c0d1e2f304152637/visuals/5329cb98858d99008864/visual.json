@@ -1,13 +1,13 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
-  "name": "34713145d1c6d4ec8e5a",
+  "name": "5329cb98858d99008864",
   "position": {
     "x": 32,
-    "y": 816,
-    "z": 8,
-    "height": 200,
-    "width": 920,
-    "tabOrder": 8
+    "y": 812,
+    "z": 12,
+    "height": 204,
+    "width": 1856,
+    "tabOrder": 12
   },
   "visual": {
     "visualType": "tableEx",
@@ -20,13 +20,13 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "ddc-hl7_adt_catalog"
+                      "Entity": "ddc-application_guide_gaps"
                     }
                   },
                   "Property": "semantic_id"
                 }
               },
-              "queryRef": "ddc-hl7_adt_catalog.semantic_id",
+              "queryRef": "ddc-application_guide_gaps.semantic_id",
               "nativeQueryRef": "semantic_id"
             },
             {
@@ -34,98 +34,70 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "ddc-hl7_adt_catalog"
+                      "Entity": "ddc-application_guide_gaps"
                     }
                   },
-                  "Property": "segment_id"
+                  "Property": "pilot_scope"
                 }
               },
-              "queryRef": "ddc-hl7_adt_catalog.segment_id",
-              "nativeQueryRef": "segment_id"
+              "queryRef": "ddc-application_guide_gaps.pilot_scope",
+              "nativeQueryRef": "pilot_scope"
             },
             {
               "field": {
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "ddc-hl7_adt_catalog"
+                      "Entity": "ddc-application_guide_gaps"
                     }
                   },
-                  "Property": "field_id"
+                  "Property": "report_column"
                 }
               },
-              "queryRef": "ddc-hl7_adt_catalog.field_id",
-              "nativeQueryRef": "field_id"
+              "queryRef": "ddc-application_guide_gaps.report_column",
+              "nativeQueryRef": "report_column"
             },
             {
               "field": {
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "ddc-hl7_adt_catalog"
+                      "Entity": "ddc-application_guide_gaps"
                     }
                   },
-                  "Property": "hl7_ce_encoding"
+                  "Property": "gap_reason"
                 }
               },
-              "queryRef": "ddc-hl7_adt_catalog.hl7_ce_encoding",
-              "nativeQueryRef": "hl7_ce_encoding"
+              "queryRef": "ddc-application_guide_gaps.gap_reason",
+              "nativeQueryRef": "gap_reason"
             },
             {
               "field": {
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "ddc-hl7_adt_catalog"
+                      "Entity": "ddc-application_guide_gaps"
                     }
                   },
-                  "Property": "field_name"
+                  "Property": "excel_sheet"
                 }
               },
-              "queryRef": "ddc-hl7_adt_catalog.field_name",
-              "nativeQueryRef": "field_name"
+              "queryRef": "ddc-application_guide_gaps.excel_sheet",
+              "nativeQueryRef": "excel_sheet"
             },
             {
               "field": {
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "ddc-hl7_adt_catalog"
+                      "Entity": "ddc-application_guide_gaps"
                     }
                   },
-                  "Property": "message_type"
+                  "Property": "steward_action"
                 }
               },
-              "queryRef": "ddc-hl7_adt_catalog.message_type",
-              "nativeQueryRef": "message_type"
-            },
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "ddc-hl7_adt_catalog"
-                    }
-                  },
-                  "Property": "mapping_status"
-                }
-              },
-              "queryRef": "ddc-hl7_adt_catalog.mapping_status",
-              "nativeQueryRef": "mapping_status"
-            },
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "ddc-hl7_adt_catalog"
-                    }
-                  },
-                  "Property": "notes"
-                }
-              },
-              "queryRef": "ddc-hl7_adt_catalog.notes",
-              "nativeQueryRef": "notes"
+              "queryRef": "ddc-application_guide_gaps.steward_action",
+              "nativeQueryRef": "steward_action"
             }
           ]
         }
@@ -138,7 +110,7 @@
             "fontSize": {
               "expr": {
                 "Literal": {
-                  "Value": "12D"
+                  "Value": "11D"
                 }
               }
             },
@@ -164,6 +136,13 @@
                 }
               }
             },
+            "outline": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Frame'"
+                }
+              }
+            },
             "bold": {
               "expr": {
                 "Literal": {
@@ -180,7 +159,7 @@
             "fontSize": {
               "expr": {
                 "Literal": {
-                  "Value": "12D"
+                  "Value": "11D"
                 }
               }
             },
@@ -272,13 +251,6 @@
                   "Value": "1D"
                 }
               }
-            },
-            "gridVertical": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
             }
           }
         }
@@ -298,14 +270,14 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'HL7 v2 ADT context (CE fields merged: .1 code ^ .2 text)'"
+                  "Value": "'Concept Profile curation gaps (pilots + non-Approved concepts)'"
                 }
               }
             },
             "fontSize": {
               "expr": {
                 "Literal": {
-                  "Value": "14D"
+                  "Value": "13D"
                 }
               }
             },
@@ -314,7 +286,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#FFFFFF'"
+                      "Value": "'#000000'"
                     }
                   }
                 }
@@ -325,7 +297,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#0047AB'"
+                      "Value": "'#FFC000'"
                     }
                   }
                 }
@@ -388,14 +360,14 @@
             "top": {
               "expr": {
                 "Literal": {
-                  "Value": "12D"
+                  "Value": "10D"
                 }
               }
             },
             "bottom": {
               "expr": {
                 "Literal": {
-                  "Value": "12D"
+                  "Value": "10D"
                 }
               }
             },

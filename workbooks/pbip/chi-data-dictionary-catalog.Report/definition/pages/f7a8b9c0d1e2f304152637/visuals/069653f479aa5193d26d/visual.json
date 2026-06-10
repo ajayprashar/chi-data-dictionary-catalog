@@ -1,13 +1,13 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
-  "name": "59619aadd91318fd8beb",
+  "name": "069653f479aa5193d26d",
   "position": {
-    "x": 32,
-    "y": 248,
-    "z": 5,
-    "height": 108,
-    "width": 965,
-    "tabOrder": 5
+    "x": 1668,
+    "y": 288,
+    "z": 9,
+    "height": 100,
+    "width": 220,
+    "tabOrder": 9
   },
   "visual": {
     "visualType": "card",
@@ -23,11 +23,11 @@
                       "Entity": "ddc-application_guide"
                     }
                   },
-                  "Property": "page_purpose"
+                  "Property": "primary_audience"
                 }
               },
-              "queryRef": "ddc-application_guide.page_purpose",
-              "nativeQueryRef": "page_purpose"
+              "queryRef": "ddc-application_guide.primary_audience",
+              "nativeQueryRef": "primary_audience"
             }
           ]
         }
@@ -40,7 +40,7 @@
             "fontSize": {
               "expr": {
                 "Literal": {
-                  "Value": "13D"
+                  "Value": "14D"
                 }
               }
             },

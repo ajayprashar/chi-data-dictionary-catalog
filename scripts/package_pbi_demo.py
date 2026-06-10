@@ -27,6 +27,7 @@ DEFAULT_OUT = REPO_ROOT / "workbooks" / f"chi-ddc-demo-{date.today().isoformat()
 
 PARQUET_FILES = [
     "ddc-application_guide.parquet",
+    "ddc-application_guide_gaps.parquet",
     "ddc-master_patient_catalog.parquet",
     "ddc-master_patient_dictionary.parquet",
     "ddc-data_source_availability.parquet",
@@ -65,6 +66,7 @@ Required layout after extract:
     ddc-value_set_member.parquet
     ddc-source_value_crosswalk.parquet
     ddc-application_guide.parquet
+    ddc-application_guide_gaps.parquet
     workbooks\\chi-steward-workbook.xlsx
     workbooks\\chi-partner-intake-workbook.xlsx
     workbooks\\pbip\\chi-data-dictionary-catalog.pbip

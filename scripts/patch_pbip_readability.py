@@ -16,6 +16,8 @@ REPORT_VISUALS = REPO / "workbooks" / "pbip" / "chi-data-dictionary-catalog.Repo
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from pbip_layout_constants import (  # noqa: E402
+    ADT_CONTEXT_COLUMNS,
+    ADT_CONTEXT_TITLE,
     DICT_PROFILE_TITLE,
     FHIR_STANDARDS_COLUMNS,
     FHIR_STANDARDS_TABLE_H,
@@ -29,7 +31,6 @@ from pbip_layout_constants import (  # noqa: E402
 
 GOVERNED_CODES_TITLE = "Governed value set codes"
 SOURCE_XW_TITLE = "Source value crosswalk"
-ADT_TITLE = "HL7 v2 ADT context"
 CCDA_TITLE = "C-CDA / CCD context"
 
 
@@ -122,12 +123,16 @@ def patch_visual(container: dict) -> list[str]:
                 pos["y"] = layout["codes_y"]
                 changes.append(f"{title[:24]}… {name}: y -> {layout['codes_y']}")
 
-        elif title.startswith(ADT_TITLE) or title == CCDA_TITLE:
+        elif title.startswith(ADT_CONTEXT_TITLE) or title == CCDA_TITLE:
             layout = standards_page_y_positions()
             pos = container.setdefault("position", {})
             if pos.get("y") != layout["adt_y"]:
                 pos["y"] = layout["adt_y"]
                 changes.append(f"{title[:24]}… {name}: y -> {layout['adt_y']}")
+            if title.startswith(ADT_CONTEXT_TITLE):
+                _set_table_columns(visual, "ddc-hl7_adt_catalog", ADT_CONTEXT_COLUMNS)
+                _enable_word_wrap(visual)
+                changes.append(f"ADT table {name}: columns include field_id + hl7_ce_encoding")
 
     return changes
 

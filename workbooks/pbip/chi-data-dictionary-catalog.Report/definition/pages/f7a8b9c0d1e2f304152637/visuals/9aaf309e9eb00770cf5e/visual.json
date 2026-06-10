@@ -1,13 +1,13 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
-  "name": "209d6e271c3d8c9e689a",
+  "name": "9aaf309e9eb00770cf5e",
   "position": {
     "x": 32,
-    "y": 364,
-    "z": 8,
-    "height": 44,
+    "y": 240,
+    "z": 6,
+    "height": 40,
     "width": 1856,
-    "tabOrder": 8
+    "tabOrder": 6
   },
   "visual": {
     "visualType": "textbox",
@@ -19,7 +19,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "Layers: Catalog = WHAT | Dictionary = HOW | Terminology/Crosswalk = WHICH | Message context = WHERE | Sources = coverage",
+                    "value": "Publish ritual: chi-steward-workbook.xlsx \u2192 save \u2192 python scripts/import_steward_workbook_to_parquet.py \u2192 Refresh PBIP | Concept Profile: pick semantic_id slicer after publish | docs/excel-workbook-guide.md",
                     "textStyle": {
                       "fontSize": "11pt",
                       "color": "#000000"

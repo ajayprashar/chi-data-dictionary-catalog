@@ -1,12 +1,12 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
-  "name": "645080379f54d1e8524b",
+  "name": "bf95113490486038034f",
   "position": {
-    "x": 1668,
-    "y": 248,
+    "x": 32,
+    "y": 288,
     "z": 7,
-    "height": 108,
-    "width": 220,
+    "height": 100,
+    "width": 928,
     "tabOrder": 7
   },
   "visual": {
@@ -23,11 +23,11 @@
                       "Entity": "ddc-application_guide"
                     }
                   },
-                  "Property": "primary_audience"
+                  "Property": "page_purpose"
                 }
               },
-              "queryRef": "ddc-application_guide.primary_audience",
-              "nativeQueryRef": "primary_audience"
+              "queryRef": "ddc-application_guide.page_purpose",
+              "nativeQueryRef": "page_purpose"
             }
           ]
         }
@@ -40,7 +40,7 @@
             "fontSize": {
               "expr": {
                 "Literal": {
-                  "Value": "14D"
+                  "Value": "13D"
                 }
               }
             },

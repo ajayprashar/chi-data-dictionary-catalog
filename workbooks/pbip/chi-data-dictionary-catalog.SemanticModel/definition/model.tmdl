@@ -8,7 +8,7 @@ model Model
 
 annotation __PBI_TimeIntelligenceEnabled = 1
 
-annotation PBI_QueryOrder = ["ddc-master_patient_catalog", "ddc-master_patient_dictionary", "ddc-data_source_availability", "ddc-hl7_adt_catalog", "ddc-ccda_catalog", "ddc-value_set_member", "ddc-source_value_crosswalk", "ddc-application_guide"]
+annotation PBI_QueryOrder = ["ddc-master_patient_catalog", "ddc-master_patient_dictionary", "ddc-data_source_availability", "ddc-hl7_adt_catalog", "ddc-ccda_catalog", "ddc-value_set_member", "ddc-source_value_crosswalk", "ddc-application_guide", "ddc-application_guide_gaps"]
 
 annotation PBI_ProTooling = ["DevMode"]
 
@@ -21,5 +21,6 @@ ref table ddc-source_value_crosswalk
 ref table ddc-value_set_member
 
 ref table ddc-application_guide
+ref table ddc-application_guide_gaps
 ref cultureInfo en-US
 

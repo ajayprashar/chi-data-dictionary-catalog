@@ -1,13 +1,13 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
-  "name": "33901bcfecb08876dec3",
+  "name": "6bdd267e69326753b7fa",
   "position": {
     "x": 32,
-    "y": 420,
-    "z": 9,
-    "height": 596,
+    "y": 440,
+    "z": 11,
+    "height": 360,
     "width": 1856,
-    "tabOrder": 9
+    "tabOrder": 11
   },
   "visual": {
     "visualType": "tableEx",
@@ -51,11 +51,53 @@
                       "Entity": "ddc-application_guide"
                     }
                   },
-                  "Property": "layer_question"
+                  "Property": "editable_in_excel"
                 }
               },
-              "queryRef": "ddc-application_guide.layer_question",
-              "nativeQueryRef": "layer_question"
+              "queryRef": "ddc-application_guide.editable_in_excel",
+              "nativeQueryRef": "editable_in_excel"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ddc-application_guide"
+                    }
+                  },
+                  "Property": "excel_sheet"
+                }
+              },
+              "queryRef": "ddc-application_guide.excel_sheet",
+              "nativeQueryRef": "excel_sheet"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ddc-application_guide"
+                    }
+                  },
+                  "Property": "steward_action"
+                }
+              },
+              "queryRef": "ddc-application_guide.steward_action",
+              "nativeQueryRef": "steward_action"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ddc-application_guide"
+                    }
+                  },
+                  "Property": "review_on_page"
+                }
+              },
+              "queryRef": "ddc-application_guide.review_on_page",
+              "nativeQueryRef": "review_on_page"
             },
             {
               "field": {
@@ -93,39 +135,11 @@
                       "Entity": "ddc-application_guide"
                     }
                   },
-                  "Property": "standards_touchpoint"
-                }
-              },
-              "queryRef": "ddc-application_guide.standards_touchpoint",
-              "nativeQueryRef": "standards_touchpoint"
-            },
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "ddc-application_guide"
-                    }
-                  },
                   "Property": "standards_url"
                 }
               },
               "queryRef": "ddc-application_guide.standards_url",
               "nativeQueryRef": "standards_url"
-            },
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "ddc-application_guide"
-                    }
-                  },
-                  "Property": "excel_sheet"
-                }
-              },
-              "queryRef": "ddc-application_guide.excel_sheet",
-              "nativeQueryRef": "excel_sheet"
             },
             {
               "field": {

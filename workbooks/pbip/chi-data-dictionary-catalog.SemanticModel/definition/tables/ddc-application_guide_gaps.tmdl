@@ -1,0 +1,102 @@
+table ddc-application_guide_gaps
+	lineageTag: 9e1073704be7b9d0af8e
+
+	column gap_id
+		dataType: string
+		lineageTag: b0fe216f60275ce973d1
+		summarizeBy: none
+		sourceColumn: gap_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column semantic_id
+		dataType: string
+		lineageTag: 1d3d608c876e619eee34
+		summarizeBy: none
+		sourceColumn: semantic_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column pilot_scope
+		dataType: string
+		lineageTag: bbeeab2a42eeeabb9559
+		summarizeBy: none
+		sourceColumn: pilot_scope
+
+		annotation SummarizationSetBy = Automatic
+
+	column approval_status
+		dataType: string
+		lineageTag: 8b79d2cfc347146499ec
+		summarizeBy: none
+		sourceColumn: approval_status
+
+		annotation SummarizationSetBy = Automatic
+
+	column report_page
+		dataType: string
+		lineageTag: 1774a50ea02e357ad1ff
+		summarizeBy: none
+		sourceColumn: report_page
+
+		annotation SummarizationSetBy = Automatic
+
+	column report_column
+		dataType: string
+		lineageTag: 31e4dcfc4cbb84d11ccf
+		summarizeBy: none
+		sourceColumn: report_column
+
+		annotation SummarizationSetBy = Automatic
+
+	column excel_sheet
+		dataType: string
+		lineageTag: d187b1a056f13e8f1a01
+		summarizeBy: none
+		sourceColumn: excel_sheet
+
+		annotation SummarizationSetBy = Automatic
+
+	column source_column
+		dataType: string
+		lineageTag: dadf9e501fa750bc553b
+		summarizeBy: none
+		sourceColumn: source_column
+
+		annotation SummarizationSetBy = Automatic
+
+	column gap_reason
+		dataType: string
+		lineageTag: 2868f46ab023a9ff6154
+		summarizeBy: none
+		sourceColumn: gap_reason
+
+		annotation SummarizationSetBy = Automatic
+
+	column steward_action
+		dataType: string
+		lineageTag: 015eb6854c7737c05d99
+		summarizeBy: none
+		sourceColumn: steward_action
+
+		annotation SummarizationSetBy = Automatic
+
+	column sort_order
+		dataType: string
+		lineageTag: 39afb724814eb30a2618
+		summarizeBy: none
+		sourceColumn: sort_order
+
+		annotation SummarizationSetBy = Automatic
+
+	partition ddc-application_guide_gaps = m
+		mode: import
+		source =
+				let
+				    Source = Parquet.Document(File.Contents("C:\AI\chi-data-dictionary-catalog\ddc-application_guide_gaps.parquet"), [Compression=null, LegacyColumnNameEncoding=false, MaxDepth=null])
+				in
+				    Source
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table

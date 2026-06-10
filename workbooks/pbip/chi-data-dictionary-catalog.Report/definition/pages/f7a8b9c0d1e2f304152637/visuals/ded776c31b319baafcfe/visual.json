@@ -1,13 +1,13 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
-  "name": "37069aaf26e1ac8b9eee",
+  "name": "ded776c31b319baafcfe",
   "position": {
     "x": 32,
-    "y": 20,
-    "z": 1,
-    "height": 56,
-    "width": 1200,
-    "tabOrder": 1
+    "y": 80,
+    "z": 2,
+    "height": 40,
+    "width": 1750,
+    "tabOrder": 2
   },
   "visual": {
     "visualType": "textbox",
@@ -19,11 +19,10 @@
               {
                 "textRuns": [
                   {
-                    "value": "Report field guide",
+                    "value": "Steward workflow + column reference \u2014 links Excel sheets to Concept Profile and curation gaps",
                     "textStyle": {
-                      "fontSize": "28pt",
-                      "color": "#FFFFFF",
-                      "fontWeight": "bold"
+                      "fontSize": "13pt",
+                      "color": "#FFFFFF"
                     }
                   }
                 ]

@@ -150,6 +150,7 @@ VISUALS: list[dict] = [
         "columns": [
             "semantic_id",
             "segment_id",
+            "field_id",
             "hl7_ce_encoding",
             "field_name",
             "message_type",
@@ -642,14 +643,25 @@ FIELD_GUIDE: dict[tuple[str, str], dict] = {
         "pilot_example": "PID for patient demographics.",
         "doc_ref": "docs/cmt-adt-feed-and-master-patient.md",
     },
-    ("ddc-hl7_adt_catalog", "hl7_ce_encoding"): {
-        "purpose_short": "HL7 CE component encoding (code ^ text) for the field.",
-        "interop_role": "Shows merged .1/.2 CE pair for interface mapping — replaces separate field_id in report view.",
+    ("ddc-hl7_adt_catalog", "field_id"): {
+        "purpose_short": "HL7 field position (e.g. PID-15, PID-10).",
+        "interop_role": "Primary wire locator for interface specs — always populated; pair with hl7_ce_encoding when code^text CE exists.",
         "standards_touchpoint": "HL7 v2 field table",
         "exchange_formats": "HL7 v2 ADT",
         "excel_sheet": "ADT_Mappings",
         "editable_in_excel": "yes",
-        "pilot_example": "PID-10.1^PID-10.2 for race code and display text.",
+        "pilot_example": "Patient.language → PID-15; Patient.race → PID-10.",
+        "doc_ref": "docs/cmt-adt-feed-and-master-patient.md",
+        "standards_url": "https://hl7-definition.caristix.com/v2/",
+    },
+    ("ddc-hl7_adt_catalog", "hl7_ce_encoding"): {
+        "purpose_short": "HL7 CE component encoding (code ^ text) when both .1 and .2 are mapped.",
+        "interop_role": "Optional detail for CE fields (race, ethnicity); blank for single-component fields like PID-15 language.",
+        "standards_touchpoint": "HL7 v2 field table",
+        "exchange_formats": "HL7 v2 ADT",
+        "excel_sheet": "ADT_Mappings",
+        "editable_in_excel": "yes",
+        "pilot_example": "PID-10.1^PID-10.2 for race; empty for Patient.language (PID-15 only).",
         "doc_ref": "docs/cmt-adt-feed-and-master-patient.md",
         "standards_url": "https://hl7-definition.caristix.com/v2/",
     },
@@ -871,6 +883,42 @@ def resolve_standards_url(touchpoint: str, meta: dict) -> str:
     return TOUCHPOINT_URLS.get(touchpoint, "")
 
 
+EXCEL_TABLE_BY_SHEET: dict[str, str] = {
+    "Catalog": "chi_catalog",
+    "Dictionary": "chi_dictionary",
+    "Source_Availability": "chi_source_availability",
+    "ADT_Mappings": "chi_adt_mappings",
+    "CCDA_Mappings": "chi_ccda_mappings",
+    "Value_Set_Members": "chi_value_set_member",
+    "Source_Value_Crosswalk": "chi_source_value_crosswalk",
+    "Steward_Queue": "chi_steward_queue",
+}
+
+PUBLISH_RITUAL = (
+    "Publish ritual: chi-steward-workbook.xlsx → save → "
+    "python scripts/import_steward_workbook_to_parquet.py → Refresh PBIP"
+)
+
+
+def excel_table_for_sheet(sheet: str) -> str:
+    if sheet == "—":
+        return "—"
+    return EXCEL_TABLE_BY_SHEET.get(sheet, sheet)
+
+
+def steward_action_for(meta: dict) -> str:
+    if meta.get("editable_in_excel") != "yes":
+        return "Read only in Power BI — not edited in steward workbook."
+    sheet = meta.get("excel_sheet", "—")
+    if sheet == "—":
+        return "Read only — not steward-authored."
+    table = excel_table_for_sheet(sheet)
+    return (
+        f"Edit {sheet} ({table}) → save workbook → "
+        f"import_steward_workbook_to_parquet.py → Concept Profile Refresh"
+    )
+
+
 GUIDE_COLUMNS = [
     "guide_id",
     "page_id",
@@ -890,7 +938,10 @@ GUIDE_COLUMNS = [
     "standards_url",
     "exchange_formats",
     "excel_sheet",
+    "excel_table",
     "editable_in_excel",
+    "steward_action",
+    "review_on_page",
     "pilot_example",
     "doc_ref",
 ]

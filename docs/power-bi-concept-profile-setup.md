@@ -28,7 +28,7 @@ python scripts/generate_pbip_model_guide.py
 python scripts/add_pbip_documentation_page.py
 ```
 
-The Field guide tab includes **page summary cards** (purpose, interoperability summary, audience) plus column detail with `standards_url`. After changing PBIP table columns, update `data/pbip_report_manifest.py` so validation stays green.
+The Field guide tab includes **page summary cards**, **steward workflow** (Excel sheet → import → Refresh), an **editable in Excel** slicer, column detail with `steward_action` / `review_on_page`, and a **curation gaps** table (`ddc-application_guide_gaps.parquet`) built from live catalog/dictionary parquet. Regenerate gaps after each steward publish. After changing PBIP table columns, update `data/pbip_report_manifest.py` so validation stays green.
 
 **Default landing page:** **Standards & Contexts** (opens on load). **Start here** remains the first tab for orientation.
 
