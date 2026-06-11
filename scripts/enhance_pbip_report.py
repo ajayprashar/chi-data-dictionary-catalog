@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import json
 import secrets
+import shutil
 import sys
 from pathlib import Path
 
@@ -15,7 +16,10 @@ from pbip_layout_constants import (  # noqa: E402
     ADT_CONTEXT_COLUMNS,
     ADT_CONTEXT_TITLE,
     CONCEPT_BLANK_CALLOUT,
+    CONCEPT_CARD_GAP,
+    CONCEPT_FOOTER_H,
     CONTENT_W,
+    concept_profile_layout,
     DEFAULT_LANDING_PAGE_ID,
     DEMO_LANDING_PAGE_ID,
     DEMO_PAGE_ID,
@@ -250,7 +254,7 @@ def table_format(*, header_pt: int = 12, value_pt: int = 12, word_wrap: bool = T
         "grid": [
             {
                 "properties": {
-                    "rowPadding": lit_pt(6),
+                    "rowPadding": lit_pt(8),
                     "gridHorizontal": lit_bool(True),
                     "gridHorizontalColor": {"solid": {"color": lit_str(TABLE_GRID_LINE)}},
                     "outlineColor": {"solid": {"color": lit_str(TABLE_GRID_LINE)}},
@@ -289,6 +293,67 @@ def bar_format() -> dict:
             }
         ],
     }
+
+
+def callout_strip(
+    name: str,
+    x: float,
+    y: float,
+    w: float,
+    h: float,
+    z: int,
+    text: str,
+    *,
+    size: str = "11pt",
+    bold: bool = True,
+) -> dict:
+    """Yellow accent callout — needs explicit height so wrapped text does not stack in PBI."""
+    run_style: dict = {"fontSize": size, "color": TEXT_BLACK}
+    if bold:
+        run_style["fontWeight"] = "bold"
+    return visual_container(
+        name, x, y, w, h, z,
+        {
+            "visualType": "textbox",
+            "objects": {
+                "general": [
+                    {
+                        "properties": {
+                            "paragraphs": [
+                                {
+                                    "textRuns": [
+                                        {
+                                            "value": text,
+                                            "textStyle": run_style,
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "visualContainerObjects": {
+                "background": [
+                    {"properties": {"show": lit_bool(True), "color": {"solid": {"color": lit_str(PRIMARY_YELLOW)}}}}
+                ],
+                "border": [
+                    {"properties": {"show": lit_bool(True), "color": {"solid": {"color": lit_str(PRIMARY_BLUE)}}}}
+                ],
+                "padding": [
+                    {
+                        "properties": {
+                            "top": lit_pt(10),
+                            "bottom": lit_pt(10),
+                            "left": lit_pt(14),
+                            "right": lit_pt(14),
+                        }
+                    }
+                ],
+            },
+            "drillFilterOtherVisuals": True,
+        },
+    )
 
 
 def textbox(
@@ -465,11 +530,8 @@ def write_visual(page_dir: Path, container: dict) -> None:
 def clear_visuals(page_dir: Path) -> None:
     visuals = page_dir / "visuals"
     if visuals.exists():
-        for child in visuals.iterdir():
-            if child.is_dir():
-                for f in child.iterdir():
-                    f.unlink()
-                child.rmdir()
+        shutil.rmtree(visuals)
+    visuals.mkdir(parents=True, exist_ok=True)
 
 
 def build_concept_profile_page(page_dir: Path) -> None:
@@ -477,18 +539,21 @@ def build_concept_profile_page(page_dir: Path) -> None:
     w, h = PAGE_PROFILE_W, PAGE_PROFILE_H
     margin = PAGE_MARGIN
     content_w = CONTENT_W
-    header_h = 128
-    slicer_y = header_h + 12
-    slicer_h = SLICER_H_PROFILE
-    callout_y = slicer_y + slicer_h + 8
-    callout_h = 40
-    cards_y = callout_y + callout_h + 12
-    card_h = 156
-    tables_y = cards_y + card_h + 20
-    biz_h = 318
-    dict_y = tables_y + biz_h + 16
-    dict_h = 248
-    footer_h = 52
+    layout = concept_profile_layout()
+    header_h = layout["header_h"]
+    footer_h = layout["footer_h"]
+    footer_y = layout["footer_y"]
+    slicer_y = layout["slicer_y"]
+    callout_y = layout["callout_y"]
+    callout_h = layout["callout_h"]
+    cards_y = layout["cards_y"]
+    card_h = layout["card_h"]
+    card_w = layout["card_w"]
+    tables_y = layout["tables_y"]
+    biz_h = layout["biz_h"]
+    dict_y = layout["dict_y"]
+    dict_h = layout["dict_h"]
+    source_h = layout["source_h"]
     visuals = [
         shape_rect(vid(), 0, 0, w, header_h, 0, PRIMARY_BLUE),
         textbox(
@@ -501,18 +566,14 @@ def build_concept_profile_page(page_dir: Path) -> None:
             "Concept profile — catalog, dictionary, and source availability on one semantic_id",
             size="13pt", color=TEXT_WHITE, transparent=True,
         ),
-        slicer_dropdown(vid(), margin, slicer_y, SLICER_W, slicer_h, 3, CATALOG, "semantic_id", "Patient.race"),
-        textbox(
-            vid(), margin, callout_y, content_w, callout_h, 4,
-            CONCEPT_BLANK_CALLOUT,
-            size="11pt", color=TEXT_BLACK,
-        ),
+        slicer_dropdown(vid(), margin, slicer_y, SLICER_W, SLICER_H_PROFILE, 3, CATALOG, "semantic_id", "Patient.race"),
+        callout_strip(vid(), margin, callout_y, content_w, callout_h, 4, CONCEPT_BLANK_CALLOUT),
         *[
             card(
                 vid(),
-                margin + (idx * 376),
+                margin + idx * (card_w + CONCEPT_CARD_GAP),
                 cards_y,
-                360,
+                card_w,
                 card_h,
                 5 + idx,
                 CATALOG,
@@ -540,13 +601,13 @@ def build_concept_profile_page(page_dir: Path) -> None:
             title="Implementation & survivorship (FHIR + standards)",
         ),
         table_ex(
-            vid(), margin + 1200, tables_y, 656, dict_y + dict_h - tables_y, 12, SOURCES,
+            vid(), margin + 1200, tables_y, 656, source_h, 12, SOURCES,
             ["source_id", "availability", "completeness_pct", "timeliness_sla_hours", "notes"],
             title="Source availability",
         ),
-        shape_rect(vid(), 0, h - footer_h, w, footer_h, 13, PRIMARY_YELLOW),
+        shape_rect(vid(), 0, footer_y, w, footer_h, 13, PRIMARY_YELLOW),
         textbox(
-            vid(), margin, h - footer_h + 10, content_w, 36, 14,
+            vid(), margin, footer_y + 10, content_w, 36, 14,
             "Read-only view. Edit chi-steward-workbook.xlsx, run import_steward_workbook_to_parquet.py, then Refresh.",
             size="12pt", color=TEXT_BLACK, transparent=True,
         ),
@@ -561,19 +622,21 @@ def build_standards_contexts_page(page_dir: Path) -> None:
     margin = PAGE_MARGIN
     content_w = CONTENT_W
     header_h = STANDARDS_HEADER_H
-    layer_y = header_h + 8
-    layer_h = STANDARDS_LAYER_H
     layout = standards_page_y_positions()
+    layer_y = layout["layer_y"]
+    layer_h = layout["layer_h"]
     slicer_y = layout["slicer_y"]
     slicer_h = SLICER_H_STANDARDS
     tables_y = layout["fhir_y"]
-    fhir_h = FHIR_STANDARDS_TABLE_H
+    fhir_h = layout["fhir_h"]
     codes_y = layout["codes_y"]
-    codes_h = STANDARDS_HALF_TABLE_H
+    codes_h = layout["codes_h"]
     adt_callout_y = layout["adt_callout_y"]
+    adt_callout_h = layout["adt_callout_h"]
     adt_ccda_y = layout["adt_y"]
     adt_h = layout["adt_h"]
-    footer_h = 52
+    footer_y = layout["footer_y"]
+    footer_h = CONCEPT_FOOTER_H
     half_w = (content_w - 16) // 2
     concept_slicer_w = int(SLICER_W * 0.62)
     pilot_slicer_w = content_w - concept_slicer_w - 16
@@ -589,10 +652,11 @@ def build_standards_contexts_page(page_dir: Path) -> None:
             "Healthcare standards + HL7 ADT + C-CDA + FHIR for one semantic_id",
             size="13pt", color=TEXT_WHITE, transparent=True,
         ),
-        textbox(
+        callout_strip(
             vid(), margin, layer_y, content_w, layer_h, 3,
             STANDARDS_LAYER_TEXT,
-            size="12pt", color=TEXT_BLACK,
+            size="12pt",
+            bold=False,
         ),
         slicer_dropdown(
             vid(), margin, slicer_y, concept_slicer_w, slicer_h, 4,
@@ -628,11 +692,7 @@ def build_standards_contexts_page(page_dir: Path) -> None:
             ],
             title="Source value crosswalk",
         ),
-        textbox(
-            vid(), margin, adt_callout_y, half_w, STANDARDS_ADT_CALLOUT_H - 4, 9,
-            ADT_CALLOUT_TEXT,
-            size="11pt", color=TEXT_BLACK,
-        ),
+        callout_strip(vid(), margin, adt_callout_y, content_w, adt_callout_h, 9, ADT_CALLOUT_TEXT),
         table_ex(
             vid(), margin, adt_ccda_y, half_w, adt_h, 10, ADT,
             ADT_CONTEXT_COLUMNS,
@@ -643,9 +703,9 @@ def build_standards_contexts_page(page_dir: Path) -> None:
             ["semantic_id", "section_name", "entry_type", "xml_path", "mapping_status", "notes"],
             title="C-CDA / CCD context",
         ),
-        shape_rect(vid(), 0, h - footer_h, w, footer_h, 12, PRIMARY_YELLOW),
+        shape_rect(vid(), 0, footer_y, w, footer_h, 12, PRIMARY_YELLOW),
         textbox(
-            vid(), margin, h - footer_h + 10, content_w, 36, 13,
+            vid(), margin, footer_y + 10, content_w, 36, 13,
             "Standards: docs/shie-standards-reference.md | Crosswalk model: docs/crosswalk-model.md",
             size="12pt", color=TEXT_BLACK, transparent=True,
         ),

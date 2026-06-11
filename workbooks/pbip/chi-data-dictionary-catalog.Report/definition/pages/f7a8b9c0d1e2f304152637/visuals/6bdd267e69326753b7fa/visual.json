@@ -192,13 +192,6 @@
                 }
               }
             },
-            "outline": {
-              "expr": {
-                "Literal": {
-                  "Value": "'Frame'"
-                }
-              }
-            },
             "bold": {
               "expr": {
                 "Literal": {

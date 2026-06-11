@@ -167,7 +167,8 @@ def build_start_here_page(page_dir: Path) -> None:
     callout_y = row1_y + panel_h + 12
     callout_h = 48
     row2_y = callout_y + callout_h + 12
-    row3_y = row2_y + 196
+    how_to_h = 248  # 8 body lines + title band; 184px caused stacked/overlapping text in PBI
+    row3_y = row2_y + how_to_h + 12
     footer_h = 52
 
     visuals = [
@@ -185,7 +186,7 @@ def build_start_here_page(page_dir: Path) -> None:
         section_panel(margin, row1_y, col_w, panel_h, 3, "Purpose", PURPOSE_LINES),
         section_panel(margin + col_w + 16, row1_y, col_w, panel_h, 4, "Sources of truth", SOURCES_LINES),
         callout_banner(margin, callout_y, content_w, callout_h, 5, PILOT_CALLOUT),
-        section_panel(margin, row2_y, content_w, 184, 6, "How to use this report", HOW_TO_USE_LINES),
+        section_panel(margin, row2_y, content_w, how_to_h, 6, "How to use this report", HOW_TO_USE_LINES),
         section_panel(margin, row3_y, content_w, 96, 7, "Update cycle", PUBLISH_LINES, body_size="11pt"),
         shape_rect(vid(), 0, h - footer_h, w, footer_h, 8, PRIMARY_YELLOW),
         textbox(

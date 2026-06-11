@@ -19,8 +19,8 @@ ref table ddc-hl7_adt_catalog
 ref table ddc-ccda_catalog
 ref table ddc-source_value_crosswalk
 ref table ddc-value_set_member
-
 ref table ddc-application_guide
 ref table ddc-application_guide_gaps
+
 ref cultureInfo en-US
 

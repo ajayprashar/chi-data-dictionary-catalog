@@ -100,3 +100,4 @@ table ddc-application_guide_gaps
 	annotation PBI_NavigationStepName = Navigation
 
 	annotation PBI_ResultType = Table
+

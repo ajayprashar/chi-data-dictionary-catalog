@@ -19,7 +19,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "Publish ritual: chi-steward-workbook.xlsx \u2192 save \u2192 python scripts/import_steward_workbook_to_parquet.py \u2192 Refresh PBIP | Concept Profile: pick semantic_id slicer after publish | docs/excel-workbook-guide.md",
+                    "value": "Publish ritual: chi-steward-workbook.xlsx → save → python scripts/import_steward_workbook_to_parquet.py → Refresh PBIP | Concept Profile: pick semantic_id slicer after publish | docs/excel-workbook-guide.md",
                     "textStyle": {
                       "fontSize": "11pt",
                       "color": "#000000"
