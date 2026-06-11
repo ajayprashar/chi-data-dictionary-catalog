@@ -1,0 +1,63 @@
+table ddc-data_source_availability
+	lineageTag: 16e13d03-b820-4bbf-81f6-8f7f7dff0a34
+
+	column source_id
+		dataType: string
+		lineageTag: 0ffb059f-6f5e-407d-8ed7-88fa90084921
+		summarizeBy: none
+		sourceColumn: source_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column semantic_id
+		dataType: string
+		lineageTag: 84049341-c87c-4208-baae-a357cd4414c1
+		summarizeBy: none
+		sourceColumn: semantic_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column availability
+		dataType: string
+		lineageTag: 988008c5-f6fc-4061-917a-d8b3649d8447
+		summarizeBy: none
+		sourceColumn: availability
+
+		annotation SummarizationSetBy = Automatic
+
+	column completeness_pct
+		dataType: string
+		lineageTag: 7959066c-44d5-4092-ba80-693099367ba3
+		summarizeBy: none
+		sourceColumn: completeness_pct
+
+		annotation SummarizationSetBy = Automatic
+
+	column timeliness_sla_hours
+		dataType: string
+		lineageTag: f1da7b15-a5fb-4dac-a7fb-d6bc142e97ac
+		summarizeBy: none
+		sourceColumn: timeliness_sla_hours
+
+		annotation SummarizationSetBy = Automatic
+
+	column notes
+		dataType: string
+		lineageTag: f5611503-df57-4536-bed9-64a269ce1c7d
+		summarizeBy: none
+		sourceColumn: notes
+
+		annotation SummarizationSetBy = Automatic
+
+	partition ddc-data_source_availability = m
+		mode: import
+		source =
+				let
+				    Source = Parquet.Document(File.Contents("C:\AI\chiddc\ddc-data_source_availability.parquet"), [Compression=null, LegacyColumnNameEncoding=false, MaxDepth=null])
+				in
+				    Source
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

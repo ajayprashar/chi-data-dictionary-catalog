@@ -2,7 +2,7 @@
 
 How to register another **data source** so CHI can document feed coverage and (optionally) rebuild the source availability matrix.
 
-**Viewer today:** Power BI PBIP (`workbooks/pbip/chi-data-dictionary-catalog.pbip`) - not a separate Streamlit or sidebar app.
+**Viewer today:** Power BI PBIP (`workbooks/pbip/chiddc.pbip`) - not a separate Streamlit or sidebar app.
 
 ---
 

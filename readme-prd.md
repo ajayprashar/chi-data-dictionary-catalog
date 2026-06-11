@@ -107,7 +107,7 @@ This mirrors enterprise metadata patterns while remaining simple.
 1. Author or edit metadata in **`workbooks/chi-steward-workbook.xlsx`** (`Catalog`, `Dictionary`, `Source_Availability` sheets).
 2. Import workbook changes to Parquet:
    `python scripts/import_steward_workbook_to_parquet.py`
-3. Open **`workbooks/pbip/chi-data-dictionary-catalog.pbip`** in Power BI Desktop and **Refresh** to load the latest catalog and dictionary (joined on Semantic ID).
+3. Open **`workbooks/pbip/chiddc.pbip`** in Power BI Desktop and **Refresh** to load the latest catalog and dictionary (joined on Semantic ID).
 4. Optional - regenerate the workbook from Parquet after script rebuilds:
    `python scripts/generate_steward_workbook.py`
 5. Optional - legacy CSV split or ad-hoc queries: `scripts/split_to_catalog_and_dictionary.py`, or Jupyter + DuckDB (**docs/jupyter-duckdb-parquet-setup.md**).

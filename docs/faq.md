@@ -22,6 +22,53 @@ Terminology / crosswalk → WHICH codes; local → standard
 
 ---
 
+## Is a "Concept" the same as an "Element"?
+
+**Usually yes** — in this project, both words mean **one governed piece of patient information**, identified by a single `semantic_id`.
+
+| Term | Typical use here | Example |
+|------|------------------|---------|
+| **Concept** | Steward and demo language; Power BI **Concept Profile** | "Review the **concept** `Patient.race`" |
+| **Element** | Catalog/dictionary and USCDI-aligned language | "The catalog lists one **element** per `semantic_id`" |
+| **`semantic_id`** | Stable ID both terms point to | `Patient.name_first` |
+
+**Definitions**
+
+- **Concept** — A patient attribute CHI officially governs (name, race, address, etc.). One concept = one row in the catalog and one row in the dictionary, joined by `semantic_id`.
+- **Element** — The same governed attribute when described as a **catalog row** or a **field on a standards checklist**. "Data element" in the PRD and "governed concept" in the vision statement refer to the same grain.
+
+They are **not** interchangeable when **USCDI** uses "Element" for its own labels (see below).
+
+### Plain example (high school level)
+
+Imagine a **school registration form** online:
+
+| Blank on the form | What it is in CHI terms |
+|-------------------|-------------------------|
+| **First name** | One **concept** and one **element** — CHI ID: `Patient.name_first` |
+| **Last name** | A different **concept** / **element** — CHI ID: `Patient.name_last` |
+
+Both blanks are about "name," but CHI tracks them as **two separate concepts** (two `semantic_id`s), not one.
+
+The **government checklist** (USCDI) groups them differently:
+
+| USCDI label type | Example | Think of it as… |
+|------------------|---------|-----------------|
+| **USCDI Data Element** (official category) | "Patient Name" | The **section heading** on the government form |
+| **USCDI Element** (friendly label) | "First Name", "Last Name" | The **specific blanks** under that heading |
+
+So:
+
+- **CHI concept** ≈ **CHI element** ≈ one governed `semantic_id` (e.g. first name).
+- **USCDI Element** = a standards display name (often matches the friendly blank, e.g. "First Name").
+- **USCDI Data Element** = the broader official USCDI category (e.g. "Patient Name") that may cover **several** CHI concepts.
+
+**Rule of thumb:** If someone says "pick a concept" or "pick an element" and means one row in the catalog → they mean the same thing. If someone says "USCDI Element" or "USCDI Data Element" → they mean **standards column labels**, not a substitute for `semantic_id`.
+
+See also `TECH-SPEC.md` §2.2.1 (table naming) and §3.1 (catalog grain).
+
+---
+
 ## Do Power BI tabs map to Catalog vs Dictionary tables?
 
 **No.** PBIP pages are **task lenses** on the same `semantic_id` spine, not one tab per parquet table.
@@ -60,7 +107,7 @@ Only the first pair (master catalog + dictionary) is the core **catalog vs dicti
 |--------|--------|
 | **Author** governance, FHIR, survivorship | `workbooks/chi-steward-workbook.xlsx` (Catalog, Dictionary, Source_Availability, ADT/CCDA sheets) |
 | **Publish** machine copy | `python scripts/import_steward_workbook_to_parquet.py` |
-| **Read / demo** | `workbooks/pbip/chi-data-dictionary-catalog.pbip` → **Refresh** |
+| **Read / demo** | `workbooks/pbip/chiddc.pbip` → **Refresh** |
 
 Excel is source of human edits. Power BI is read-only after publish. Do not expect PBIP tabs to mirror Excel sheet names 1:1.
 

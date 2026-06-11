@@ -10,7 +10,7 @@ Local proof-of-concept: **one steward workbook** is the primary surface for a **
 
 | Authoring (in scope) | Optional read | Deferred |
 |----------------------|---------------|----------|
-| `chi-steward-workbook.xlsx` - edit Catalog + Dictionary + Source_Availability | Power BI PBIP (`workbooks/pbip/chi-data-dictionary-catalog.pbip`) | SharePoint / team portals |
+| `chi-steward-workbook.xlsx` - edit Catalog + Dictionary + Source_Availability | Power BI PBIP (`workbooks/pbip/chiddc.pbip`) | SharePoint / team portals |
 | 5 demographics pilot (`Patient.race`, `.ethnicity`, `.language`, `.gender_id`, `.birth_sex`) | See `docs/power-bi-concept-profile-setup.md` | All 28 data sources |
 | `semantic_id` as join key | Jupyter notebook - ad-hoc DuckDB queries only | Partner intake (until onboarding a source) |
 | Round-trip: Excel → parquet in this folder | | Full FHIR inventory curation |
@@ -66,7 +66,7 @@ flowchart LR
    python scripts/import_steward_workbook_to_parquet.py
    ```
 
-3. **Review** - open `workbooks/pbip/chi-data-dictionary-catalog.pbip` and **Refresh** (see `docs/power-bi-concept-profile-setup.md`).
+3. **Review** - open `workbooks/pbip/chiddc.pbip` and **Refresh** (see `docs/power-bi-concept-profile-setup.md`).
 
 **Reverse direction** (only when scripts rebuild parquet, not daily use):
 

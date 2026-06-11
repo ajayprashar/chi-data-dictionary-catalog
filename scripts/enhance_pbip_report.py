@@ -59,10 +59,21 @@ PAGES_JSON_SCHEMA = (
     "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/pagesMetadata/1.1.0/schema.json"
 )
 
+from pbip_paths import (  # noqa: E402
+    REPO_PARQUET,
+    THEME_FILE,
+    THEME_LABEL,
+    THEME_RESOURCE_PATH,
+    pbip_root,
+    report_definition,
+    semantic_model_definition,
+    theme_dir,
+)
+
 REPO = Path(__file__).resolve().parent.parent
-PBIP = REPO / "workbooks" / "pbip"
-REPORT = PBIP / "chi-data-dictionary-catalog.Report" / "definition"
-THEME_DIR = PBIP / "chi-data-dictionary-catalog.Report" / "StaticResources" / "SharedResources" / "BaseThemes"
+PBIP = pbip_root(REPO)
+REPORT = report_definition(REPO)
+THEME_DIR = theme_dir(REPO)
 
 CATALOG = "ddc-master_patient_catalog"
 DICTIONARY = "ddc-master_patient_dictionary"
@@ -72,9 +83,8 @@ CCDA = "ddc-ccda_catalog"
 VALUE_MEMBER = "ddc-value_set_member"
 SOURCE_XW = "ddc-source_value_crosswalk"
 
-SEMANTIC_MODEL = PBIP / "chi-data-dictionary-catalog.SemanticModel" / "definition"
+SEMANTIC_MODEL = semantic_model_definition(REPO)
 TABLES_DIR = SEMANTIC_MODEL / "tables"
-REPO_PARQUET = r"C:\AI\chi-data-dictionary-catalog"
 
 STANDARDS_LAYER_TEXT = (
     "USCDI = Catalog (what) | US Core + FHIR R4 = Dictionary (how) | Governed codes = Value_Set_Members | "
@@ -936,7 +946,7 @@ def build_overview_page(page_dir: Path) -> None:
 
 def write_chi_theme() -> None:
     theme = {
-        "name": "CHI High Contrast",
+        "name": THEME_LABEL,
         "dataColors": [PRIMARY_BLUE, PRIMARY_RED, PRIMARY_YELLOW, "#1AAB40", "#6B6B6B", "#0091D5"],
         "foreground": TEXT_BLACK,
         "foregroundNeutralSecondary": "#333333",
@@ -1014,7 +1024,7 @@ def write_chi_theme() -> None:
             },
         },
     }
-    write_text_utf8_no_bom(THEME_DIR / "CHI High Contrast.json", json.dumps(theme, indent=2))
+    write_text_utf8_no_bom(THEME_DIR / THEME_FILE, json.dumps(theme, indent=2))
 
 
 def update_report_json() -> None:
@@ -1022,7 +1032,7 @@ def update_report_json() -> None:
     data = json.loads(path.read_text(encoding="utf-8"))
     data["themeCollection"] = {
         "baseTheme": {
-            "name": "CHI High Contrast",
+            "name": THEME_LABEL,
             "reportVersionAtImport": {"visual": "2.10.0", "report": "3.4.0", "page": "2.3.1"},
             "type": "SharedResources",
         }
@@ -1032,7 +1042,7 @@ def update_report_json() -> None:
             "name": "SharedResources",
             "type": "SharedResources",
             "items": [
-                {"name": "CHI High Contrast", "path": "BaseThemes/CHI High Contrast.json", "type": "BaseTheme"},
+                {"name": THEME_LABEL, "path": THEME_RESOURCE_PATH, "type": "BaseTheme"},
             ],
         }
     ]

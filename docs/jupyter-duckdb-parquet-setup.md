@@ -16,7 +16,7 @@ The approach that works reliably uses the **DuckDB Python API** only (no `%%sql`
 - Create and use a virtual environment so dependencies are reproducible:
 
   ```powershell
-  cd C:\AI\chi-data-dictionary-catalog
+  cd C:\AI\chiddc
   python -m venv .venv
   .venv\Scripts\activate
   ```
@@ -46,7 +46,7 @@ The notebook kernel’s current working directory must be the project folder so 
 
 ```python
 import os
-os.chdir(r'C:\AI\chi-data-dictionary-catalog')  # or your project path
+os.chdir(r'C:\AI\chiddc')  # or your project path
 ```
 
 **Query pattern**

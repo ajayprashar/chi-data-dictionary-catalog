@@ -24,9 +24,10 @@ from pilot_curation_checks import PILOT_SEMANTIC_IDS  # noqa: E402
 ADT_PATH = ROOT / "ddc-hl7_adt_catalog.parquet"
 MEMBER_PATH = ROOT / "ddc-value_set_member.parquet"
 CATALOG_PATH = ROOT / "ddc-master_patient_catalog.parquet"
+from pbip_paths import semantic_model_definition  # noqa: E402
+
 CATALOG_TMDL = (
-    ROOT / "workbooks" / "pbip" / "chi-data-dictionary-catalog.SemanticModel"
-    / "definition" / "tables" / "ddc-master_patient_catalog.tmdl"
+    semantic_model_definition(ROOT) / "tables" / "ddc-master_patient_catalog.tmdl"
 )
 
 CE_CODE_RE = re.compile(r"\bcode\b", re.IGNORECASE)

@@ -472,6 +472,8 @@ To reduce confusion, treat the physical table/file names as stable technical IDs
 
 Interpretation tip: in `ddc-master_patient_catalog`, "master_patient" means *person-centric canonical scope* (not a patient table from an EHR), and "catalog" means *list of governed concepts*.
 
+**Concept vs element:** In CHI governance, **concept** and **element** both mean one governed row per `semantic_id` (catalog + dictionary). UI copy favors *concept* (e.g. Concept Profile); table labels favor *element* (e.g. Canonical Element Catalog). **USCDI Element** and **USCDI Data Element** are standards display columns — not join keys. Plain-language definitions and a worked example: `docs/faq.md` → *Is a "Concept" the same as an "Element"?*.
+
 **Join key:** All governed tables join on **`semantic_id`**. Use friendly display columns such as `uscdi_element` in Excel for human review.
 
 ### 2.2.2 Update cadence and stewardship model
@@ -833,7 +835,7 @@ Displayed as **-** (em dash). Multiline fields (Description, survivorship logic,
 
 ## 6. Viewer Layout, Organization, and Logic
 
-The read surface is **Power BI** (`workbooks/pbip/chi-data-dictionary-catalog.pbip`). Stewards author in **Excel**; optional **Jupyter** supports ad-hoc parquet queries. See `docs/power-bi-concept-profile-setup.md` for open, refresh, and troubleshooting.
+The read surface is **Power BI** (`workbooks/pbip/chiddc.pbip`). Stewards author in **Excel**; optional **Jupyter** supports ad-hoc parquet queries. See `docs/power-bi-concept-profile-setup.md` for open, refresh, and troubleshooting.
 
 ### 6.1 Report Pages
 

@@ -128,7 +128,9 @@ def main() -> None:
     sync_page_tab_styles()
     print(f"Wrote PBIP page: {DEMO_DISPLAY_NAME} ({DEMO_PAGE_ID})")
     print(f"  Default landing page: {DEMO_DISPLAY_NAME} ({DEMO_LANDING_PAGE_ID})")
-    print("  Re-open chi-data-dictionary-catalog.pbip in Power BI Desktop and Refresh.")
+    from pbip_paths import PBIP_FILE  # noqa: E402
+
+    print(f"  Re-open {PBIP_FILE} in Power BI Desktop and Refresh.")
 
 
 if __name__ == "__main__":

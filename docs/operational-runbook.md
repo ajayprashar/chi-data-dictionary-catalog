@@ -35,7 +35,7 @@ Excel (author)  →  import script  →  parquet  →  Power BI Refresh (read)
 | Parquet | `ddc-*.parquet` (repo root) | Published machine copy (7 clinical tables from steward import) |
 | Field guide parquet | `ddc-application_guide.parquet` | In-report column reference - **not** from steward import; regenerate from `data/pbip_report_manifest.py` |
 | Curation gaps parquet | `ddc-application_guide_gaps.parquet` | Concept Profile gaps for pilots + non-Approved concepts - regenerate after steward import |
-| Read surface | `workbooks/pbip/chi-data-dictionary-catalog.pbip` | Review / discovery |
+| Read surface | `workbooks/pbip/chiddc.pbip` | Review / discovery |
 
 ---
 
@@ -67,7 +67,7 @@ Excel (author)  →  import script  →  parquet  →  Power BI Refresh (read)
 Use the **same folder name** on every machine so PBIP parquet paths work without edits:
 
 ```text
-C:\AI\chi-data-dictionary-catalog
+C:\AI\chiddc
 ```
 
 If you must use a different drive, either:
@@ -78,7 +78,7 @@ If you must use a different drive, either:
 ### 2. Python environment
 
 ```powershell
-cd C:\AI\chi-data-dictionary-catalog
+cd C:\AI\chiddc
 python -m venv .venv
 .venv\Scripts\activate
 pip install -r requirements.txt
@@ -89,7 +89,7 @@ pip install -r requirements.txt
 Install Power BI Desktop. Open:
 
 ```text
-workbooks\pbip\chi-data-dictionary-catalog.pbip
+workbooks\pbip\chiddc.pbip
 ```
 
 Set **View → Zoom → 100%** for readable text.
@@ -109,7 +109,7 @@ Set **View → Zoom → 100%** for readable text.
 ### Publisher
 
 ```powershell
-cd C:\AI\chi-data-dictionary-catalog
+cd C:\AI\chiddc
 .venv\Scripts\activate
 python scripts/import_steward_workbook_to_parquet.py
 python scripts/generate_pbip_model_guide.py
@@ -125,7 +125,7 @@ python scripts/generate_pbip_model_guide.py
 ### Reviewer
 
 ```powershell
-cd C:\AI\chi-data-dictionary-catalog
+cd C:\AI\chiddc
 git pull
 ```
 
@@ -199,7 +199,7 @@ Complete before calling the demographics pilot **operationally done**:
 
 - [ ] This runbook shared with stewards and reviewers
 - [x] Publisher role assigned (**Ajay Prashar**)
-- [ ] Standard clone path agreed (`C:\AI\chi-data-dictionary-catalog`)
+- [ ] Standard clone path agreed (`C:\AI\chiddc`)
 
 ---
 
@@ -272,7 +272,7 @@ Stewards should only need **import** for daily work.
 | Symptom | Fix |
 |---------|-----|
 | Power BI shows stale data | Publisher ran import? Reviewer ran `git pull` + **Refresh**? |
-| Parquet path error on open | Clone path must match `C:\AI\chi-data-dictionary-catalog` or re-point TMDL |
+| Parquet path error on open | Clone path must match `C:\AI\chiddc` or re-point TMDL |
 | Import script fails | Workbook open in Excel? Close file and retry |
 | Excel repair prompt on open | See `docs/excel-workbook-generation-rules.md`; regenerate with `generate_steward_workbook.py` |
 | UTF-8 BOM error on PBIP | PBIP JSON must be UTF-8 without BOM - see `docs/power-bi-concept-profile-setup.md` |

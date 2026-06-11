@@ -76,7 +76,7 @@ def render_demo_walkthrough_txt() -> str:
         "-" * len(PILOT_QUICK_REF_TITLE),
         *PILOT_QUICK_REF_LINES,
         "",
-        "Open: workbooks\\pbip\\chi-data-dictionary-catalog.pbip",
+        "Open: workbooks\\pbip\\chiddc.pbip",
         "Or double-click OPEN-DEMO.bat in the extracted folder.",
     ]
     return "\n".join(sections) + "\n"

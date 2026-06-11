@@ -16,7 +16,7 @@ Edit `chi-steward-workbook.xlsx` → import to parquet → review in Power BI (*
 
 | Authoring (use now) | Optional read | Defer |
 |---------------------|---------------|-------|
-| `workbooks/chi-steward-workbook.xlsx` | `workbooks/pbip/chi-data-dictionary-catalog.pbip` (Power BI) | SharePoint |
+| `workbooks/chi-steward-workbook.xlsx` | `workbooks/pbip/chiddc.pbip` (Power BI) | SharePoint |
 | `Catalog` + `Dictionary` + `Source_Availability` + `ADT_Mappings` + `CCDA_Mappings` | See `docs/power-bi-concept-profile-setup.md` | Partner intake workbook |
 | `Concept_Explorer` sheet | Jupyter notebook (`chi-data-dictionary-catalog.ipynb`) for ad-hoc DuckDB queries only | Full 28-source coverage |
 | `import_steward_workbook_to_parquet.py` | | Azure DevOps, Innovaccer DEM |
@@ -53,7 +53,7 @@ pip install -r requirements.txt
    python scripts/import_steward_workbook_to_parquet.py
    ```
 
-5. Optional - open `workbooks/pbip/chi-data-dictionary-catalog.pbip` in Power BI Desktop and **Refresh** (see `docs/power-bi-concept-profile-setup.md`). For ad-hoc parquet queries only, use `chi-data-dictionary-catalog.ipynb` (`docs/jupyter-duckdb-parquet-setup.md`).
+5. Optional - open `workbooks/pbip/chiddc.pbip` in Power BI Desktop and **Refresh** (see `docs/power-bi-concept-profile-setup.md`). For ad-hoc parquet queries only, use `chi-data-dictionary-catalog.ipynb` (`docs/jupyter-duckdb-parquet-setup.md`).
 
 Regenerate workbook from parquet after script rebuilds:
 
@@ -81,7 +81,7 @@ PBIP layout (maintainers): `python scripts/add_pbip_start_here_page.py` · `pyth
 | Artifact | Role |
 |----------|------|
 | `chi-steward-workbook.xlsx` | Primary steward surface (authoring) |
-| `workbooks/pbip/chi-data-dictionary-catalog.pbip` | Read-only catalog/dictionary viewer |
+| `workbooks/pbip/chiddc.pbip` | Read-only catalog/dictionary viewer |
 | `ddc-master_patient_catalog.parquet` | One row per governed concept |
 | `ddc-master_patient_dictionary.parquet` | Implementation detail per concept |
 | `ddc-data_source_availability.parquet` | Concept ↔ source links |

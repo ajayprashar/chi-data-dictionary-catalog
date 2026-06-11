@@ -1,10 +1,10 @@
 """Package PBIP, parquet, and Excel workbooks for demo on another Windows PC.
 
 The semantic model uses absolute paths to:
-  C:\\AI\\chi-data-dictionary-catalog\\ddc-*.parquet
+  C:\\AI\\chiddc\\ddc-*.parquet
 
 Extract the zip to that exact folder on the demo machine, then open:
-  workbooks\\pbip\\chi-data-dictionary-catalog.pbip
+  workbooks\\pbip\\chiddc.pbip
 """
 
 from __future__ import annotations
@@ -23,8 +23,19 @@ import pyarrow.parquet as pq
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO_ROOT / "scripts"))
-PBIP_DIR = REPO_ROOT / "workbooks" / "pbip"
-DEFAULT_OUT = REPO_ROOT / "workbooks" / f"chi-ddc-demo-{date.today().isoformat()}.zip"
+
+from pbip_paths import (  # noqa: E402
+    DEMO_ROOT_NAME,
+    PACKAGE_ZIP_STEM,
+    PBIP_FILE,
+    PBIP_REPORT_DIR,
+    PBIP_SEMANTIC_MODEL_DIR,
+    REPO_PARQUET,
+    pbip_root,
+)
+
+PBIP_DIR = pbip_root(REPO_ROOT)
+DEFAULT_OUT = REPO_ROOT / "workbooks" / f"{PACKAGE_ZIP_STEM}{date.today().strftime('%Y%m%d')}.zip"
 
 PARQUET_FILES = [
     "ddc-application_guide.parquet",
@@ -49,29 +60,33 @@ SKIP_SUFFIXES = {
     ".pbi/editorSettings.json",
 }
 
-OPEN_DEMO_BAT = """@echo off
+
+def open_demo_bat() -> str:
+    return f"""@echo off
 cd /d "%~dp0"
 echo Opening CHI Data Dictionary Catalog in Power BI Desktop...
-start "" "%~dp0workbooks\\pbip\\chi-data-dictionary-catalog.pbip"
+start "" "%~dp0workbooks\\pbip\\{PBIP_FILE}"
 echo.
 echo After Power BI opens: Home -^> Refresh from the REPORT view (not Transform data).
 echo Start on the Guide · Demo tour tab, then follow the steps on screen.
 pause
 """
 
-README = """CHI Data Dictionary Catalog - Power BI demo package
+
+def demo_readme() -> str:
+    return f"""CHI Data Dictionary Catalog - Power BI demo package
 =====================================================
 
 Extract this zip so the folder exists at:
 
-  C:\\AI\\chi-data-dictionary-catalog\\
+  {REPO_PARQUET}\\
 
 Quick start: double-click OPEN-DEMO.bat (or open the PBIP path below).
 Read DEMO-WALKTHROUGH.txt for the same steps as the in-report Guide · Demo tour tab.
 
 Required layout after extract:
 
-  C:\\AI\\chi-data-dictionary-catalog\\
+  {REPO_PARQUET}\\
     ddc-master_patient_catalog.parquet
     ddc-master_patient_dictionary.parquet
     ddc-data_source_availability.parquet
@@ -83,9 +98,9 @@ Required layout after extract:
     ddc-application_guide_gaps.parquet
     workbooks\\chi-steward-workbook.xlsx
     workbooks\\chi-partner-intake-workbook.xlsx
-    workbooks\\pbip\\chi-data-dictionary-catalog.pbip
-    workbooks\\pbip\\chi-data-dictionary-catalog.Report\\
-    workbooks\\pbip\\chi-data-dictionary-catalog.SemanticModel\\
+    workbooks\\pbip\\{PBIP_FILE}
+    workbooks\\pbip\\{PBIP_REPORT_DIR}\\
+    workbooks\\pbip\\{PBIP_SEMANTIC_MODEL_DIR}\\
 
 Steward authoring (optional demo of edit -> publish):
   workbooks\\chi-steward-workbook.xlsx
@@ -94,7 +109,7 @@ Steward authoring (optional demo of edit -> publish):
 
 Open in Power BI Desktop:
 
-  workbooks\\pbip\\chi-data-dictionary-catalog.pbip
+  workbooks\\pbip\\{PBIP_FILE}
 
 Default tab: Guide · Demo tour (5-minute walkthrough). Then Home -> Refresh from the REPORT view.
 
@@ -104,9 +119,11 @@ Power Query preview crash (0x80131623 on ddc-ccda_catalog, etc.):
   Parquets in this zip are rewritten to Parquet 1.0 for broader Desktop compatibility.
   Prefer the EXE installer over Microsoft Store. US Gov cloud tenants: use EXE build.
 
-If you cannot use C:\\AI\\chi-data-dictionary-catalog on the demo PC:
+If you cannot use {REPO_PARQUET} on the demo PC:
   Transform data -> Data source settings -> change the folder for all
   nine parquet queries to wherever you extracted the ddc-*.parquet files.
+
+PBIP folder names are alphanumeric only (no hyphens) so Publish / Save as PBIX works.
 
 A single-file .pbix is not required for this demo. PBIP is the maintained
 report format in git.
@@ -144,39 +161,42 @@ def package(out_zip: Path, *, native_parquet: bool = False) -> None:
     if not PBIP_DIR.is_dir():
         raise SystemExit(f"PBIP folder not found: {PBIP_DIR}")
 
+    validate_paths = REPO_ROOT / "scripts" / "validate_pbip_paths.py"
+    if validate_paths.is_file():
+        subprocess.run([sys.executable, str(validate_paths)], check=True, cwd=REPO_ROOT)
+
     out_zip.parent.mkdir(parents=True, exist_ok=True)
-    root_name = "chi-data-dictionary-catalog"
 
     with tempfile.TemporaryDirectory() as tmp:
         tmp_path = Path(tmp)
         from pbip_demo_walkthrough_content import render_demo_walkthrough_txt
 
         with zipfile.ZipFile(out_zip, "w", compression=zipfile.ZIP_DEFLATED) as zf:
-            zf.writestr(f"{root_name}/DEMO-README.txt", README)
-            zf.writestr(f"{root_name}/DEMO-WALKTHROUGH.txt", render_demo_walkthrough_txt())
-            zf.writestr(f"{root_name}/OPEN-DEMO.bat", OPEN_DEMO_BAT)
+            zf.writestr(f"{DEMO_ROOT_NAME}/DEMO-README.txt", demo_readme())
+            zf.writestr(f"{DEMO_ROOT_NAME}/DEMO-WALKTHROUGH.txt", render_demo_walkthrough_txt())
+            zf.writestr(f"{DEMO_ROOT_NAME}/OPEN-DEMO.bat", open_demo_bat())
 
             for name in PARQUET_FILES:
                 src = REPO_ROOT / name
                 if native_parquet:
-                    zf.write(src, f"{root_name}/{name}")
+                    zf.write(src, f"{DEMO_ROOT_NAME}/{name}")
                 else:
                     compat = tmp_path / name
                     write_pbi_compatible_parquet(src, compat)
-                    zf.write(compat, f"{root_name}/{name}")
+                    zf.write(compat, f"{DEMO_ROOT_NAME}/{name}")
 
             for rel in EXCEL_FILES:
                 src = REPO_ROOT / rel
-                zf.write(src, f"{root_name}/{Path(rel).as_posix()}")
+                zf.write(src, f"{DEMO_ROOT_NAME}/{Path(rel).as_posix()}")
 
             for src in PBIP_DIR.rglob("*"):
                 if src.is_dir() or should_skip(src.relative_to(PBIP_DIR)):
                     continue
                 rel = src.relative_to(REPO_ROOT)
-                zf.write(src, f"{root_name}/{rel.as_posix()}")
+                zf.write(src, f"{DEMO_ROOT_NAME}/{rel.as_posix()}")
 
     print(f"Wrote {out_zip}")
-    print("On demo PC: extract to C:\\AI\\ then open workbooks\\pbip\\chi-data-dictionary-catalog.pbip")
+    print(f"On demo PC: extract to C:\\AI\\ then open workbooks\\pbip\\{PBIP_FILE}")
 
 
 def main() -> None:

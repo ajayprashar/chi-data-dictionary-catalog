@@ -82,7 +82,7 @@ python -c "import pandas as pd; cat = pd.read_parquet('ddc-master_patient_catalo
 - `scripts/build_data_source_availability.py` - NEW: source availability builder
 
 ### Application ([OK] Updated)
-- `workbooks/pbip/chi-data-dictionary-catalog.pbip` - Power BI read surface (replaces retired local web viewer)
+- `workbooks/pbip/chiddc.pbip` - Power BI read surface (replaces retired local web viewer)
 - `chi-data-dictionary-catalog.ipynb` - Jupyter notebook for optional ad-hoc data exploration
 
 ### Documentation ([OK] Current)

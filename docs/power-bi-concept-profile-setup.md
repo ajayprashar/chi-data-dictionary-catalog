@@ -5,7 +5,7 @@ Read-only **governed catalog and dictionary viewer** (see `docs/product-vision.m
 **Recommended:** open the PBIP project in Power BI Desktop:
 
 ```text
-workbooks/pbip/chi-data-dictionary-catalog.pbip
+workbooks/pbip/chiddc.pbip
 ```
 
 The report includes seven tabs (left-to-right):
@@ -71,19 +71,37 @@ In Power BI Desktop:
 2. **View → Page view → Actual size** (if available).
 3. Use **Fit to page** only when presenting on a small screen.
 
+### PBIP folder paths (Publish / Save as PBIX)
+
+Power BI OPC packaging validates **relative paths** inside the project when bundling to `.pbix` or publishing. **Directory names must be alphanumeric only** - no **spaces**, **hyphens**, or **underscores**. (Tab labels and in-report text may still contain spaces.)
+
+| Item | Path |
+|------|------|
+| Demo / parquet root | `C:\AI\chiddc\` |
+| PBIP entry | `workbooks\pbip\chiddc.pbip` |
+| Report / model folders | `chiddc.Report`, `chiddc.SemanticModel` |
+| Theme file (no spaces in filename) | `BaseThemes/CHIHighContrast.json` |
+
+Constants: `scripts/pbip_paths.py`. Validate before packaging: `python scripts/validate_pbip_paths.py`. Parquet **filenames** at repo root (`ddc-*.parquet`) are unchanged.
+
+**Local clone:** rename your git folder to `C:\AI\chiddc\` (from `chi-data-dictionary-catalog`), or re-point all nine parquet queries in Transform data. Reopen `workbooks\pbip\chiddc.pbip`.
+
+Purge non-Power BI artifacts from `.Report` / `.SemanticModel` before Publish. Clear Desktop cache if packaging still fails after a path fix.
+
 ### Troubleshooting
 
 | Symptom | Fix |
 |---------|-----|
+| Publish / Save as PBIX fails on path | Use `C:\AI\chiddc` and `chiddc.*` folders only; see section above |
 | Text too small / hard to read | Set zoom to **100%**; pages are laid out at Actual size with 12–13pt table text. |
 | UTF-8 BOM error on open | PBIP JSON must be UTF-8 **without** BOM. Do not edit with PowerShell `Set-Content -Encoding utf8`; use Python or VS Code “UTF-8” (not “UTF-8 with BOM”). |
-| Yellow banner: *"Some tables have incomplete or no data"* | Click **Refresh now** (or **Home → Refresh**). Parquet must exist at `C:\AI\chi-data-dictionary-catalog\ddc-*.parquet`. |
-| Red error icons on measures | Close the report, reopen `chi-data-dictionary-catalog.pbip`. KPI measures live under `ddc-master_patient_catalog` → **Governance KPIs** (not a separate metrics table). |
+| Yellow banner: *"Some tables have incomplete or no data"* | Click **Refresh now** (or **Home → Refresh**). Parquet must exist at `C:\AI\chiddc\ddc-*.parquet`. |
+| Red error icons on measures | Close the report, reopen `chiddc.pbip`. KPI measures live under `ddc-master_patient_catalog` → **Governance KPIs** (not a separate metrics table). |
 | Source shows wrong `source_id` | Run `import_steward_workbook_to_parquet.py`, then Refresh. |
 | **Unable to save document** / invalid path when saving `.pbix` | Not caused by repo cleanup. This project uses **PBIP + TMDL + PBIR**; **Save a copy → PBIX** is unreliable on some Desktop builds (especially Microsoft Store, June 2026). Use the **demo package** below instead of fighting PBIX export. |
-| Report opens but has no data | Parquet must be at `C:\AI\chi-data-dictionary-catalog\ddc-*.parquet` (hardcoded in the model). Refresh after parquets are in place. |
+| Report opens but has no data | Parquet must be at `C:\AI\chiddc\ddc-*.parquet` (hardcoded in the model). Refresh after parquets are in place. |
 | **Transform data** → query preview: `Container exited unexpectedly` **0x80131623** | **Not corrupt parquet.** Known Power BI Mashup crash when previewing parquet queries inside PBIP (common on **Microsoft Store** app, **US Gov cloud**, June 2026). **Close Power Query** without Apply if broken; use **Home → Refresh** on the report canvas instead. Do not use Transform data for routine demos. Try **EXE installer**, clear `%LocalAppData%\Microsoft\Power BI Desktop\Cache`, or re-run `python scripts/package_pbi_demo.py` (rewrites parquets to Parquet 1.0). |
-| **Unable to save auto recovery file** / invalid path in `...\Power BI Desktop Store App\TempSaves\` | **Not corrupt PBIP.** Store-app auto-recovery cannot write its temp `.pbix`. Click **Close** and demo anyway - switch to **Report** view → **Home → Refresh**. On demo PC: **File → Options → Global → Auto recovery** → uncheck; or use the **EXE** installer. Repo sets `"enableAutoRecovery": false` in `chi-data-dictionary-catalog.pbip`. |
+| **Unable to save auto recovery file** / invalid path in `...\Power BI Desktop Store App\TempSaves\` | **Not corrupt PBIP.** Store-app auto-recovery cannot write its temp `.pbix`. Click **Close** and demo anyway - switch to **Report** view → **Home → Refresh**. On demo PC: **File → Options → Global → Auto recovery** → uncheck; or use the **EXE** installer. Repo sets `"enableAutoRecovery": false` in `chiddc.pbip`. |
 
 ---
 
@@ -97,7 +115,7 @@ In Power BI Desktop:
 python scripts/package_pbi_demo.py
 ```
 
-Writes `workbooks/chi-ddc-demo-YYYY-MM-DD.zip` containing:
+Writes `workbooks/chiddcYYYYMMDD.zip` (alphanumeric only, e.g. `chiddc20260611.zip`) containing:
 
 - 9 `ddc-*.parquet` files (7 governed data + 2 field guide; rewritten to Parquet 1.0 for Desktop compatibility)
 - `workbooks/chi-steward-workbook.xlsx` and `workbooks/chi-partner-intake-workbook.xlsx`
@@ -105,13 +123,13 @@ Writes `workbooks/chi-ddc-demo-YYYY-MM-DD.zip` containing:
 
 ### On the demo PC
 
-1. Extract the zip to **`C:\AI\chi-data-dictionary-catalog\`** (same path the model expects).
+1. Extract the zip to **`C:\AI\chiddc\`** (same path the model expects).
 2. Install [Power BI Desktop](https://www.microsoft.com/en-us/download/details.aspx?id=58494) (EXE installer preferred over Store for PBIP work).
-3. Open `workbooks\pbip\chi-data-dictionary-catalog.pbip`.
+3. Open `workbooks\pbip\chiddc.pbip`.
 4. **Home → Refresh**.
 5. **View → Zoom → 100%**.
 
-If you cannot use `C:\AI\chi-data-dictionary-catalog`: **Transform data → Data source settings** → point all nine parquet queries at the folder where you placed `ddc-*.parquet`.
+If you cannot use `C:\AI\chiddc`: **Transform data → Data source settings** → point all nine parquet queries at the folder where you placed `ddc-*.parquet`.
 
 ### Optional: single-file `.pbix` (often fails)
 
@@ -132,7 +150,7 @@ If export still fails, use the demo zip or **Publish** to a Power BI workspace a
 
 Before PBIP, stewards could build a one-off `.pbix` by connecting to parquet manually. That path is **deprecated**:
 
-- Use **`workbooks/pbip/chi-data-dictionary-catalog.pbip`** (seven tabs, nine-table semantic model).
+- Use **`workbooks/pbip/chiddc.pbip`** (seven tabs, nine-table semantic model).
 - Do not commit `workbooks/*.pbix` (gitignored).
 - Regenerate layout with `enhance_pbip_report.py` / `patch_pbip_readability.py` instead of hand-building visuals.
 
@@ -166,7 +184,7 @@ Power BI’s **Parquet** dialog often says “URL” even for local files. That 
 2. In the path/URL box, paste the full path to one file, for example:
 
    ```text
-   C:\AI\chi-data-dictionary-catalog\ddc-master_patient_catalog.parquet
+   C:\AI\chiddc\ddc-master_patient_catalog.parquet
    ```
 
 3. **OK** → preview loads → **Load** (or **Transform data** if you want to rename the query).
@@ -182,7 +200,7 @@ Rename queries in Power Query if helpful: `Catalog`, `Dictionary`, `Sources`.
 
 **Option B - pick from a folder**
 
-1. **Get data → Folder** → browse to `C:\AI\chi-data-dictionary-catalog`.
+1. **Get data → Folder** → browse to `C:\AI\chiddc`.
 2. **Transform data** → filter **Extension** = `.parquet` → keep the three `ddc-*` files above → **Combine** (or load each file as its own query).
 
 **Option C - if Parquet still won’t take a local path**
@@ -192,7 +210,7 @@ Rename queries in Power Query if helpful: `Catalog`, `Dictionary`, `Sources`.
 
    ```powerquery
    let
-       Source = Parquet.Document(File.Contents("C:\AI\chi-data-dictionary-catalog\ddc-master_patient_catalog.parquet"))
+       Source = Parquet.Document(File.Contents("C:\AI\chiddc\ddc-master_patient_catalog.parquet"))
    in
        Source
    ```

@@ -45,7 +45,7 @@ Create a governed **Data Catalog** and **Data Dictionary** for five demographics
 | Steward workbook (`workbooks/chi-steward-workbook.xlsx`) | Done |
 | Parquet artifacts (`ddc-master_patient_*.parquet`, `ddc-data_source_availability.parquet`) | Done |
 | Import / export scripts | Done |
-| Power BI viewer (`workbooks/pbip/chi-data-dictionary-catalog.pbip`) | Done |
+| Power BI viewer (`workbooks/pbip/chiddc.pbip`) | Done |
 
 ### Governance content: Phase 1 in progress
 

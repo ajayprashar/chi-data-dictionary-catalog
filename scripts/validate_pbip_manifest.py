@@ -9,7 +9,9 @@ from dataclasses import dataclass
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
-REPORT_PAGES = REPO / "workbooks" / "pbip" / "chi-data-dictionary-catalog.Report" / "definition" / "pages"
+from pbip_paths import report_definition  # noqa: E402
+
+REPORT_PAGES = report_definition(REPO) / "pages"
 
 sys.path.insert(0, str(REPO / "data"))
 sys.path.insert(0, str(REPO / "scripts"))

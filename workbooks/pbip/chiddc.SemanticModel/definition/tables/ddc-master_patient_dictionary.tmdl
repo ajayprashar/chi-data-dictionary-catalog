@@ -1,0 +1,159 @@
+table ddc-master_patient_dictionary
+	lineageTag: 187302bc-d747-47f7-9a76-8d71c86070c5
+
+	column semantic_id
+		dataType: string
+		lineageTag: e88d45de-d64b-4fcb-b824-a06041e7bc9f
+		summarizeBy: none
+		sourceColumn: semantic_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column data_source_rank_reference
+		dataType: string
+		lineageTag: 9e227a1e-d651-4a3e-84cd-b98b2df3c407
+		summarizeBy: none
+		sourceColumn: data_source_rank_reference
+
+		annotation SummarizationSetBy = Automatic
+
+	column innovaccer_survivorship_logic
+		dataType: string
+		lineageTag: f004f9c6-c510-4ce7-b5d5-d8394d7350df
+		summarizeBy: none
+		sourceColumn: innovaccer_survivorship_logic
+
+		annotation SummarizationSetBy = Automatic
+
+	column data_quality_notes
+		dataType: string
+		lineageTag: f3e9af7a-86a6-44b9-be9b-da9d288717e6
+		summarizeBy: none
+		sourceColumn: data_quality_notes
+
+		annotation SummarizationSetBy = Automatic
+
+	column fhir_r4_path
+		dataType: string
+		lineageTag: dd25a612-587f-4311-88c1-2c60dd544920
+		summarizeBy: none
+		sourceColumn: fhir_r4_path
+
+		annotation SummarizationSetBy = Automatic
+
+	column fhir_data_type
+		dataType: string
+		lineageTag: 58bb5686-d3c8-4b57-b0b5-b978bdce9bde
+		summarizeBy: none
+		sourceColumn: fhir_data_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column calculation_grain
+		dataType: string
+		lineageTag: bc75f536-3704-4099-b40e-42f6ecd735f1
+		summarizeBy: none
+		sourceColumn: calculation_grain
+
+		annotation SummarizationSetBy = Automatic
+
+	column historical_freeze
+		dataType: string
+		lineageTag: 12c32923-12af-44f8-9a66-212172571a96
+		summarizeBy: none
+		sourceColumn: historical_freeze
+
+		annotation SummarizationSetBy = Automatic
+
+	column recalc_window_months
+		dataType: string
+		lineageTag: 9ef293df-d81d-4134-bf92-18e9b0768326
+		summarizeBy: none
+		sourceColumn: recalc_window_months
+
+		annotation SummarizationSetBy = Automatic
+
+	column fhir_must_support
+		dataType: string
+		lineageTag: e67c8940-ab94-4895-b9ff-e4f65540a37d
+		summarizeBy: none
+		sourceColumn: fhir_must_support
+
+		annotation SummarizationSetBy = Automatic
+
+	column fhir_profile
+		dataType: string
+		lineageTag: 6991fcf7-430b-4802-926f-56e8aaaa05ae
+		summarizeBy: none
+		sourceColumn: fhir_profile
+
+		annotation SummarizationSetBy = Automatic
+
+	column fhir_cardinality
+		dataType: string
+		lineageTag: a165c532-c3ee-40e4-8180-c8c60bfd73b4
+		summarizeBy: none
+		sourceColumn: fhir_cardinality
+
+		annotation SummarizationSetBy = Automatic
+
+	column identity_resolution_notes
+		dataType: string
+		lineageTag: f4e69cf3-5070-4e80-8029-9bd4265a9584
+		summarizeBy: none
+		sourceColumn: identity_resolution_notes
+
+		annotation SummarizationSetBy = Automatic
+
+	column tie_breaker_rule
+		dataType: string
+		lineageTag: 177872d1-4457-4301-b24c-7b4288261233
+		summarizeBy: none
+		sourceColumn: tie_breaker_rule
+
+		annotation SummarizationSetBy = Automatic
+
+	column conflict_detection_enabled
+		dataType: string
+		lineageTag: 5c555040-11bf-4870-ab44-130e53272a91
+		summarizeBy: none
+		sourceColumn: conflict_detection_enabled
+
+		annotation SummarizationSetBy = Automatic
+
+	column manual_override_allowed
+		dataType: string
+		lineageTag: 0b0fd522-8099-4247-8a47-1f060d68d281
+		summarizeBy: none
+		sourceColumn: manual_override_allowed
+
+		annotation SummarizationSetBy = Automatic
+
+	column de_identification_method
+		dataType: string
+		lineageTag: 7ecb75cb-a79a-4a3b-b5f0-b4a9ae9fd37a
+		summarizeBy: none
+		sourceColumn: de_identification_method
+
+		annotation SummarizationSetBy = Automatic
+
+	column chi_survivorship_logic
+		dataType: string
+		lineageTag: a17eb621-1d01-40e2-b00c-fad09c65b015
+		summarizeBy: none
+		sourceColumn: chi_survivorship_logic
+
+		annotation SummarizationSetBy = Automatic
+
+	partition ddc-master_patient_dictionary = m
+		mode: import
+		source =
+				let
+				    Source = Parquet.Document(File.Contents("C:\AI\chiddc\ddc-master_patient_dictionary.parquet"), [Compression=null, LegacyColumnNameEncoding=false, MaxDepth=null])
+				in
+				    Source
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

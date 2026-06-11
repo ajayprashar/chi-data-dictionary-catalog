@@ -25,7 +25,7 @@ Use this page as the index for which documents are actively maintained versus ke
 - `docs/power-bi-concept-profile-setup.md`
   - Power BI PBIP viewer - open, refresh, troubleshooting (read surface after Excel import).
 - `docs/faq.md`
-  - Catalog vs dictionary, PBIP pages vs tables, **seven data + two guide semantic model tables**, where to edit vs read (steward and demo audiences).
+  - Catalog vs dictionary, **concept vs element** (with plain example), PBIP pages vs tables, **seven data + two guide semantic model tables**, where to edit vs read (steward and demo audiences).
 - `data/pbip_report_manifest.py`
   - Source manifest for in-report Field guide (`ddc-application_guide.parquet`); validate with `scripts/validate_pbip_manifest.py`; regenerate via `scripts/generate_pbip_model_guide.py`.
 - `data/pilot_curation_checks.py`

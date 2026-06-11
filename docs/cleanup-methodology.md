@@ -21,7 +21,7 @@ How to keep **chi-data-dictionary-catalog** aligned with what is actually runnin
 |-------|-----------|
 | Authoring | `workbooks/chi-steward-workbook.xlsx`, optional `chi-partner-intake-workbook.xlsx` |
 | Published data | Root `ddc-*.parquet` (commit after steward publish) |
-| Viewer | `workbooks/pbip/chi-data-dictionary-catalog.pbip` |
+| Viewer | `workbooks/pbip/chiddc.pbip` |
 | Publish | `import_steward_workbook_to_parquet.py`, `generate_steward_workbook.py` |
 | Demographics pilot | `seed_demographics_pilot.py`, value set / crosswalk seed scripts (see runbook maintainer section) |
 | PBIP layout | `add_pbip_start_here_page.py`, `patch_pbip_readability.py`, `enhance_pbip_report.py` (full regen) |

@@ -59,7 +59,7 @@ from pilot_curation_checks import (  # noqa: E402
 )
 
 GUIDE = GUIDE_TABLE
-REPO_PARQUET = r"C:\AI\chi-data-dictionary-catalog"
+from pbip_paths import REPO_PARQUET  # noqa: E402
 FIELD_GUIDE_DISPLAY_NAME = TAB_FIELD_GUIDE
 
 DETAIL_COLUMNS = [
@@ -370,7 +370,9 @@ def main() -> None:
     sync_pages_json()
     sync_page_tab_styles()
     print(f"Wrote {GUIDE_PARQUET} and PBIP page: {FIELD_GUIDE_DISPLAY_NAME} ({PAGE_FIELD_GUIDE})")
-    print("  Re-open chi-data-dictionary-catalog.pbip in Power BI Desktop and Refresh.")
+    from pbip_paths import PBIP_FILE  # noqa: E402
+
+    print(f"  Re-open {PBIP_FILE} in Power BI Desktop and Refresh.")
 
 
 if __name__ == "__main__":

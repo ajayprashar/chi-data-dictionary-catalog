@@ -1,0 +1,104 @@
+table ddc-value_set_member
+	lineageTag: 286de97c4236ac32b826
+
+	column semantic_id
+		dataType: string
+		lineageTag: b29e3dd204ce20f879eb
+		summarizeBy: none
+		sourceColumn: semantic_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column code_system_oid
+		dataType: string
+		lineageTag: 81fa90d7b45a1115be64
+		summarizeBy: none
+		sourceColumn: code_system_oid
+
+		annotation SummarizationSetBy = Automatic
+
+	column code
+		dataType: string
+		lineageTag: aaf84a28926e7ad68f21
+		summarizeBy: none
+		sourceColumn: code
+
+		annotation SummarizationSetBy = Automatic
+
+	column display
+		dataType: string
+		lineageTag: 300b6bc3783d5e7b05ab
+		summarizeBy: none
+		sourceColumn: display
+
+		annotation SummarizationSetBy = Automatic
+
+	column member_type
+		dataType: string
+		lineageTag: 8c9a40ad694cf9c13dd7
+		summarizeBy: none
+		sourceColumn: member_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column binding_role
+		dataType: string
+		lineageTag: bc8189261cacbc441f22
+		summarizeBy: none
+		sourceColumn: binding_role
+
+		annotation SummarizationSetBy = Automatic
+
+	column binding_strength
+		dataType: string
+		lineageTag: db69e8037b34747a15ae
+		summarizeBy: none
+		sourceColumn: binding_strength
+
+		annotation SummarizationSetBy = Automatic
+
+	column active
+		dataType: string
+		lineageTag: 0bffc07e88de028f2f1e
+		summarizeBy: none
+		sourceColumn: active
+
+		annotation SummarizationSetBy = Automatic
+
+	column sort_order
+		dataType: string
+		lineageTag: 1fa6c54b753bb8b5698a
+		summarizeBy: none
+		sourceColumn: sort_order
+
+		annotation SummarizationSetBy = Automatic
+
+	column notes
+		dataType: string
+		lineageTag: b1e62f753648a1fce5c6
+		summarizeBy: none
+		sourceColumn: notes
+
+		annotation SummarizationSetBy = Automatic
+
+	column pbi_default_show
+		dataType: string
+		lineageTag: a1b2c3d4e5f6071829345
+		summarizeBy: none
+		sourceColumn: pbi_default_show
+
+		annotation SummarizationSetBy = Automatic
+
+	partition ddc-value_set_member = m
+		mode: import
+		source =
+				let
+				    Source = Parquet.Document(File.Contents("C:\AI\chiddc\ddc-value_set_member.parquet"), [Compression=null, LegacyColumnNameEncoding=false, MaxDepth=null]),
+				    #"PBIP default subset" = Table.SelectRows(Source, each [pbi_default_show] = "true")
+				in
+				    #"PBIP default subset"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

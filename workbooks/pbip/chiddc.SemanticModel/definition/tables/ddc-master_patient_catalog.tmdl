@@ -1,0 +1,256 @@
+table ddc-master_patient_catalog
+	lineageTag: 683c3345-69ac-4982-9780-1d274b17f0ce
+
+	measure 'Total Concepts' = COUNTROWS('ddc-master_patient_catalog')
+		displayFolder: Governance KPIs
+		lineageTag: dbcbe49b9102b32f50e1f4eb972fc6c7
+
+	measure 'Approved Concepts' =
+			CALCULATE(
+				COUNTROWS('ddc-master_patient_catalog'),
+				'ddc-master_patient_catalog'[approval_status] = "Approved"
+			)
+		displayFolder: Governance KPIs
+		lineageTag: ae41ffe993db54652d3f431f4b803cb9
+
+	measure 'Pending Approval' =
+			CALCULATE(
+				COUNTROWS('ddc-master_patient_catalog'),
+				OR(
+					ISBLANK('ddc-master_patient_catalog'[approval_status]),
+					'ddc-master_patient_catalog'[approval_status] <> "Approved"
+				)
+			)
+		displayFolder: Governance KPIs
+		lineageTag: 823ac34176c8df9c03f684520e6d9490
+
+	measure 'Demographics Pilot' =
+			CALCULATE(
+				COUNTROWS('ddc-master_patient_catalog'),
+				'ddc-master_patient_catalog'[semantic_id] = "Patient.race"
+					|| 'ddc-master_patient_catalog'[semantic_id] = "Patient.ethnicity"
+					|| 'ddc-master_patient_catalog'[semantic_id] = "Patient.language"
+					|| 'ddc-master_patient_catalog'[semantic_id] = "Patient.gender_id"
+					|| 'ddc-master_patient_catalog'[semantic_id] = "Patient.birth_sex"
+			)
+		displayFolder: Governance KPIs
+		lineageTag: 1d5421804c083f0371d40bcf89c9c0a1
+
+	measure 'Profile USCDI Element' =
+			VAR _v = SELECTEDVALUE('ddc-master_patient_catalog'[uscdi_element])
+			RETURN IF(ISBLANK(_v) || _v = "", "-", _v)
+		displayFolder: Concept Profile Cards
+		lineageTag: a1b2c3d4e5f6478990a1
+
+	measure 'Profile Classification' =
+			VAR _v = SELECTEDVALUE('ddc-master_patient_catalog'[classification])
+			RETURN IF(ISBLANK(_v) || _v = "", "-", _v)
+		displayFolder: Concept Profile Cards
+		lineageTag: a1b2c3d4e5f6478990a2
+
+	measure 'Profile Approval Status' =
+			VAR _v = SELECTEDVALUE('ddc-master_patient_catalog'[approval_status])
+			RETURN IF(ISBLANK(_v) || _v = "", "-", _v)
+		displayFolder: Concept Profile Cards
+		lineageTag: a1b2c3d4e5f6478990a3
+
+	measure 'Profile Data Steward' =
+			VAR _v = SELECTEDVALUE('ddc-master_patient_catalog'[data_steward])
+			RETURN IF(ISBLANK(_v) || _v = "", "-", _v)
+		displayFolder: Concept Profile Cards
+		lineageTag: a1b2c3d4e5f6478990a4
+
+	measure 'Profile Domain' =
+			VAR _v = SELECTEDVALUE('ddc-master_patient_catalog'[domain])
+			RETURN IF(ISBLANK(_v) || _v = "", "-", _v)
+		displayFolder: Concept Profile Cards
+		lineageTag: a1b2c3d4e5f6478990a5
+
+	column semantic_id
+		dataType: string
+		lineageTag: 8ad535bb-8be6-489f-a91d-7ce0e9f5474f
+		summarizeBy: none
+		sourceColumn: semantic_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column uscdi_element
+		dataType: string
+		lineageTag: 167943d5-36bc-4729-b7b1-4852096f7cee
+		summarizeBy: none
+		sourceColumn: uscdi_element
+
+		annotation SummarizationSetBy = Automatic
+
+	column uscdi_description
+		dataType: string
+		lineageTag: b572d3c6-6bf1-4c56-a55f-8347c65e8c1c
+		summarizeBy: none
+		sourceColumn: uscdi_description
+
+		annotation SummarizationSetBy = Automatic
+
+	column classification
+		dataType: string
+		lineageTag: c00922b9-5e80-46ba-a453-d9727b7ca3b0
+		summarizeBy: none
+		sourceColumn: classification
+
+		annotation SummarizationSetBy = Automatic
+
+	column ruleset_category
+		dataType: string
+		lineageTag: d6c89e55-792c-4262-a363-f67892ed0504
+		summarizeBy: none
+		sourceColumn: ruleset_category
+
+		annotation SummarizationSetBy = Automatic
+
+	column domain
+		dataType: string
+		lineageTag: d541d9cb-006e-4c0c-a442-a3719f347ef5
+		summarizeBy: none
+		sourceColumn: domain
+
+		annotation SummarizationSetBy = Automatic
+
+	column rollup_relationship
+		dataType: string
+		lineageTag: b51253ed-1173-4cac-b340-47f25977d7ba
+		summarizeBy: none
+		sourceColumn: rollup_relationship
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_rollup
+		dataType: string
+		lineageTag: d75b5bf3-ea9c-4cdb-aad3-310552394eed
+		summarizeBy: none
+		sourceColumn: is_rollup
+
+		annotation SummarizationSetBy = Automatic
+
+	column composite_group
+		dataType: string
+		lineageTag: 5fff1c84-062c-467b-ae34-1045b6a87b2f
+		summarizeBy: none
+		sourceColumn: composite_group
+
+		annotation SummarizationSetBy = Automatic
+
+	column data_steward
+		dataType: string
+		lineageTag: b70c424d-d0f0-4185-9e1f-986834b1b06c
+		summarizeBy: none
+		sourceColumn: data_steward
+
+		annotation SummarizationSetBy = Automatic
+
+	column steward_contact
+		dataType: string
+		lineageTag: 1a1496a6-0fbe-418e-a906-c4214d40e1fa
+		summarizeBy: none
+		sourceColumn: steward_contact
+
+		annotation SummarizationSetBy = Automatic
+
+	column approval_status
+		dataType: string
+		lineageTag: 67746a83-6b79-485a-acbc-fa6d19a6d99c
+		summarizeBy: none
+		sourceColumn: approval_status
+
+		annotation SummarizationSetBy = Automatic
+
+	column schema_version
+		dataType: string
+		lineageTag: 2eb4d17f-4fef-4107-a91f-11271d21d336
+		summarizeBy: none
+		sourceColumn: schema_version
+
+		annotation SummarizationSetBy = Automatic
+
+	column last_modified_date
+		dataType: string
+		lineageTag: c8d7fb6c-d077-4208-891e-e502c509181d
+		summarizeBy: none
+		sourceColumn: last_modified_date
+
+		annotation SummarizationSetBy = Automatic
+
+	column identifier_type
+		dataType: string
+		lineageTag: bd308481-1329-4c42-914b-f289d8605f07
+		summarizeBy: none
+		sourceColumn: identifier_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column identifier_authority
+		dataType: string
+		lineageTag: f4b20880-9bbe-44db-a48e-4c92a10983f3
+		summarizeBy: none
+		sourceColumn: identifier_authority
+
+		annotation SummarizationSetBy = Automatic
+
+	column hipaa_category
+		dataType: string
+		lineageTag: 113f83fa-c6b3-4808-864a-f2b4161dc301
+		summarizeBy: none
+		sourceColumn: hipaa_category
+
+		annotation SummarizationSetBy = Automatic
+
+	column fhir_security_label
+		dataType: string
+		lineageTag: e3fe4304-cad4-475f-9225-c59f5a57b9d2
+		summarizeBy: none
+		sourceColumn: fhir_security_label
+
+		annotation SummarizationSetBy = Automatic
+
+	column consent_category
+		dataType: string
+		lineageTag: 867c7c4f-f442-4198-8b73-cd14af05ea6c
+		summarizeBy: none
+		sourceColumn: consent_category
+
+		annotation SummarizationSetBy = Automatic
+
+	column uscdi_data_class
+		dataType: string
+		lineageTag: dc13c069-b406-4279-99c0-fc3d3e112009
+		summarizeBy: none
+		sourceColumn: uscdi_data_class
+
+		annotation SummarizationSetBy = Automatic
+
+	column uscdi_data_element
+		dataType: string
+		lineageTag: 4107b03b-3ab1-410b-a31a-38b360989f14
+		summarizeBy: none
+		sourceColumn: uscdi_data_element
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_demographics_pilot
+		dataType: string
+		lineageTag: 533c62228ff5db9af4d4
+		summarizeBy: none
+		sourceColumn: is_demographics_pilot
+
+		annotation SummarizationSetBy = Automatic
+
+	partition ddc-master_patient_catalog = m
+		mode: import
+		source =
+				let
+				    Source = Parquet.Document(File.Contents("C:\AI\chiddc\ddc-master_patient_catalog.parquet"), [Compression=null, LegacyColumnNameEncoding=false, MaxDepth=null])
+				in
+				    Source
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

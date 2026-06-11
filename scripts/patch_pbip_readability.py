@@ -12,7 +12,9 @@ import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
-REPORT_VISUALS = REPO / "workbooks" / "pbip" / "chi-data-dictionary-catalog.Report" / "definition" / "pages"
+from pbip_paths import report_definition  # noqa: E402
+
+REPORT_VISUALS = report_definition(REPO) / "pages"
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from pbip_layout_constants import (  # noqa: E402
