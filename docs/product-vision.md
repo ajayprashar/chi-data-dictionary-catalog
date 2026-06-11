@@ -1,4 +1,4 @@
-# Product Vision — Governed Data Catalog & Data Dictionary
+# Product Vision - Governed Data Catalog & Data Dictionary
 
 North star for the **chi-data-dictionary-catalog** project.
 
@@ -6,7 +6,7 @@ North star for the **chi-data-dictionary-catalog** project.
 
 ## Vision statement
 
-> A **governed data catalog and data dictionary** for CHI patient concepts (`semantic_id`), **curated against healthcare standards** (USCDI, US Core, terminology), with **dictionary implementation detail** and **interoperability views** for **HL7 ADT**, **C-CDA**, and **FHIR** — so users can discover what CHI governs, how it is implemented, and where it appears in each message context.
+> A **governed data catalog and data dictionary** for CHI patient concepts (`semantic_id`), **curated against healthcare standards** (USCDI, US Core, terminology), with **dictionary implementation detail** and **interoperability views** for **HL7 ADT**, **C-CDA**, and **FHIR** - so users can discover what CHI governs, how it is implemented, and where it appears in each message context.
 
 ---
 
@@ -54,7 +54,7 @@ Governance         →  WHO approved it               (Catalog: steward, approva
 
 ## Sources of truth
 
-National standards (USCDI, US Core, HL7 terminologies) are authoritative **externally**. DAP is authoritative for **enterprise terminology at scale**. CHI steward workbook + published parquet is authoritative for **governed metadata CHI signs**. County and partner source strings are **inputs** mapped via crosswalk — not standards.
+National standards (USCDI, US Core, HL7 terminologies) are authoritative **externally**. DAP is authoritative for **enterprise terminology at scale**. CHI steward workbook + published parquet is authoritative for **governed metadata CHI signs**. County and partner source strings are **inputs** mapped via crosswalk - not standards.
 
 Detail: **`docs/sources-of-truth.md`**.
 

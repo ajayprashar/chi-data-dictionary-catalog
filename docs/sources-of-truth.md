@@ -1,6 +1,6 @@
 # Sources of truth
 
-How CHI's data dictionary catalog relates to **US interoperability standards**, **enterprise terminology (DAP)**, and **local operational data** — without collapsing them into one bucket.
+How CHI's data dictionary catalog relates to **US interoperability standards**, **enterprise terminology (DAP)**, and **local operational data** - without collapsing them into one bucket.
 
 **Related:** `docs/product-vision.md`, `docs/shie-standards-reference.md`, `TECH-SPEC.md` §1.7, Power BI **Start here** page.
 
@@ -30,7 +30,7 @@ Survivorship       →  HOW CHI resolves conflicts        (chi_survivorship_logi
 Governance         →  WHO approved metadata             (approval_status, steward)
 ```
 
-**Master patient truth (L3)** is the canonical demographics layer in operations. ADT, CCDA, and FHIR are **renderings** of governed concepts for exchange — see `TECH-SPEC.md` §1.1.
+**Master patient truth (L3)** is the canonical demographics layer in operations. ADT, CCDA, and FHIR are **renderings** of governed concepts for exchange - see `TECH-SPEC.md` §1.1.
 
 ---
 
@@ -38,7 +38,7 @@ Governance         →  WHO approved metadata             (approval_status, stew
 
 | Layer | Source of truth | In this repo | This repo does **not** |
 |-------|-----------------|--------------|-------------------------|
-| Federal data content | [USCDI](https://www.healthit.gov/isa/united-states-core-data-interoperability-uscdi) | Catalog: `uscdi_element`, classification | Replace ONC policy |
+| Federal data content | [USCDI](https://www.healthit.gov/isa/united-states-core-data-interoperability-uscdi) — **v3** cert baseline (2026); **v3.1+** via SVAP | Catalog: `uscdi_element`, classification | Replace ONC policy |
 | US exchange profiles | [US Core](https://hl7.org/fhir/us/core/) on FHIR R4 | Dictionary: `fhir_r4_path`, `fhir_profile` | Act as FHIR server or certifier |
 | National terminologies | HL7 THO, LOINC, SNOMED, BCP 47, CDCREC | Bindings → `value_set_url`; members = CHI subset | Host full code systems |
 | Enterprise terminology | **Innovaccer DAP** | References in notes; future `dap_value_set_id` | Duplicate ICD/SNOMED catalogs |
@@ -67,7 +67,7 @@ Crosswalk **does not replace** HL7 members. Members = standards; crosswalk = loc
 Steward Excel  →  import_steward_workbook_to_parquet.py  →  parquet  →  Power BI Refresh  →  git commit
 ```
 
-National standards are cited by URL/OID — they do not live in git. **CHI's signed interpretation** does.
+National standards are cited by URL/OID - they do not live in git. **CHI's signed interpretation** does.
 
 Operational ritual: `docs/operational-runbook.md`.
 
@@ -90,7 +90,7 @@ Operational ritual: `docs/operational-runbook.md`.
 | Page | Role |
 |------|------|
 | **Start here** | Purpose + sources of truth (static); first tab |
-| **Standards & Contexts** | **Default landing** — terminology + crosswalk + ADT/CCDA per `semantic_id` |
+| **Standards & Contexts** | **Default landing** - terminology + crosswalk + ADT/CCDA per `semantic_id` |
 | **Concept Profile** | Governance + survivorship + sources per `semantic_id` |
 | **Governance Overview** | Portfolio status |
 
@@ -98,4 +98,4 @@ Operational ritual: `docs/operational-runbook.md`.
 
 ## PBIP copy sync
 
-Start here page text: `scripts/pbip_start_here_content.py` — update together with this doc when messaging changes.
+Start here page text: `scripts/pbip_start_here_content.py` - update together with this doc when messaging changes.

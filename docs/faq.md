@@ -1,4 +1,4 @@
-# FAQ — Catalog, dictionary, and Power BI
+# FAQ - Catalog, dictionary, and Power BI
 
 Short answers for stewards, reviewers, and demo audiences. Deep detail: `docs/product-vision.md`, `docs/sources-of-truth.md`, `docs/demographics-pilot-plan.md`.
 
@@ -29,7 +29,7 @@ Terminology / crosswalk → WHICH codes; local → standard
 | Page | What it is for | Tables used (often mixed on one page) |
 |------|----------------|----------------------------------------|
 | **Start here** | Orientation | None (static text) |
-| **Field guide** | In-report documentation | `ddc-application_guide` — filter by page and visual; column layer and interop role |
+| **Field guide** | In-report documentation | `ddc-application_guide` - filter by page and visual; column layer and interop role |
 | **Standards & Contexts** | Standards + interoperability for one concept | Slicer: catalog. Tables: dictionary (FHIR), value sets, crosswalk, ADT catalog, CCDA catalog |
 | **Concept Profile** | Full stewarded profile for one concept | Catalog (governance), dictionary (FHIR + **survivorship**), source availability |
 | **Governance Overview** | Portfolio KPIs | Mostly catalog |
@@ -44,9 +44,9 @@ Three different meanings:
 
 | Table | Meaning of "catalog" |
 |-------|----------------------|
-| `ddc-master_patient_catalog` | **Element catalog** — canonical list of governed concepts (person-centric scope) |
-| `ddc-hl7_adt_catalog` | **ADT mapping catalog** — where each `semantic_id` lands in HL7 v2 ADT |
-| `ddc-ccda_catalog` | **CCDA mapping catalog** — where each `semantic_id` lands in C-CDA XML |
+| `ddc-master_patient_catalog` | **Element catalog** - canonical list of governed concepts (person-centric scope) |
+| `ddc-hl7_adt_catalog` | **ADT mapping catalog** - where each `semantic_id` lands in HL7 v2 ADT |
+| `ddc-ccda_catalog` | **CCDA mapping catalog** - where each `semantic_id` lands in C-CDA XML |
 
 Only the first pair (master catalog + dictionary) is the core **catalog vs dictionary** split. ADT/CCDA catalogs are **message-placement** artifacts, not duplicates of the master catalog.
 
@@ -73,11 +73,11 @@ After import + Refresh (see `docs/demographics-pilot-plan.md` for pilot detail):
 | Catalog: steward, approval, USCDI, HIPAA | Profile cards + governance table | (via slicer filter) |
 | Dictionary: FHIR, quality notes | Implementation table | FHIR table (no survivorship column) |
 | Dictionary: `chi_survivorship_logic` | Implementation table | **Not shown** (by design) |
-| ADT_Mappings | — | HL7 ADT table |
-| CCDA_Mappings | — | C-CDA table |
-| Value_Set_Members | — | Governed value set codes |
-| Source_Value_Crosswalk | — | Crosswalk table |
-| Source_Availability | Source availability table | — |
+| ADT_Mappings | - | HL7 ADT table |
+| CCDA_Mappings | - | C-CDA table |
+| Value_Set_Members | - | Governed value set codes |
+| Source_Value_Crosswalk | - | Crosswalk table |
+| Source_Availability | Source availability table | - |
 
 ---
 
@@ -85,9 +85,9 @@ After import + Refresh (see `docs/demographics-pilot-plan.md` for pilot detail):
 
 | Audience | What matters |
 |----------|----------------|
-| **Stewards** | **Yes** — put fields in the right Excel sheet; wrong sheet breaks governance intent. |
-| **Reviewers** | **Yes** — approval and survivorship live in different tables by design. |
-| **Demo viewers** | **Light touch** — explain WHAT / HOW / WHERE layers; they do not need to memorize which tab maps to which table. |
+| **Stewards** | **Yes** - put fields in the right Excel sheet; wrong sheet breaks governance intent. |
+| **Reviewers** | **Yes** - approval and survivorship live in different tables by design. |
+| **Demo viewers** | **Light touch** - explain WHAT / HOW / WHERE layers; they do not need to memorize which tab maps to which table. |
 
 ---
 

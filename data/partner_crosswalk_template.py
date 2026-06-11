@@ -4,7 +4,7 @@ Partners copy these patterns in chi-partner-intake-workbook.xlsx (Crosswalk_Temp
 sheet) or stewards edit this file after intake review. Rows use source_id
 ``partner_intake`` and approval_status ``draft`` until signed.
 
-Not county_master survivorship — that stays in county_survivorship_mappings.py.
+Not county_master survivorship - that stays in county_survivorship_mappings.py.
 """
 
 from __future__ import annotations
@@ -114,7 +114,7 @@ PARTNER_CROSSWALK_TEMPLATE: list[tuple[str, ...]] = [
         "2028-9",
         "Asian",
         "rollup",
-        "Pattern example only — replace with your local race code list; target must be governed CDCREC OMB rollup.",
+        "Pattern example only - replace with your local race code list; target must be governed CDCREC OMB rollup.",
     ),
 ]
 

@@ -52,6 +52,6 @@ Edit mappings in **`data/partner_crosswalk_template.py`**, re-run the seed scrip
 
 ## Related
 
-- `docs/crosswalk-model.md` — three-table model
-- `docs/shie-standards-reference.md#gender-identity-minimum-set` — governed answer codes
-- `docs/excel-workbook-guide.md` — steward vs partner workbooks
+- `docs/crosswalk-model.md` - three-table model
+- `docs/shie-standards-reference.md#gender-identity-minimum-set` - governed answer codes
+- `docs/excel-workbook-guide.md` - steward vs partner workbooks

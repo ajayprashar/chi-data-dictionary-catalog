@@ -117,12 +117,12 @@ BINDINGS: list[dict[str, str]] = [
         "fhir_element": "Patient.extension(us-core-birthsex)",
         "authority_reference": "docs/shie-standards-reference.md",
         "approval_status": "Approved",
-        "notes": "Administrative sex — not CDCREC; distinct from gender identity.",
+        "notes": "Administrative sex - not CDCREC; distinct from gender identity.",
     },
 ]
 
 MEMBERS: list[dict[str, str]] = [
-    # Patient.race — OMB rollup (CDCREC)
+    # Patient.race - OMB rollup (CDCREC)
     *[
         {
             "semantic_id": "Patient.race",
@@ -148,7 +148,7 @@ MEMBERS: list[dict[str, str]] = [
             start=1,
         )
     ],
-    # Patient.race — NullFlavor (non-answers)
+    # Patient.race - NullFlavor (non-answers)
     *[
         {
             "semantic_id": "Patient.race",
@@ -208,7 +208,7 @@ MEMBERS: list[dict[str, str]] = [
         "sort_order": "10",
         "notes": "Distinct from patient-refused / declined in survivorship",
     },
-    # Patient.language — pilot examples (BCP 47)
+    # Patient.language - pilot examples (BCP 47)
     *[
         {
             "semantic_id": "Patient.language",
@@ -220,7 +220,7 @@ MEMBERS: list[dict[str, str]] = [
             "binding_strength": "example",
             "active": "true",
             "sort_order": str(i),
-            "notes": "Pilot examples; full list from IANA/BCP 47 — not duplicated locally",
+            "notes": "Pilot examples; full list from IANA/BCP 47 - not duplicated locally",
         }
         for i, (code, display) in enumerate(
             [
@@ -245,7 +245,7 @@ MEMBERS: list[dict[str, str]] = [
         "sort_order": "90",
         "notes": "Excluded from county aggregates per survivorship",
     },
-    # Patient.gender_id — HL7 minimum gender identity (SNOMED + non-answers)
+    # Patient.gender_id - HL7 minimum gender identity (SNOMED + non-answers)
     {
         "semantic_id": "Patient.gender_id",
         "code_system_oid": SNOMED_OID,
@@ -306,7 +306,7 @@ MEMBERS: list[dict[str, str]] = [
         "sort_order": "20",
         "notes": "FHIR Data Absent Reason; exclude from equity aggregates",
     },
-    # Patient.birth_sex — US Core birth sex
+    # Patient.birth_sex - US Core birth sex
     *[
         {
             "semantic_id": "Patient.birth_sex",

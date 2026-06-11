@@ -1,8 +1,8 @@
-Below is a **1‑page executive PRD** distilled from the longer PRD and our discussion. It’s written for **leaders and decision‑makers**—clear, non‑technical, and focused on *why this matters*, not how it’s built.
+Below is a **1‑page executive PRD** distilled from the longer PRD and our discussion. It’s written for **leaders and decision‑makers**-clear, non‑technical, and focused on *why this matters*, not how it’s built.
 
 ***
 
-# Executive PRD — Local Metadata Catalog & Data Dictionary (POC)
+# Executive PRD - Local Metadata Catalog & Data Dictionary (POC)
 
 ## Product Name
 
@@ -14,7 +14,7 @@ Below is a **1‑page executive PRD** distilled from the longer PRD and our disc
 
 This proof‑of‑concept (POC) delivers a **governed data catalog and data dictionary** for CHI patient concepts, curated against **healthcare standards** (USCDI, US Core, CDCREC, BCP 47), with **interoperability context** for **HL7 ADT**, **C-CDA**, and **FHIR** on a single `semantic_id`.
 
-Stewards author in Excel; stakeholders review in Power BI (**Concept Profile**, **Standards & Contexts**, **Governance Overview**)—without Power Apps, Dataverse, or enterprise platform dependencies.
+Stewards author in Excel; stakeholders review in Power BI (**Concept Profile**, **Standards & Contexts**, **Governance Overview**)-without Power Apps, Dataverse, or enterprise platform dependencies.
 
 The goal is to validate **governance clarity, standards alignment, and multi-format discoverability** before production platform decisions. See **`docs/product-vision.md`**.
 
@@ -71,9 +71,9 @@ Primary use case: **review, validation, and discussion of metadata**.
 *   Metadata **authored** in **Excel** (`chi-steward-workbook.xlsx`)
 *   Saved to **open, portable Parquet files** in the project folder
 *   **Presented** in **Power BI Desktop** (read-only PBIP report) as:
-    *   **Concept Profile** — governance + dictionary + sources for one `semantic_id`
-    *   **Standards & Contexts** — FHIR/US Core, terminology notes, HL7 ADT fields, C-CDA paths
-    *   **Governance Overview** — portfolio KPIs and full concept table
+    *   **Concept Profile** - governance + dictionary + sources for one `semantic_id`
+    *   **Standards & Contexts** - FHIR/US Core, terminology notes, HL7 ADT fields, C-CDA paths
+    *   **Governance Overview** - portfolio KPIs and full concept table
 
 Excel remains the **authoring surface**; Power BI is the **review and discovery surface**. A Jupyter notebook is available only for optional ad-hoc DuckDB queries over Parquet.
 
@@ -95,12 +95,12 @@ This mirrors enterprise metadata patterns while remaining simple.
 
 ### Artifacts
 
-*   **ddc-master_patient_catalog.parquet** — Master patient catalog (Semantic ID, element name, description, classification, ruleset category, HIPAA/FHIR/consent governance tags).
-*   **ddc-master_patient_dictionary.parquet** — Master patient dictionary (Semantic ID plus FHIR paths, survivorship logic, data quality notes, and other definition/rule columns).
+*   **ddc-master_patient_catalog.parquet** - Master patient catalog (Semantic ID, element name, description, classification, ruleset category, HIPAA/FHIR/consent governance tags).
+*   **ddc-master_patient_dictionary.parquet** - Master patient dictionary (Semantic ID plus FHIR paths, survivorship logic, data quality notes, and other definition/rule columns).
 *   Source data is authored in the steward Excel workbook and imported to these Parquet files (see *Data pipeline* below).
 *   Optional **message-format catalogs** for interoperability demonstrations:
-    *   `ddc-hl7_adt_catalog.parquet` — Example HL7 ADT field mappings (PID segment for a few core demographics).
-    *   `ddc-ccda_catalog.parquet` — Example CCD/CCDA XML paths for the same master patient elements.
+    *   `ddc-hl7_adt_catalog.parquet` - Example HL7 ADT field mappings (PID segment for a few core demographics).
+    *   `ddc-ccda_catalog.parquet` - Example CCD/CCDA XML paths for the same master patient elements.
 
 ### Data pipeline
 
@@ -108,9 +108,9 @@ This mirrors enterprise metadata patterns while remaining simple.
 2. Import workbook changes to Parquet:
    `python scripts/import_steward_workbook_to_parquet.py`
 3. Open **`workbooks/pbip/chi-data-dictionary-catalog.pbip`** in Power BI Desktop and **Refresh** to load the latest catalog and dictionary (joined on Semantic ID).
-4. Optional — regenerate the workbook from Parquet after script rebuilds:
+4. Optional - regenerate the workbook from Parquet after script rebuilds:
    `python scripts/generate_steward_workbook.py`
-5. Optional — legacy CSV split or ad-hoc queries: `scripts/split_to_catalog_and_dictionary.py`, or Jupyter + DuckDB (**docs/jupyter-duckdb-parquet-setup.md**).
+5. Optional - legacy CSV split or ad-hoc queries: `scripts/split_to_catalog_and_dictionary.py`, or Jupyter + DuckDB (**docs/jupyter-duckdb-parquet-setup.md**).
 
 ***
 
@@ -123,7 +123,7 @@ This mirrors enterprise metadata patterns while remaining simple.
     *   Create a local virtual environment in the project folder.
     *   Install dependencies from `requirements.txt`.
     *   Edit the steward workbook, run `import_steward_workbook_to_parquet.py`, then open or refresh the PBIP report (**docs/power-bi-concept-profile-setup.md**).
-*   **Mobility requirement**: A user can move the POC to a new machine by copying the folder, recreating the virtual environment, and reinstalling from `requirements.txt`—no additional configuration files, registries, or services.
+*   **Mobility requirement**: A user can move the POC to a new machine by copying the folder, recreating the virtual environment, and reinstalling from `requirements.txt`-no additional configuration files, registries, or services.
 
 ***
 
@@ -137,7 +137,7 @@ This mirrors enterprise metadata patterns while remaining simple.
 
 | Page | Purpose |
 |------|---------|
-| **Concept Profile** | Select one `semantic_id` — USCDI identity, FHIR mapping, survivorship, and source availability on one screen |
+| **Concept Profile** | Select one `semantic_id` - USCDI identity, FHIR mapping, survivorship, and source availability on one screen |
 | **Governance Overview** | Portfolio KPIs (total, approved, pending, demographics pilot), classification/approval charts, full catalog table |
 
 ### Key user workflows
@@ -168,7 +168,7 @@ This POC answers a critical question *before* platform investment:
 
 > “Does this metadata structure and user experience actually work for our users?”
 
-It provides evidence to guide future decisions—whether that’s Power Pages, a commercial catalog, or a custom solution—without locking the organization into any one path.
+It provides evidence to guide future decisions-whether that’s Power Pages, a commercial catalog, or a custom solution-without locking the organization into any one path.
 
 ***
 
@@ -186,5 +186,5 @@ The POC is **platform‑agnostic by design**.
 
 ## Bottom Line
 
-This POC delivers **high signal at low cost**: it improves clarity, reduces friction, and informs strategy—without triggering licensing, governance, or architectural overhead.
+This POC delivers **high signal at low cost**: it improves clarity, reduces friction, and informs strategy-without triggering licensing, governance, or architectural overhead.
 

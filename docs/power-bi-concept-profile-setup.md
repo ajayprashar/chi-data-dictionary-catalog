@@ -14,9 +14,9 @@ The report includes four pages:
 |------|---------|
 | **Guide · Start here** | Purpose, sources-of-truth layers, how to navigate the report (static text; cream canvas) |
 | **Guide · Demo walkthrough** | 5-minute guided tour (default landing in demo package; cream canvas) |
-| **Guide · Field guide** | In-report column reference — layer (Catalog/Dictionary/Context), interoperability role, Excel source (slicers; cream canvas) |
-| **Concept Profile** | One `semantic_id` — governance, FHIR/US Core, **survivorship**, sources |
-| **Standards & Contexts** | Same slicer — FHIR/terminology notes, value sets, crosswalk, **HL7 ADT**, **C-CDA** (no survivorship column on FHIR table) |
+| **Guide · Field guide** | In-report column reference - layer (Catalog/Dictionary/Context), interoperability role, Excel source (slicers; cream canvas) |
+| **Concept Profile** | One `semantic_id` - governance, FHIR/US Core, **survivorship**, sources |
+| **Standards & Contexts** | Same slicer - FHIR/terminology notes, value sets, crosswalk, **HL7 ADT**, **C-CDA** (no survivorship column on FHIR table) |
 | **Governance Overview** | Portfolio KPIs, classification/approval charts, full concept table |
 
 Add or refresh **Start here** only: `python scripts/add_pbip_start_here_page.py` (does not rebuild other pages).
@@ -47,7 +47,7 @@ After steward Excel edits: `python scripts/import_steward_workbook_to_parquet.py
 python scripts/patch_pbip_readability.py
 ```
 
-Layout constants live in `scripts/pbip_layout_constants.py` — keep in sync with `enhance_pbip_report.py`. After a full `enhance_pbip_report.py` run, re-run `patch_pbip_readability.py` if needed.
+Layout constants live in `scripts/pbip_layout_constants.py` - keep in sync with `enhance_pbip_report.py`. After a full `enhance_pbip_report.py` run, re-run `patch_pbip_readability.py` if needed.
 
 Pilot dictionary notes use `\n` line breaks in `scripts/seed_demographics_pilot.py`; re-seed with `python scripts/seed_demographics_pilot.py` and publish import when notes change.
 
@@ -55,11 +55,11 @@ Pilot dictionary notes use `\n` line breaks in `scripts/seed_demographics_pilot.
 
 The report uses **Actual size** (not Fit to page) and a **high-contrast** theme (blue / yellow / black on white).
 
-**Table readability:** each table has three visual layers — **dark blue title band** (visual title), **light blue column header row** (field names), **white/zebra data rows**. If column headers look like the title after manual edits, select the visual → **Format** → **Reset to default** (theme + `enhance_pbip_report.py` set the header row separately).
+**Table readability:** each table has three visual layers - **dark blue title band** (visual title), **light blue column header row** (field names), **white/zebra data rows**. If column headers look like the title after manual edits, select the visual → **Format** → **Reset to default** (theme + `enhance_pbip_report.py` set the header row separately).
 
 In Power BI Desktop:
 
-1. **View → Zoom → 100%** (avoid 79% or lower — text looks much smaller).
+1. **View → Zoom → 100%** (avoid 79% or lower - text looks much smaller).
 2. **View → Page view → Actual size** (if available).
 3. Use **Fit to page** only when presenting on a small screen.
 
@@ -75,7 +75,7 @@ In Power BI Desktop:
 | **Unable to save document** / invalid path when saving `.pbix` | Not caused by repo cleanup. This project uses **PBIP + TMDL + PBIR**; **Save a copy → PBIX** is unreliable on some Desktop builds (especially Microsoft Store, June 2026). Use the **demo package** below instead of fighting PBIX export. |
 | Report opens but has no data | Parquet must be at `C:\AI\chi-data-dictionary-catalog\ddc-*.parquet` (hardcoded in the model). Refresh after parquets are in place. |
 | **Transform data** → query preview: `Container exited unexpectedly` **0x80131623** | **Not corrupt parquet.** Known Power BI Mashup crash when previewing parquet queries inside PBIP (common on **Microsoft Store** app, **US Gov cloud**, June 2026). **Close Power Query** without Apply if broken; use **Home → Refresh** on the report canvas instead. Do not use Transform data for routine demos. Try **EXE installer**, clear `%LocalAppData%\Microsoft\Power BI Desktop\Cache`, or re-run `python scripts/package_pbi_demo.py` (rewrites parquets to Parquet 1.0). |
-| **Unable to save auto recovery file** / invalid path in `...\Power BI Desktop Store App\TempSaves\` | **Not corrupt PBIP.** Store-app auto-recovery cannot write its temp `.pbix`. Click **Close** and demo anyway — switch to **Report** view → **Home → Refresh**. On demo PC: **File → Options → Global → Auto recovery** → uncheck; or use the **EXE** installer. Repo sets `"enableAutoRecovery": false` in `chi-data-dictionary-catalog.pbip`. |
+| **Unable to save auto recovery file** / invalid path in `...\Power BI Desktop Store App\TempSaves\` | **Not corrupt PBIP.** Store-app auto-recovery cannot write its temp `.pbix`. Click **Close** and demo anyway - switch to **Report** view → **Home → Refresh**. On demo PC: **File → Options → Global → Auto recovery** → uncheck; or use the **EXE** installer. Repo sets `"enableAutoRecovery": false` in `chi-data-dictionary-catalog.pbip`. |
 
 ---
 
@@ -150,9 +150,9 @@ Only the steward round-trip you already have:
 
 ### 1. Load three tables
 
-Power BI’s **Parquet** dialog often says “URL” even for local files. That field accepts a **full Windows path** — you are not required to use a web address.
+Power BI’s **Parquet** dialog often says “URL” even for local files. That field accepts a **full Windows path** - you are not required to use a web address.
 
-**Option A — paste a local path (simplest)**
+**Option A - paste a local path (simplest)**
 
 1. **Home → Get data → Parquet** (under *Database* or search “Parquet”).
 2. In the path/URL box, paste the full path to one file, for example:
@@ -172,12 +172,12 @@ Power BI’s **Parquet** dialog often says “URL” even for local files. That 
 
 Rename queries in Power Query if helpful: `Catalog`, `Dictionary`, `Sources`.
 
-**Option B — pick from a folder**
+**Option B - pick from a folder**
 
 1. **Get data → Folder** → browse to `C:\AI\chi-data-dictionary-catalog`.
 2. **Transform data** → filter **Extension** = `.parquet` → keep the three `ddc-*` files above → **Combine** (or load each file as its own query).
 
-**Option C — if Parquet still won’t take a local path**
+**Option C - if Parquet still won’t take a local path**
 
 1. **Get data → Blank query**.
 2. **Advanced editor** and paste (adjust path):
@@ -206,13 +206,13 @@ If lines already exist from auto-detect, you are done. Return to **Report** view
 
 ---
 
-### 3. Build the page — tables first, slicer last
+### 3. Build the page - tables first, slicer last
 
 Stay in **Report** view. You should see a blank white canvas.
 
-Until you add the slicer (step 4), each table shows **all 46 rows**. That is normal — you are checking that fields load correctly.
+Until you add the slicer (step 4), each table shows **all 46 rows**. That is normal - you are checking that fields load correctly.
 
-#### Table 1 — Catalog (business context)
+#### Table 1 - Catalog (business context)
 
 1. Click empty space on the canvas.
 2. **Visualizations** pane (right) → click the **Table** icon (grid).
@@ -228,7 +228,7 @@ Until you add the slicer (step 4), each table shows **all 46 rows**. That is nor
 
 5. Drag the visual wider. You should see 46 rows.
 
-#### Table 2 — Dictionary (FHIR and survivorship)
+#### Table 2 - Dictionary (FHIR and survivorship)
 
 1. Click empty space below Table 1 (so you do not replace it).
 2. **Visualizations** → **Table** again.
@@ -239,7 +239,7 @@ Until you add the slicer (step 4), each table shows **all 46 rows**. That is nor
    - `chi_survivorship_logic`
    - `data_source_rank_reference`
 
-#### Table 3 — Sources (where data comes from)
+#### Table 3 - Sources (where data comes from)
 
 1. Click empty space below Table 2.
 2. **Visualizations** → **Table** again.

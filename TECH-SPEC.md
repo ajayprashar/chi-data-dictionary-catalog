@@ -1,4 +1,4 @@
-# CHI Metadata Catalog — Technical Specification
+# CHI Metadata Catalog - Technical Specification
 
 This document describes the **architecture strategy**, **architecture itself**, **file and table definitions**, **column schemas**, **test data display**, and **UI layout, organization, and logic** for the chi-data-dictionary-catalog project. It serves as an implementation reference for engineers and maintainers.
 
@@ -156,14 +156,14 @@ This section is a rolling summary. Re-evaluate when schema, join logic, interope
 - [OK] Data source availability table (links sources to semantic IDs)
 
 **Implemented after initial POC (demographics pilot):**
-- [OK] Value set bindings and governed members (`ddc-value_set_binding`, `ddc-value_set_member`) — see `docs/crosswalk-model.md`
-- [OK] Source crosswalk (`ddc-source_crosswalk`) — county master + partner intake template rows
+- [OK] Value set bindings and governed members (`ddc-value_set_binding`, `ddc-value_set_member`) - see `docs/crosswalk-model.md`
+- [OK] Source crosswalk (`ddc-source_crosswalk`) - county master + partner intake template rows
 - [OK] PBIP semantic model and multi-page report (Start here, Concept Profile, Standards & Contexts, Governance Overview)
 
 **Deferred to production:**
-- Field-level provenance tracking (source + timestamp per value) — runtime data, not metadata schema
-- Machine-readable source hierarchy — current text format sufficient for POC
-- Full clinical code-system hosting in-repo — DAP remains authoritative; CHI carries bindings and crosswalk intent only
+- Field-level provenance tracking (source + timestamp per value) - runtime data, not metadata schema
+- Machine-readable source hierarchy - current text format sufficient for POC
+- Full clinical code-system hosting in-repo - DAP remains authoritative; CHI carries bindings and crosswalk intent only
 - Clinical data elements beyond demographics pilot scope
 
 See **docs/archive/EVALUATION.md** for detailed scoring, compliance assessment (USCDI v4/v5, FHIR US Core, Carequality, CommonWell), and production roadmap.
@@ -176,15 +176,15 @@ See **docs/archive/EVALUATION.md** for detailed scoring, compliance assessment (
 
 The CHI metadata catalog architecture was designed to address several strategic constraints and goals:
 
-1. **Person-centric vs. message-centric separation** — Master patient attributes (demographics, survivorship) are fundamentally different from message-format specifications (HL7 ADT segments, CCD/CCDA XML paths). Combining them in one schema creates semantic confusion, governance conflicts, and query inefficiency.
+1. **Person-centric vs. message-centric separation** - Master patient attributes (demographics, survivorship) are fundamentally different from message-format specifications (HL7 ADT segments, CCD/CCDA XML paths). Combining them in one schema creates semantic confusion, governance conflicts, and query inefficiency.
 
-2. **Different consumers, different query patterns** — Data engineers building ADT interfaces need message-level specs (segments, fields, event types). Domain SMEs and stewards need person-level attributes (survivorship, source hierarchy). Forcing both into one schema means every query drags irrelevant columns.
+2. **Different consumers, different query patterns** - Data engineers building ADT interfaces need message-level specs (segments, fields, event types). Domain SMEs and stewards need person-level attributes (survivorship, source hierarchy). Forcing both into one schema means every query drags irrelevant columns.
 
-3. **Different governance cadences** — HL7 v2 specs change when onboarding a new hospital or partner. Master patient attributes change when survivorship or source hierarchy changes. These should not trigger schema evolution in the same artifact.
+3. **Different governance cadences** - HL7 v2 specs change when onboarding a new hospital or partner. Master patient attributes change when survivorship or source hierarchy changes. These should not trigger schema evolution in the same artifact.
 
-4. **Different stewardship models** — Interface engineers own message specs; domain SMEs (e.g., Housing Services, data governance) own patient attributes. Mixing ownership creates approval bottlenecks.
+4. **Different stewardship models** - Interface engineers own message specs; domain SMEs (e.g., Housing Services, data governance) own patient attributes. Mixing ownership creates approval bottlenecks.
 
-5. **L3 as canonical truth** — The master demographics layer (L3) is the single source of truth. ADT messages, CCDA documents, and FHIR resources are **renderings** of that truth in different formats for different partners. Message catalogs define *where* each attribute lands in each format; they do not duplicate business logic.
+5. **L3 as canonical truth** - The master demographics layer (L3) is the single source of truth. ADT messages, CCDA documents, and FHIR resources are **renderings** of that truth in different formats for different partners. Message catalogs define *where* each attribute lands in each format; they do not duplicate business logic.
 
 ### 1.2 Key Design Principles
 
@@ -194,22 +194,22 @@ The CHI metadata catalog architecture was designed to address several strategic 
 | **Dictionary stays separate from message specs** | L3 survivorship rules are independent of interoperability. Partner-specific rules belong in a crosswalk (future), not the core dictionary. |
 | **Link via semantic_id** | The `semantic_id` (e.g., `Patient.name_first`, `Patient.birth_date`) is the universal join key. Master catalog ↔ dictionary is 1:1; master catalog ↔ message catalogs is 1:many. |
 | **Crosswalks for output, not input** | Inbound: everyone's data is normalized to L3 using catalog + dictionary. Outbound: L3 is customized per partner using catalogs + crosswalk. |
-| **POC scope** | Demographics pilot: core master tables, message-format catalogs (ADT/CCDA), source availability, value set members, and source crosswalk — published to parquet and exposed in PBIP. Broader clinical domains and enterprise terminology hosting remain out of scope for this repo. |
+| **POC scope** | Demographics pilot: core master tables, message-format catalogs (ADT/CCDA), source availability, value set members, and source crosswalk - published to parquet and exposed in PBIP. Broader clinical domains and enterprise terminology hosting remain out of scope for this repo. |
 
 ### 1.3 What Was Explicitly Rejected
 
-- **Single unified catalog** — "One metadata catalog to rule them all" fails because different consumers, cadences, and stewards need separation.
-- **Forcing HL7 into data_catalog / data_dictionary** — Person-centric and event-centric models were kept separate.
-- **Format-specific dictionaries** — For POC, message catalogs carry minimal notes; a unified crosswalk (future) will handle partner rules.
+- **Single unified catalog** - "One metadata catalog to rule them all" fails because different consumers, cadences, and stewards need separation.
+- **Forcing HL7 into data_catalog / data_dictionary** - Person-centric and event-centric models were kept separate.
+- **Format-specific dictionaries** - For POC, message catalogs carry minimal notes; a unified crosswalk (future) will handle partner rules.
 
 ### 1.4 Identity Resolution Strategy
 
 The CHI Master Demographics layer (L3) implements **probabilistic identity resolution** via Verato's Master Patient Index (MPI). The catalog and dictionary support this strategy through several mechanisms:
 
 **Identity Management Columns:**
-- `identifier_type` — Taxonomy of identifiers (MRN, SSN, DL, State ID, etc.) for multi-source tracking
-- `identifier_authority` — Issuing authority (State of California, SSA, Hospital MRN) for provenance
-- `identity_resolution_notes` — Match logic transparency: probabilistic linkage strategy, confidence thresholds, match/no-match rules
+- `identifier_type` - Taxonomy of identifiers (MRN, SSN, DL, State ID, etc.) for multi-source tracking
+- `identifier_authority` - Issuing authority (State of California, SSA, Hospital MRN) for provenance
+- `identity_resolution_notes` - Match logic transparency: probabilistic linkage strategy, confidence thresholds, match/no-match rules
 
 **Survivorship for Identity Attributes:**
 - Identity attributes (Domain 1) use reliability-based survivorship: hospital-issued legal name ranks higher than self-reported
@@ -227,10 +227,10 @@ The CHI Master Demographics layer (L3) implements **probabilistic identity resol
 The catalog implements **attribute-level security classification** to support HIPAA compliance, 42 CFR Part 2 (substance use disorder), and FHIR security labeling:
 
 **Security and Privacy Columns:**
-- `hipaa_category` — HIPAA-specific: "PII" | "PHI" | "SUD_Part2" | "" for regulatory compliance
-- `fhir_security_label` — FHIR security labels: "N" (normal), "R" (restricted), "V" (very restricted)
-- `consent_category` — Consent requirements: "general" | "research" | "sensitive" for opt-in/opt-out directives
-- `de_identification_method` — Strategy for research/public health: "redact" | "suppress" | "generalize" | "pseudonymize"
+- `hipaa_category` - HIPAA-specific: "PII" | "PHI" | "SUD_Part2" | "" for regulatory compliance
+- `fhir_security_label` - FHIR security labels: "N" (normal), "R" (restricted), "V" (very restricted)
+- `consent_category` - Consent requirements: "general" | "research" | "sensitive" for opt-in/opt-out directives
+- `de_identification_method` - Strategy for research/public health: "redact" | "suppress" | "generalize" | "pseudonymize"
 
 **Operational Security (Not Metadata Scope):**
 - Encryption at rest: AES-256 for Parquet files (deployment concern, not catalog schema)
@@ -256,21 +256,21 @@ The catalog schema aligns with Health Information Exchange (HIE) interoperabilit
 
 **Additional CHI alignment:**
 
-- **Roll-up vs. detail** — `rollup_relationship`, `is_rollup` for race, ethnicity, language, etc. (detailed elements point to rollup parent).
-- **Address coherence** — `composite_group` ensures street, city, zip are selected as a set from one source at one timestamp.
-- **Source hierarchy** — `data_source_rank_reference` documents attribute-specific rules (e.g., address: recency; legal name: reliability).
-- **Governance & stewardship** — `data_steward`, `steward_contact`, `approval_status` for ownership transparency.
-- **Identity management** — `identifier_type`, `identifier_authority` for multi-source identity tracking; `identity_resolution_notes` for match logic.
-- **Security & consent** — `hipaa_category`, `fhir_security_label`, `consent_category` for HIPAA/42 CFR Part 2 compliance and attribute-level consent directives.
-- **FHIR compliance** — `fhir_must_support`, `fhir_profile`, `fhir_cardinality` for US Core validation.
-- **Survivorship enhancements** — `tie_breaker_rule`, `conflict_detection_enabled`, `manual_override_allowed` for conflict resolution.
-- **Data source linkage** — `ddc-data_source_availability.parquet` table links feed profiles to catalog elements for intelligent source selection.
+- **Roll-up vs. detail** - `rollup_relationship`, `is_rollup` for race, ethnicity, language, etc. (detailed elements point to rollup parent).
+- **Address coherence** - `composite_group` ensures street, city, zip are selected as a set from one source at one timestamp.
+- **Source hierarchy** - `data_source_rank_reference` documents attribute-specific rules (e.g., address: recency; legal name: reliability).
+- **Governance & stewardship** - `data_steward`, `steward_contact`, `approval_status` for ownership transparency.
+- **Identity management** - `identifier_type`, `identifier_authority` for multi-source identity tracking; `identity_resolution_notes` for match logic.
+- **Security & consent** - `hipaa_category`, `fhir_security_label`, `consent_category` for HIPAA/42 CFR Part 2 compliance and attribute-level consent directives.
+- **FHIR compliance** - `fhir_must_support`, `fhir_profile`, `fhir_cardinality` for US Core validation.
+- **Survivorship enhancements** - `tie_breaker_rule`, `conflict_detection_enabled`, `manual_override_allowed` for conflict resolution.
+- **Data source linkage** - `ddc-data_source_availability.parquet` table links feed profiles to catalog elements for intelligent source selection.
 
 **Deferred (P2):** Formal machine-readable `data_source_rank_reference` structure (current: human-readable text); field-level provenance tracking (source_system_id + timestamp per value).
 
 ---
 
-### 1.7 Terminology & Value Sets — Practical Implementation (DAP as System of Record)
+### 1.7 Terminology & Value Sets - Practical Implementation (DAP as System of Record)
 
 The CHI metadata catalog is **not** intended to re-host full clinical code systems (ICD-10-CM, SNOMED CT, LOINC, RxNorm) or enterprise value sets.
 Those artifacts already exist and are governed within the **Innovaccer DAP platform**, which remains the **system of record** for terminology.
@@ -801,17 +801,17 @@ The Power BI semantic model joins catalog + dictionary on `semantic_id` and deri
 | `semantic_id` | ✓ (as "Semantic ID") | ✓ | Search |
 | `uscdi_element` | ✓ (as "Element") | ✓ | Search |
 | `fhir_resource` | ✓ (as "Resource") | ✓ (derived) | Multiselect |
-| `uscdi_description` | — | ✓ | Search |
-| `uscdi_data_class` | — | ✓ | — |
-| `uscdi_data_element` | — | ✓ | — |
-| `classification` | — | ✓ | Multiselect |
-| `ruleset_category` | — | ✓ | Multiselect |
-| `fhir_r4_path` | — | ✓ | Search |
-| `fhir_data_type` | — | ✓ | — |
-| `chi_survivorship_logic` | — | ✓ | — |
-| `innovaccer_survivorship_logic` | — | ✓ | — |
-| `data_source_rank_reference` | — | ✓ | — |
-| `data_quality_notes` | — | ✓ | — |
+| `uscdi_description` | - | ✓ | Search |
+| `uscdi_data_class` | - | ✓ | - |
+| `uscdi_data_element` | - | ✓ | - |
+| `classification` | - | ✓ | Multiselect |
+| `ruleset_category` | - | ✓ | Multiselect |
+| `fhir_r4_path` | - | ✓ | Search |
+| `fhir_data_type` | - | ✓ | - |
+| `chi_survivorship_logic` | - | ✓ | - |
+| `innovaccer_survivorship_logic` | - | ✓ | - |
+| `data_source_rank_reference` | - | ✓ | - |
+| `data_quality_notes` | - | ✓ | - |
 
 **Join behavior:** The semantic model uses an **inner join** on `semantic_id`. Elements that exist in only one of the two master tables are excluded from the main viewer.
 
@@ -827,7 +827,7 @@ When ADT or CCDA catalogs exist and contain rows for the selected `semantic_id`:
 
 ### 5.3 Empty or Missing Values
 
-Displayed as **—** (em dash). Multiline fields (Description, survivorship logic, etc.) use a scrollable box with min/max height.
+Displayed as **-** (em dash). Multiline fields (Description, survivorship logic, etc.) use a scrollable box with min/max height.
 
 ---
 
@@ -849,8 +849,8 @@ flowchart LR
 
 | Page | Purpose |
 |------|---------|
-| **Concept Profile** | One `semantic_id` — governance, FHIR/US Core, survivorship, source availability |
-| **Standards & Contexts** | Same slicer — terminology notes, HL7 ADT fields, C-CDA paths, standards banner |
+| **Concept Profile** | One `semantic_id` - governance, FHIR/US Core, survivorship, source availability |
+| **Standards & Contexts** | Same slicer - terminology notes, HL7 ADT fields, C-CDA paths, standards banner |
 | **Governance Overview** | Portfolio KPIs, classification/approval charts, full concept table |
 
 Semantic model tables: `ddc-master_patient_catalog`, `ddc-master_patient_dictionary`, `ddc-data_source_availability`, `ddc-hl7_adt_catalog`, `ddc-ccda_catalog` (all joined on `semantic_id`).
@@ -897,17 +897,17 @@ Semantic model tables: `ddc-master_patient_catalog`, `ddc-master_patient_diction
 - Missing required parquet files raise `FileNotFoundError` in build scripts and fail fast.
 - Join mismatch risk is handled by preserving `semantic_id` as the canonical key and validating generated inventories before publish.
 - Optional artifacts (ADT/CCDA inventories, business rules) can be absent without blocking core catalog/dictionary builds.
-- Power BI refresh errors (missing parquet, UTF-8 BOM on PBIP JSON) — see `docs/power-bi-concept-profile-setup.md`.
+- Power BI refresh errors (missing parquet, UTF-8 BOM on PBIP JSON) - see `docs/power-bi-concept-profile-setup.md`.
 
 ### 6.8 Viewer Behavior Requirements
 
 Any replacement read surface should preserve:
 
-1. **Core data model** — catalog + dictionary inner join on `semantic_id`; ADT, CCDA, and source availability as optional supporting tables.
-2. **Primary workflow** — select one `semantic_id`; show full catalog + dictionary detail for that concept.
-3. **Detail layout** — four groups in order: Catalog → FHIR Mapping → Survivorship & Sources → Quality & Governance.
-4. **Interoperability context** — ADT and CCDA rows for the selected `semantic_id` when present.
-5. **Display conventions** — blank values as `—`; multiline fields readable in bounded text areas or tables.
+1. **Core data model** - catalog + dictionary inner join on `semantic_id`; ADT, CCDA, and source availability as optional supporting tables.
+2. **Primary workflow** - select one `semantic_id`; show full catalog + dictionary detail for that concept.
+3. **Detail layout** - four groups in order: Catalog → FHIR Mapping → Survivorship & Sources → Quality & Governance.
+4. **Interoperability context** - ADT and CCDA rows for the selected `semantic_id` when present.
+5. **Display conventions** - blank values as `-`; multiline fields readable in bounded text areas or tables.
 
 ---
 
@@ -956,14 +956,14 @@ This section defines the centralized plan for standards-aligned enrichment while
 - Current implementation uses existing dictionary FHIR metadata (`fhir_r4_path`, `fhir_data_type`, `fhir_cardinality`, `fhir_profile`, `fhir_must_support`) as the baseline inventory.
 - Linked folder `fhir_release_5` now contains machine-readable R5 bundles and is used for enrichment.
 - Key files in `fhir_release_5`:
-  - `profiles-resources.json` — canonical StructureDefinition bundle for resource elements (primary inventory source).
-  - `profiles-types.json` and `profiles-others.json` — datatype and additional profile metadata.
-  - `dataelements.json` — element-level metadata support.
-  - `conceptmaps.json` — mapping artifacts, including useful links to HL7 v2 and CDA-oriented concepts.
-  - `valuesets.json` — value-set definitions and binding context.
-  - `search-parameters.json` — search metadata (secondary for catalog use cases).
-  - `fhir.schema.json` — JSON schema reference.
-  - `version.info` — confirms `FhirVersion=5.0.0`.
+  - `profiles-resources.json` - canonical StructureDefinition bundle for resource elements (primary inventory source).
+  - `profiles-types.json` and `profiles-others.json` - datatype and additional profile metadata.
+  - `dataelements.json` - element-level metadata support.
+  - `conceptmaps.json` - mapping artifacts, including useful links to HL7 v2 and CDA-oriented concepts.
+  - `valuesets.json` - value-set definitions and binding context.
+  - `search-parameters.json` - search metadata (secondary for catalog use cases).
+  - `fhir.schema.json` - JSON schema reference.
+  - `version.info` - confirms `FhirVersion=5.0.0`.
 - Prioritized Administration resources: `Patient`, `Practitioner`, `CareTeam`, `Device`, `Organization`, `Location`, `HealthcareService`.
 
 ### 8.5 Excel alignment plan

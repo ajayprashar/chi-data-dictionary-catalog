@@ -307,7 +307,7 @@ def build_field_guide_page(page_dir: Path) -> None:
         ),
         textbox(
             vid(), margin, 80, 1750, 40, 2,
-            "Steward workflow + column reference — links Excel sheets to Concept Profile and curation gaps",
+            "Steward workflow + column reference - links Excel sheets to Concept Profile and curation gaps",
             size="13pt", color=TEXT_WHITE, transparent=True,
         ),
         guide_slicer(

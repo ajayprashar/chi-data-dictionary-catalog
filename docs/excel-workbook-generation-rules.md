@@ -26,12 +26,12 @@ Excel is validating **workbook XML**, not your catalog data. Common openpyxl iss
 
 ### 1. Use real Excel Tables with consistent names
 
-- **Steward pattern:** `chi_{artifact}` — e.g. `chi_catalog`, `chi_dictionary`
-- **Intake pattern:** `chi_intake_{artifact}` — e.g. `chi_intake_field_inventory`
+- **Steward pattern:** `chi_{artifact}` - e.g. `chi_catalog`, `chi_dictionary`
+- **Intake pattern:** `chi_intake_{artifact}` - e.g. `chi_intake_field_inventory`
 - Names: snake_case, unique across the workbook, start with a letter
 - Create tables only via `add_excel_table()` in `excel_workbook_common.py`
 
-### 2. One AutoFilter per sheet — inside the Table only
+### 2. One AutoFilter per sheet - inside the Table only
 
 `add_excel_table()` registers AutoFilter on the Table definition. **Do not** also set `ws.auto_filter.ref` on the worksheet. Duplicate filters triggered repair prompts.
 
@@ -97,15 +97,15 @@ ddc-*.parquet  →  generate_steward_workbook.py  →  workbooks/*.xlsx
 ## Checklist before committing generator changes
 
 1. Regenerate both workbooks
-2. Open `chi-steward-workbook.xlsx` in Excel — **no repair prompt**
+2. Open `chi-steward-workbook.xlsx` in Excel - **no repair prompt**
 3. Confirm **Table Design** shows expected name (e.g. `chi_catalog`)
-4. Test **Concept_Explorer** with `Patient.race` in B3 — values appear, no `#NAME?` / `#REF!`
-5. Run `python scripts/import_steward_workbook_to_parquet.py` — row counts unchanged
+4. Test **Concept_Explorer** with `Patient.race` in B3 - values appear, no `#NAME?` / `#REF!`
+5. Run `python scripts/import_steward_workbook_to_parquet.py` - row counts unchanged
 6. Zip check (optional): worksheet XML has **0** `dataValidation`, **0** worksheet-level `<autoFilter` when Tables are used
 
 ---
 
 ## Related documents
 
-- `docs/excel-workbook-guide.md` — operational POC guide
-- `README.md` — quick start
+- `docs/excel-workbook-guide.md` - operational POC guide
+- `README.md` - quick start

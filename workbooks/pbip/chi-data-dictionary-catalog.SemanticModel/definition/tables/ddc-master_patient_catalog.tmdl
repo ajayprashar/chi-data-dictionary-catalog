@@ -38,31 +38,31 @@ table ddc-master_patient_catalog
 
 	measure 'Profile USCDI Element' =
 			VAR _v = SELECTEDVALUE('ddc-master_patient_catalog'[uscdi_element])
-			RETURN IF(ISBLANK(_v) || _v = "", "—", _v)
+			RETURN IF(ISBLANK(_v) || _v = "", "-", _v)
 		displayFolder: Concept Profile Cards
 		lineageTag: a1b2c3d4e5f6478990a1
 
 	measure 'Profile Classification' =
 			VAR _v = SELECTEDVALUE('ddc-master_patient_catalog'[classification])
-			RETURN IF(ISBLANK(_v) || _v = "", "—", _v)
+			RETURN IF(ISBLANK(_v) || _v = "", "-", _v)
 		displayFolder: Concept Profile Cards
 		lineageTag: a1b2c3d4e5f6478990a2
 
 	measure 'Profile Approval Status' =
 			VAR _v = SELECTEDVALUE('ddc-master_patient_catalog'[approval_status])
-			RETURN IF(ISBLANK(_v) || _v = "", "—", _v)
+			RETURN IF(ISBLANK(_v) || _v = "", "-", _v)
 		displayFolder: Concept Profile Cards
 		lineageTag: a1b2c3d4e5f6478990a3
 
 	measure 'Profile Data Steward' =
 			VAR _v = SELECTEDVALUE('ddc-master_patient_catalog'[data_steward])
-			RETURN IF(ISBLANK(_v) || _v = "", "—", _v)
+			RETURN IF(ISBLANK(_v) || _v = "", "-", _v)
 		displayFolder: Concept Profile Cards
 		lineageTag: a1b2c3d4e5f6478990a4
 
 	measure 'Profile Domain' =
 			VAR _v = SELECTEDVALUE('ddc-master_patient_catalog'[domain])
-			RETURN IF(ISBLANK(_v) || _v = "", "—", _v)
+			RETURN IF(ISBLANK(_v) || _v = "", "-", _v)
 		displayFolder: Concept Profile Cards
 		lineageTag: a1b2c3d4e5f6478990a5
 

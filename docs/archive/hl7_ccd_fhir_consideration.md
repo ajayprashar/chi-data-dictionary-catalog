@@ -4,7 +4,7 @@ LINKS:
 
 > **Status note (strategy draft / historical context):** This document mixes current-state notes, proposed future-state artifacts, and external references from earlier design sessions. For current implementation behavior and active file names, use `docs/documentation-map.md`, `README.md`, and `TECH-SPEC.md`.
 
-The current CHI metadata catalog and data dictionary — as implemented in , and described in the PRD — successfully define a **FHIR‑aligned**, USCDI‑anchored model for master demographics and survivorship rules. These artifacts include comprehensive mappings to FHIR R4 paths, detailed source‑ranking logic, privacy classifications, and technical attributes such as coverage counts and granularity levels. [[data_catalog_pipe | Excel]](https://ajayprashar-my.sharepoint.com/personal/ajay_aprashar_com/_layouts/15/Doc.aspx?sourcedoc=%7B598AF102-C343-4655-88CA-EFBB75C8450E%7D&file=data_catalog_pipe.csv&action=default&mobileredirect=true), [[data_dictionary_pipe | Excel]](https://ajayprashar-my.sharepoint.com/personal/ajay_aprashar_com/_layouts/15/Doc.aspx?sourcedoc=%7B8B8C772E-39C0-4230-9AE3-8CE0475231F6%7D&file=data_dictionary_pipe.csv&action=default&mobileredirect=true), [[ajayprasha...epoint.com]](https://ajayprashar-my.sharepoint.com/personal/ajay_aprashar_com/Documents/Microsoft%20Copilot%20Chat%20Files/readme-prd.md)
+The current CHI metadata catalog and data dictionary - as implemented in , and described in the PRD - successfully define a **FHIR‑aligned**, USCDI‑anchored model for master demographics and survivorship rules. These artifacts include comprehensive mappings to FHIR R4 paths, detailed source‑ranking logic, privacy classifications, and technical attributes such as coverage counts and granularity levels. [[data_catalog_pipe | Excel]](https://ajayprashar-my.sharepoint.com/personal/ajay_aprashar_com/_layouts/15/Doc.aspx?sourcedoc=%7B598AF102-C343-4655-88CA-EFBB75C8450E%7D&file=data_catalog_pipe.csv&action=default&mobileredirect=true), [[data_dictionary_pipe | Excel]](https://ajayprashar-my.sharepoint.com/personal/ajay_aprashar_com/_layouts/15/Doc.aspx?sourcedoc=%7B8B8C772E-39C0-4230-9AE3-8CE0475231F6%7D&file=data_dictionary_pipe.csv&action=default&mobileredirect=true), [[ajayprasha...epoint.com]](https://ajayprashar-my.sharepoint.com/personal/ajay_aprashar_com/Documents/Microsoft%20Copilot%20Chat%20Files/readme-prd.md)
 
 However, **no components of the current architecture include HL7 v2 or HL7 ADT specifications**. There are:
 
@@ -13,13 +13,13 @@ However, **no components of the current architecture include HL7 v2 or HL7 ADT s
 - **No fields describing encounter‑level or admission‑driven data**, as the present catalog is exclusively person‑centric (name, DOB, race/ethnicity, SOGI, address, housing status, etc.). [[data_catalog_pipe | Excel]](https://ajayprashar-my.sharepoint.com/personal/ajay_aprashar_com/_layouts/15/Doc.aspx?sourcedoc=%7B598AF102-C343-4655-88CA-EFBB75C8450E%7D&file=data_catalog_pipe.csv&action=default&mobileredirect=true), [[data_dictionary_pipe | Excel]](https://ajayprashar-my.sharepoint.com/personal/ajay_aprashar_com/_layouts/15/Doc.aspx?sourcedoc=%7B8B8C772E-39C0-4230-9AE3-8CE0475231F6%7D&file=data_dictionary_pipe.csv&action=default&mobileredirect=true)
 - **No ADT‑specific business rules**, despite the presence of rich survivorship rules for demographics. [[data_dictionary_pipe | Excel]](https://ajayprashar-my.sharepoint.com/personal/ajay_aprashar_com/_layouts/15/Doc.aspx?sourcedoc=%7B8B8C772E-39C0-4230-9AE3-8CE0475231F6%7D&file=data_dictionary_pipe.csv&action=default&mobileredirect=true)
 
-This creates a **structural gap** for teams that rely on HL7 v2 message flows — particularly those addressing admission, discharge, transfer, registration updates, or patient‑identity reconciliation triggered by ADT messages. Because the metadata catalog does not express how demographic elements map into HL7 ADT message structures, the system cannot currently:
+This creates a **structural gap** for teams that rely on HL7 v2 message flows - particularly those addressing admission, discharge, transfer, registration updates, or patient‑identity reconciliation triggered by ADT messages. Because the metadata catalog does not express how demographic elements map into HL7 ADT message structures, the system cannot currently:
 
 - Define how master demographic values should populate ADT segments such as PID, PD1, NK1, or PV1.
 - Ensure alignment between FHIR‑based master demographics and real‑time event‑driven ADT workflows.
 - Support downstream partners or systems that depend on HL7 v2 as their primary integration pathway.
 
-As a result, **stakeholders who operate in HL7‑driven environments—such as hospital registration systems, legacy EHR interfaces, or encounter‑centric workflows—cannot use the CHI metadata catalog as a single source of truth**, despite its strength in modeling FHIR semantics and survivorship logic. [[ajayprasha...epoint.com]](https://ajayprashar-my.sharepoint.com/personal/ajay_aprashar_com/Documents/Microsoft%20Copilot%20Chat%20Files/readme-prd.md), [[m365.cloud.microsoft]](https://m365.cloud.microsoft/chat/pages/eyJ1IjoiaHR0cHM6Ly9hamF5cHJhc2hhci5zaGFyZXBvaW50LmNvbS9jb250ZW50c3RvcmFnZS94OEZOTy14dHNrdUNSWDJfZk1USExWbzQyWVF1NWZsQ2d0bGgxOFU5c21RP25hdj1jejBsTWtaamIyNTBaVzUwYzNSdmNtRm5aU1V5Um5nNFJrNVBKVEpFZUhSemEzVkRVbGd5SlRWR1prMVVTRXhXYnpReVdWRjFOV1pzUTJkMGJHZ3hPRlU1YzIxUkptUTlZaVV5TVhWRWNHTm1jR0oyYmpCeFIzQjBhMUpvVDFWT1pqWk1hVmhVUWxoQ2QxcEdkSEV3VTFWaE9FYzNWMXBYY21rbE1rUlFPVWtsTlVaRFVqVnBkbFJOU0haQlRsbHpKbVk5TURGTVJFMVBORWd5TjBsWlZUUXpRVUpETTFKRlRGWktUMGhYTTA1SVdFcFlUaVpqUFNVeVJnIn0?auth=2)
+As a result, **stakeholders who operate in HL7‑driven environments-such as hospital registration systems, legacy EHR interfaces, or encounter‑centric workflows-cannot use the CHI metadata catalog as a single source of truth**, despite its strength in modeling FHIR semantics and survivorship logic. [[ajayprasha...epoint.com]](https://ajayprashar-my.sharepoint.com/personal/ajay_aprashar_com/Documents/Microsoft%20Copilot%20Chat%20Files/readme-prd.md), [[m365.cloud.microsoft]](https://m365.cloud.microsoft/chat/pages/eyJ1IjoiaHR0cHM6Ly9hamF5cHJhc2hhci5zaGFyZXBvaW50LmNvbS9jb250ZW50c3RvcmFnZS94OEZOTy14dHNrdUNSWDJfZk1USExWbzQyWVF1NWZsQ2d0bGgxOFU5c21RP25hdj1jejBsTWtaamIyNTBaVzUwYzNSdmNtRm5aU1V5Um5nNFJrNVBKVEpFZUhSemEzVkRVbGd5SlRWR1prMVVTRXhXYnpReVdWRjFOV1pzUTJkMGJHZ3hPRlU1YzIxUkptUTlZaVV5TVhWRWNHTm1jR0oyYmpCeFIzQjBhMUpvVDFWT1pqWk1hVmhVUWxoQ2QxcEdkSEV3VTFWaE9FYzNWMXBYY21rbE1rUlFPVWtsTlVaRFVqVnBkbFJOU0haQlRsbHpKbVk5TURGTVJFMVBORWd5TjBsWlZUUXpRVUpETTFKRlRGWktUMGhYTTA1SVdFcFlUaVpqUFNVeVJnIn0?auth=2)
 
 This gap limits interoperability for organizations that still rely heavily on HL7 v2 workflows (common across California HIE participants), and it prevents complete mapping coverage across the full ecosystem of clinical message exchanges.
 
@@ -181,7 +181,7 @@ You're asking about parquet file structure, but the deeper question is: **How do
 - **L0:** Raw HL7 v2.x messages ingested from VPN endpoints (WHHS, Sutter, St. Rose)
 - **L1:** Parse pipe-delimited format, validate segment structure
 - **L2:** Normalize to canonical schema, apply Verato identity resolution
-- **L3:** Apply survivorship—does this ADT's address override our existing SBR?
+- **L3:** Apply survivorship-does this ADT's address override our existing SBR?
 - **L4-L6:** Make demographics available to analytics, CHR, and FHIR API
 
 **CCDA Documents (from SES/XDS, Direct messaging):**
@@ -189,7 +189,7 @@ You're asking about parquet file structure, but the deeper question is: **How do
 - **L0:** Raw CCDA XML documents received via XDS.b repository or Direct SMTP
 - **L1:** Parse XML, validate against CCDA schema/schematron
 - **L2:** Extract structured data (demographics, problems, medications, vitals), normalize codes
-- **L3:** Apply survivorship—this CCDA contains patient race/ethnicity; does it win vs. existing sources?
+- **L3:** Apply survivorship-this CCDA contains patient race/ethnicity; does it win vs. existing sources?
 - **L4-L6:** Aggregate clinical data for reporting and CHR display
 
 #### **Outbound Message Flow (ADT & CCDA)**
@@ -307,7 +307,7 @@ interoperability_crosswalk.parquet        ← Partner × format rules:
 #### **Key Architectural Principles**
 
 1. **Catalogs are format-specific** because message structures differ fundamentally
-2. **The crosswalk dictionary is partner-centric** because partners don't care about format boundaries—they care about "what data do I get?"
+2. **The crosswalk dictionary is partner-centric** because partners don't care about format boundaries-they care about "what data do I get?"
 3. **Master patient dictionary stays separate** because L3 survivorship is independent of interoperability concerns
 4. **Link via explicit mappings:** `master_attribute_mapping` column in catalogs joins to `l3_attribute` in crosswalk
 
@@ -323,7 +323,7 @@ But these are **rare**. Most rules are partner-specific, so unified crosswalk is
 
 #### **Presenting to Kim/Kanwar on Monday**
 
-Frame it as: **"We're not just fixing AF/AG—we're building a metadata foundation that supports:**
+Frame it as: **"We're not just fixing AF/AG-we're building a metadata foundation that supports:**
 
 1. **Master demographics at L3** (one source of truth for patient attributes)
 2. **Message format catalogs** (structural specifications for ADT, CCDA, FHIR)
@@ -539,7 +539,7 @@ flowchart LR
 
 ### **Why Crosswalks Are Only Needed for Outbound Flows**
 
-You may notice the decision tree treats inbound and outbound flows differently—specifically, **inbound doesn't check for a crosswalk**. This is intentional, not an oversight.
+You may notice the decision tree treats inbound and outbound flows differently-specifically, **inbound doesn't check for a crosswalk**. This is intentional, not an oversight.
 
 **Inbound vs. Outbound Have Different Goals:**
 
@@ -564,7 +564,7 @@ When you RECEIVE an ADT from WHHS:
 3. You apply YOUR survivorship rules from `master_patient_dictionary`: "Does WHHS address beat the existing address?"
 4. Result: One golden record at L3
 
-You don't need a WHHS-specific crosswalk because you're not trying to preserve "how WHHS wants data formatted"—you're converting it to YOUR format.
+You don't need a WHHS-specific crosswalk because you're not trying to preserve "how WHHS wants data formatted"-you're converting it to YOUR format.
 
 **When you SEND an ADT to WHHS:**
 
@@ -618,7 +618,7 @@ This foundation keeps metadata **simple to manage** (separate concerns) and **qu
 
 ## Current CHI Metadata Viewer ERD (POC)
 
-The Mermaid ERD below captures the **actual Parquet structures used by the current catalog**—the master patient catalog/dictionary plus the small ADT/CCD catalogs. **Where FHIR appears:** FHIR path and data type are stored as metadata in **MASTER_PATIENT_DICTIONARY** (`fhir_r4_path`, `fhir_data_type`) and in **HL7_ADT_CATALOG** / **CCDA_CATALOG** (per-format `fhir_r4_path`). This POC does **not** store FHIR resource instance data (e.g. Patient/Encounter JSON); that would live in FHIR servers, APIs, or other data stores, not in these Parquet files.
+The Mermaid ERD below captures the **actual Parquet structures used by the current catalog**-the master patient catalog/dictionary plus the small ADT/CCD catalogs. **Where FHIR appears:** FHIR path and data type are stored as metadata in **MASTER_PATIENT_DICTIONARY** (`fhir_r4_path`, `fhir_data_type`) and in **HL7_ADT_CATALOG** / **CCDA_CATALOG** (per-format `fhir_r4_path`). This POC does **not** store FHIR resource instance data (e.g. Patient/Encounter JSON); that would live in FHIR servers, APIs, or other data stores, not in these Parquet files.
 
 ```mermaid
 erDiagram
@@ -691,15 +691,15 @@ Keep this diagram in sync with the canonical ERD in `TECH-SPEC.md` when changing
 
 ---
 
-## FUTURE / POST POC — Extended ERD (coding system tables)
+## FUTURE / POST POC - Extended ERD (coding system tables)
 
 A **FUTURE / POST POC** extended ERD (not in the current five-table model) shows value-set/code-system tables and crosswalks that were strategically left out of the current POC:
 
-- **VALUE_SET_DEFINITION** — Value set metadata (name, code system, version)
-- **VALUE_SET_MEMBER** — Codes within a value set (code, display, definition)
-- **SEMANTIC_ID_VALUE_SET** — Bridge linking catalog elements to value sets (binding strength, notes)
-- **FHIR_CATALOG** — Format catalog for FHIR (resource type, element path, profile)
-- **INTEROPERABILITY_CROSSWALK** — Partner-specific transformation rules (target field, value mapping)
+- **VALUE_SET_DEFINITION** - Value set metadata (name, code system, version)
+- **VALUE_SET_MEMBER** - Codes within a value set (code, display, definition)
+- **SEMANTIC_ID_VALUE_SET** - Bridge linking catalog elements to value sets (binding strength, notes)
+- **FHIR_CATALOG** - Format catalog for FHIR (resource type, element path, profile)
+- **INTEROPERABILITY_CROSSWALK** - Partner-specific transformation rules (target field, value mapping)
 
 See the "Value set / code system support (future extension)" and "Key Relationships" sections below for details.
 

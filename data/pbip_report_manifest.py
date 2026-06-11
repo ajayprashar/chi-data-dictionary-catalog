@@ -1,4 +1,4 @@
-"""PBIP report manifest — single source for in-report field guide generation.
+"""PBIP report manifest - single source for in-report field guide generation.
 
 Synced with enhance_pbip_report.py visuals and pbip_layout_constants.py.
 """
@@ -13,7 +13,7 @@ PAGE_STANDARDS = "d4e5f6a7b8c901234567"
 PAGE_GOVERNANCE = "c8f1a2b3d4e5f6071829"
 PAGE_FIELD_GUIDE = "f7a8b9c0d1e2f304152637"
 
-# Tab labels — informational pages use Guide · prefix (see pbip_layout_constants.py).
+# Tab labels - informational pages use Guide · prefix (see pbip_layout_constants.py).
 TAB_START_HERE = "Guide · Start here"
 TAB_DEMO = "Guide · Demo walkthrough"
 TAB_FIELD_GUIDE = "Guide · Field guide"
@@ -33,7 +33,7 @@ PAGES: list[dict] = [
         "page_id": PAGE_DEMO,
         "page_display_name": TAB_DEMO,
         "page_purpose": "5-minute guided tour: pilots, slicers, and where to drill next.",
-        "page_interop_summary": "Demo landing page — walk through Patient.race and related pilots.",
+        "page_interop_summary": "Demo landing page - walk through Patient.race and related pilots.",
         "primary_audience": "All",
     },
     {
@@ -61,7 +61,7 @@ PAGES: list[dict] = [
         "page_id": PAGE_GOVERNANCE,
         "page_display_name": "Governance Overview",
         "page_purpose": "Portfolio KPIs and classification across all governed concepts.",
-        "page_interop_summary": "Leadership view of approval status and pilot scope — not message-level mapping.",
+        "page_interop_summary": "Leadership view of approval status and pilot scope - not message-level mapping.",
         "primary_audience": "Leadership / governance",
     },
 ]
@@ -98,7 +98,7 @@ VISUALS: list[dict] = [
     },
     {
         "page_id": PAGE_CONCEPT_PROFILE,
-        "visual_title": "Implementation & survivorship (FHIR + standards)",
+        "visual_title": "Implementation & survivorship (FHIR R4 + standards)",
         "semantic_model_table": "ddc-master_patient_dictionary",
         "layer": "Dictionary",
         "columns": [
@@ -268,7 +268,7 @@ FIELD_GUIDE: dict[tuple[str, str], dict] = {
     },
     ("ddc-master_patient_catalog", "Profile Approval Status"): {
         "purpose_short": "Steward approval state for metadata.",
-        "interop_role": "Signals signed CHI interpretation — not national terminology approval.",
+        "interop_role": "Signals signed CHI interpretation - not national terminology approval.",
         "standards_touchpoint": "CHI governance",
         "exchange_formats": "Governance",
         "excel_sheet": "Catalog",
@@ -343,7 +343,7 @@ FIELD_GUIDE: dict[tuple[str, str], dict] = {
         "exchange_formats": "Governance",
         "excel_sheet": "Catalog",
         "editable_in_excel": "yes",
-        "pilot_example": "Demographics often PHI — drives consent and sharing rules.",
+        "pilot_example": "Demographics often PHI - drives consent and sharing rules.",
         "doc_ref": "TECH-SPEC.md",
     },
     ("ddc-master_patient_catalog", "steward_contact"): {
@@ -391,7 +391,7 @@ FIELD_GUIDE: dict[tuple[str, str], dict] = {
         "interop_role": "Portfolio size KPI for governance planning.",
         "standards_touchpoint": "CHI governance",
         "exchange_formats": "Governance",
-        "excel_sheet": "—",
+        "excel_sheet": "-",
         "editable_in_excel": "no",
         "pilot_example": "46 concepts in current catalog.",
         "doc_ref": "docs/faq.md",
@@ -401,7 +401,7 @@ FIELD_GUIDE: dict[tuple[str, str], dict] = {
         "interop_role": "Tracks steward sign-off progress toward production metadata.",
         "standards_touchpoint": "CHI governance",
         "exchange_formats": "Governance",
-        "excel_sheet": "—",
+        "excel_sheet": "-",
         "editable_in_excel": "no",
         "pilot_example": "Five demographics pilots Approved.",
         "doc_ref": "docs/demographics-pilot-plan.md",
@@ -411,7 +411,7 @@ FIELD_GUIDE: dict[tuple[str, str], dict] = {
         "interop_role": "Backlog indicator for stewardship work.",
         "standards_touchpoint": "CHI governance",
         "exchange_formats": "Governance",
-        "excel_sheet": "—",
+        "excel_sheet": "-",
         "editable_in_excel": "no",
         "pilot_example": "Remaining 41 concepts in POC.",
         "doc_ref": "docs/demographics-pilot-plan.md",
@@ -421,7 +421,7 @@ FIELD_GUIDE: dict[tuple[str, str], dict] = {
         "interop_role": "Scopes Phase 1 interoperability proof.",
         "standards_touchpoint": "CHI pilot",
         "exchange_formats": "Governance",
-        "excel_sheet": "—",
+        "excel_sheet": "-",
         "editable_in_excel": "no",
         "pilot_example": "race, ethnicity, language, gender_id, birth_sex.",
         "doc_ref": "docs/demographics-pilot-plan.md",
@@ -458,7 +458,7 @@ FIELD_GUIDE: dict[tuple[str, str], dict] = {
     },
     ("ddc-master_patient_dictionary", "chi_survivorship_logic"): {
         "purpose_short": "CHI rules for resolving conflicting source values.",
-        "interop_role": "Operational HOW for master patient — not wire format. Shown on Concept Profile only.",
+        "interop_role": "Operational HOW for master patient - not wire format. Shown on Concept Profile only.",
         "standards_touchpoint": "County / OMB rollup, NullFlavor handling",
         "exchange_formats": "Internal governance",
         "excel_sheet": "Dictionary",
@@ -498,7 +498,7 @@ FIELD_GUIDE: dict[tuple[str, str], dict] = {
     },
     ("ddc-data_source_availability", "availability"): {
         "purpose_short": "Whether the source can provide the element.",
-        "interop_role": "Implementation planning for HIE onboarding — not code mapping.",
+        "interop_role": "Implementation planning for HIE onboarding - not code mapping.",
         "standards_touchpoint": "CHI source coverage",
         "exchange_formats": "Coverage",
         "excel_sheet": "Source_Availability",
@@ -658,7 +658,7 @@ FIELD_GUIDE: dict[tuple[str, str], dict] = {
     },
     ("ddc-hl7_adt_catalog", "field_id"): {
         "purpose_short": "HL7 field position (e.g. PID-15, PID-10).",
-        "interop_role": "Primary wire locator for interface specs — always populated; pair with hl7_ce_encoding when code^text CE exists.",
+        "interop_role": "Primary wire locator for interface specs - always populated; pair with hl7_ce_encoding when code^text CE exists.",
         "standards_touchpoint": "HL7 v2 field table",
         "exchange_formats": "HL7 v2 ADT",
         "excel_sheet": "ADT_Mappings",
@@ -695,7 +695,7 @@ FIELD_GUIDE: dict[tuple[str, str], dict] = {
         "exchange_formats": "Terminology",
         "excel_sheet": "Value_Set_Members",
         "editable_in_excel": "yes",
-        "pilot_example": "Patient.race members — not full 900+ HL7 detailed race expansion.",
+        "pilot_example": "Patient.race members - not full 900+ HL7 detailed race expansion.",
         "doc_ref": "docs/crosswalk-model.md",
     },
     ("ddc-value_set_member", "notes"): {
@@ -785,7 +785,7 @@ FIELD_GUIDE: dict[tuple[str, str], dict] = {
     },
     ("ddc-master_patient_catalog", "approval_status"): {
         "purpose_short": "Steward approval state on the catalog row.",
-        "interop_role": "Portfolio and chart segmentation by governance sign-off — not terminology approval.",
+        "interop_role": "Portfolio and chart segmentation by governance sign-off - not terminology approval.",
         "standards_touchpoint": "CHI governance",
         "exchange_formats": "Governance",
         "excel_sheet": "Catalog",
@@ -856,12 +856,12 @@ FIELD_GUIDE: dict[tuple[str, str], dict] = {
 }
 
 DEFAULT_FIELD = {
-    "purpose_short": "Report column — see TECH-SPEC and steward workbook for full schema.",
+    "purpose_short": "Report column - see TECH-SPEC and steward workbook for full schema.",
     "interop_role": "Supports CHI governed metadata and interoperability views.",
     "standards_touchpoint": "See docs/shie-standards-reference.md",
     "standards_url": "",
     "exchange_formats": "Varies",
-    "excel_sheet": "—",
+    "excel_sheet": "-",
     "editable_in_excel": "no",
     "pilot_example": "",
     "doc_ref": "docs/faq.md",
@@ -914,17 +914,17 @@ PUBLISH_RITUAL = (
 
 
 def excel_table_for_sheet(sheet: str) -> str:
-    if sheet == "—":
-        return "—"
+    if sheet == "-":
+        return "-"
     return EXCEL_TABLE_BY_SHEET.get(sheet, sheet)
 
 
 def steward_action_for(meta: dict) -> str:
     if meta.get("editable_in_excel") != "yes":
-        return "Read only in Power BI — not edited in steward workbook."
-    sheet = meta.get("excel_sheet", "—")
-    if sheet == "—":
-        return "Read only — not steward-authored."
+        return "Read only in Power BI - not edited in steward workbook."
+    sheet = meta.get("excel_sheet", "-")
+    if sheet == "-":
+        return "Read only - not steward-authored."
     table = excel_table_for_sheet(sheet)
     return (
         f"Edit {sheet} ({table}) → save workbook → "

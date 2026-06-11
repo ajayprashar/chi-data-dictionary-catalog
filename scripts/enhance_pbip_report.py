@@ -62,8 +62,8 @@ TABLES_DIR = SEMANTIC_MODEL / "tables"
 REPO_PARQUET = r"C:\AI\chi-data-dictionary-catalog"
 
 STANDARDS_LAYER_TEXT = (
-    "USCDI = Catalog (what) | US Core + FHIR = Dictionary (how) | Governed codes = Value_Set_Members | "
-    "Source maps = Source_Value_Crosswalk | HL7 ADT + C-CDA = message context | Survivorship = chi_survivorship_logic"
+    "USCDI = Catalog (what) | US Core + FHIR R4 = Dictionary (how) | Governed codes = Value_Set_Members | "
+    "Source maps = Source_Value_Crosswalk | HL7 v2 ADT + C-CDA R2.1 = message context | Survivorship = chi_survivorship_logic"
 )
 
 # High-contrast primary palette (background vs text)
@@ -78,7 +78,7 @@ TABLE_COL_HEADER_BG = "#C5D9F2"
 TABLE_COL_HEADER_FG = "#003B7A"
 TABLE_GRID_LINE = "#B8C4D4"
 
-# Concept Profile: 1920x1080 (16:9) — room for a full-width concept slicer.
+# Concept Profile: 1920x1080 (16:9) - room for a full-width concept slicer.
 PAGE_PROFILE_W = 1920
 PAGE_PROFILE_H = 1080
 # Governance Overview: same canvas for consistency.
@@ -190,7 +190,7 @@ def container_title(
 
 
 def transparent_container() -> dict:
-    """Text on top of a shape — no extra box chrome or scrollbars."""
+    """Text on top of a shape - no extra box chrome or scrollbars."""
     return {
         "background": [{"properties": {"show": lit_bool(False)}}],
         "border": [{"properties": {"show": lit_bool(False)}}],
@@ -307,7 +307,7 @@ def callout_strip(
     size: str = "11pt",
     bold: bool = True,
 ) -> dict:
-    """Yellow accent callout — needs explicit height so wrapped text does not stack in PBI."""
+    """Yellow accent callout - needs explicit height so wrapped text does not stack in PBI."""
     run_style: dict = {"fontSize": size, "color": TEXT_BLACK}
     if bold:
         run_style["fontWeight"] = "bold"
@@ -563,7 +563,7 @@ def build_concept_profile_page(page_dir: Path) -> None:
         ),
         textbox(
             vid(), margin, 80, 1750, 40, 2,
-            "Concept profile — catalog, dictionary, and source availability on one semantic_id",
+            "Concept profile - catalog, dictionary (FHIR R4), and source availability on one semantic_id",
             size="13pt", color=TEXT_WHITE, transparent=True,
         ),
         slicer_dropdown(vid(), margin, slicer_y, SLICER_W, SLICER_H_PROFILE, 3, CATALOG, "semantic_id", "Patient.race"),
@@ -598,7 +598,7 @@ def build_concept_profile_page(page_dir: Path) -> None:
                 "data_quality_notes",
                 "data_source_rank_reference",
             ],
-            title="Implementation & survivorship (FHIR + standards)",
+            title="Implementation & survivorship (FHIR R4 + standards)",
         ),
         table_ex(
             vid(), margin + 1200, tables_y, 656, source_h, 12, SOURCES,
@@ -649,7 +649,7 @@ def build_standards_contexts_page(page_dir: Path) -> None:
         ),
         textbox(
             vid(), margin, 80, 1750, 40, 2,
-            "Healthcare standards + HL7 ADT + C-CDA + FHIR for one semantic_id",
+            "Healthcare standards + HL7 v2 ADT + C-CDA R2.1 + FHIR R4 for one semantic_id",
             size="13pt", color=TEXT_WHITE, transparent=True,
         ),
         callout_strip(
@@ -900,7 +900,7 @@ def build_overview_page(page_dir: Path) -> None:
         ),
         textbox(
             vid(), margin, 80, 1200, 40, 2,
-            "Portfolio of governed patient concepts — approval and classification",
+            "Portfolio of governed patient concepts - approval and classification",
             size="13pt", color=TEXT_WHITE, transparent=True,
         ),
         card(vid(), margin, 148, 448, 148, 3, CATALOG, "Total Concepts", measure=True, value_pt=32),

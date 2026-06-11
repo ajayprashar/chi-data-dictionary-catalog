@@ -23,7 +23,7 @@ Use this page as the index for which documents are actively maintained versus ke
 - `docs/excel-workbook-generation-rules.md`
   - openpyxl DO/DON'T rules so Excel opens workbooks without repair prompts.
 - `docs/power-bi-concept-profile-setup.md`
-  - Power BI PBIP viewer — open, refresh, troubleshooting (read surface after Excel import).
+  - Power BI PBIP viewer - open, refresh, troubleshooting (read surface after Excel import).
 - `docs/faq.md`
   - Catalog vs dictionary, PBIP pages vs tables, where to edit vs read (steward and demo audiences).
 - `data/pbip_report_manifest.py`

@@ -171,7 +171,7 @@ INTAKE_TABLES: list[tuple[str, str, list[str], list[list[str]]]] = [
                 "code",
                 "Optional",
                 "FEMALE",
-                "See Crosswalk_Template — maps to Patient.gender_id, not birth sex",
+                "See Crosswalk_Template - maps to Patient.gender_id, not birth sex",
                 "false",
                 "true",
                 "At intake when collected",

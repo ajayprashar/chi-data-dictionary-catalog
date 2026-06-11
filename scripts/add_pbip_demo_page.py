@@ -53,15 +53,16 @@ def build_demo_page(page_dir: Path) -> None:
     margin = 32
     content_w = w - (margin * 2)
     header_h = 128
-    row1_y = header_h + 12
-    steps_h = 268
-    quick_ref_y = row1_y + steps_h + 12
-    quick_ref_h = 228
-    row2_y = quick_ref_y + quick_ref_h + 12
-    row2_h = 168
-    row3_y = row2_y + row2_h + 12
-    about_h = 80
     footer_h = 52
+    content_bottom = h - footer_h - 12
+    row1_y = header_h + 12
+    steps_h = 248
+    quick_ref_h = 300
+    row2_h = 156
+    quick_ref_y = row1_y + steps_h + 12
+    row2_y = quick_ref_y + quick_ref_h + 12
+    row3_y = row2_y + row2_h + 12
+    about_h = content_bottom - row3_y
 
     visuals = [
         shape_rect(vid(), 0, 0, w, header_h, 0, PRIMARY_BLUE),

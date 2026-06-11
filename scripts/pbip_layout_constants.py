@@ -1,4 +1,4 @@
-"""Shared PBIP layout constants — used by enhance_pbip_report.py and patch_pbip_readability.py."""
+"""Shared PBIP layout constants - used by enhance_pbip_report.py and patch_pbip_readability.py."""
 
 from __future__ import annotations
 
@@ -23,14 +23,14 @@ FHIR_STANDARDS_COLUMNS = [
 STANDARDS_PAGE_ID = "d4e5f6a7b8c901234567"
 DEFAULT_LANDING_PAGE_ID = STANDARDS_PAGE_ID
 
-SLICER_TITLE = "Choose a concept — try Patient.race (full example)"
+SLICER_TITLE = "Choose a concept - try Patient.race (full example)"
 PILOT_SLICER_TITLE = "Show concepts"
 PAGE_START_HERE_ID = "e1f2a3b4c5d607182934"
 PAGE_FIELD_GUIDE_ID = "f7a8b9c0d1e2f304152637"
 DEMO_PAGE_ID = "a9b8c7d6e5f403120918"
 DEMO_LANDING_PAGE_ID = DEMO_PAGE_ID
 
-# Informational (guide) vs functional (data) tabs — canvas background + tab label prefix.
+# Informational (guide) vs functional (data) tabs - canvas background + tab label prefix.
 GUIDE_TAB_PREFIX = "Guide · "
 PAGE_BG_INFORMATIONAL = "#FFF9E6"
 PAGE_BG_FUNCTIONAL = "#FFFFFF"
@@ -66,7 +66,7 @@ CONCEPT_BLANK_CALLOUT = (
     "Use the five demographics pilots (filter Show concepts = yes) for a complete example."
 )
 FHIR_STANDARDS_TITLE = "FHIR R4 + US Core (Dictionary)"
-DICT_PROFILE_TITLE = "Implementation & survivorship (FHIR + standards)"
+DICT_PROFILE_TITLE = "Implementation & survivorship (FHIR R4 + standards)"
 ADT_CONTEXT_TITLE = "HL7 v2 ADT context (CE fields merged: .1 code ^ .2 text)"
 ADT_CONTEXT_COLUMNS = [
     "semantic_id",
@@ -87,7 +87,7 @@ STANDARDS_ADT_TABLE_H = 148
 
 
 def concept_profile_layout() -> dict[str, int]:
-    """Vertical layout for Concept Profile (1920x1080) — keeps tables above the footer band."""
+    """Vertical layout for Concept Profile (1920x1080) - keeps tables above the footer band."""
     content_bottom = PROFILE_PAGE_H - CONCEPT_FOOTER_H - 12
     slicer_y = CONCEPT_HEADER_H + 12
     callout_y = slicer_y + SLICER_H_PROFILE + 8
@@ -117,7 +117,7 @@ def concept_profile_layout() -> dict[str, int]:
 
 
 def standards_page_y_positions() -> dict[str, int]:
-    """Vertical layout for Standards & Contexts (1920x1080) — sized from footer up."""
+    """Vertical layout for Standards & Contexts (1920x1080) - sized from footer up."""
     content_bottom = PROFILE_PAGE_H - CONCEPT_FOOTER_H - 12
     layer_y = STANDARDS_HEADER_H + 8
     slicer_y = layer_y + STANDARDS_LAYER_H + STANDARDS_TABLE_GAP

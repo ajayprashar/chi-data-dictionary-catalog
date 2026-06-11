@@ -8,15 +8,15 @@ Design:
   - `mapping_type=exclude` mirrors SQL WHERE / survivorship null treatment.
   - `mapping_type=rollup` for race/ethnicity/SexID county logic; `exact` for language → BCP 47.
   - County language *reporting groups* (Asian, European (other)) stay in Dictionary survivorship
-    text — not duplicated here unless we add a future county_rollup table.
+    text - not duplicated here unless we add a future county_rollup table.
 
-Source: SHIE master-demographics workbook — race_expanded_population / ethnicity /
+Source: SHIE master-demographics workbook - race_expanded_population / ethnicity /
 language_expanded_population CASE blocks (Mark B / county).
 """
 
 from __future__ import annotations
 
-# (source_value, county_race_group_label) — RaceGroup CASE in SQL
+# (source_value, county_race_group_label) - RaceGroup CASE in SQL
 RACE_SOURCE_TO_COUNTY_GROUP: tuple[tuple[str, str], ...] = (
     ("African American", "Black or African American"),
     ("American Indian", "American Indian or Alaska Native"),
@@ -60,7 +60,7 @@ RACE_SOURCE_TO_COUNTY_GROUP: tuple[tuple[str, str], ...] = (
     ("White", "White"),
 )
 
-# SQL WHERE Race NOT IN (...) — exclude from aggregates (mapping_type exclude)
+# SQL WHERE Race NOT IN (...) - exclude from aggregates (mapping_type exclude)
 RACE_AGGREGATE_EXCLUDES: frozenset[str] = frozenset(
     {"U", "Unknown", "Unknown/Not Reported", "Unknown/ Not Reported", "DTS", "Other Race"}
 )
@@ -92,7 +92,7 @@ ETHNICITY_AGGREGATE_EXCLUDES: frozenset[str] = frozenset(
     }
 )
 
-# (source_token, normalized_display, bcp47_tag) — Language CASE block 1 + ISO 639-2 aliases
+# (source_token, normalized_display, bcp47_tag) - Language CASE block 1 + ISO 639-2 aliases
 # bcp47 empty → row omitted unless listed in LANGUAGE_NEEDS_REVIEW
 LANGUAGE_SOURCE_TO_BCP47: tuple[tuple[str, str, str], ...] = (
     ("Achinese", "Achinese", "ace"),
@@ -228,7 +228,7 @@ LANGUAGE_AGGREGATE_EXCLUDES: frozenset[str] = frozenset(
     }
 )
 
-# Steward review — present in county SQL but BCP 47 not confident without validation
+# Steward review - present in county SQL but BCP 47 not confident without validation
 LANGUAGE_NEEDS_REVIEW: frozenset[str] = frozenset({"SPE"})
 
 SEXID_SOURCE_TO_BIRTHSEX: tuple[tuple[str, str, str, str], ...] = (

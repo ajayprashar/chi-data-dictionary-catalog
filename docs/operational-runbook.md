@@ -1,4 +1,4 @@
-# Operational Runbook (Level A — No SharePoint)
+# Operational Runbook (Level A - No SharePoint)
 
 How to run the **governed catalog + dictionary** as an **operational POC** until SharePoint or Power BI Service is available.
 
@@ -33,8 +33,8 @@ Excel (author)  →  import script  →  parquet  →  Power BI Refresh (read)
 |----------|------|------|
 | Steward workbook | `workbooks/chi-steward-workbook.xlsx` | Authoring |
 | Parquet | `ddc-*.parquet` (repo root) | Published machine copy (7 clinical tables from steward import) |
-| Field guide parquet | `ddc-application_guide.parquet` | In-report column reference — **not** from steward import; regenerate from `data/pbip_report_manifest.py` |
-| Curation gaps parquet | `ddc-application_guide_gaps.parquet` | Concept Profile gaps for pilots + non-Approved concepts — regenerate after steward import |
+| Field guide parquet | `ddc-application_guide.parquet` | In-report column reference - **not** from steward import; regenerate from `data/pbip_report_manifest.py` |
+| Curation gaps parquet | `ddc-application_guide_gaps.parquet` | Concept Profile gaps for pilots + non-Approved concepts - regenerate after steward import |
 | Read surface | `workbooks/pbip/chi-data-dictionary-catalog.pbip` | Review / discovery |
 
 ---
@@ -46,7 +46,7 @@ Excel (author)  →  import script  →  parquet  →  Power BI Refresh (read)
 | **Steward** | Edits Catalog, Dictionary, Source_Availability (and Steward_Queue notes) in Excel |
 | **Publisher** | Runs import script, spot-checks Power BI, commits workbook + parquet to git |
 | **Reviewer** | `git pull` → opens PBIP → **Refresh** → validates Concept Profile |
-| **Maintainer** (optional) | Regenerates workbook from parquet, PBIP layout (`enhance_pbip_report.py`) — rare |
+| **Maintainer** (optional) | Regenerates workbook from parquet, PBIP layout (`enhance_pbip_report.py`) - rare |
 
 **Rule:** One published snapshot at a time. Whoever runs import and commits is the publisher for that cycle. Everyone else pulls before reviewing.
 
@@ -120,7 +120,7 @@ python scripts/generate_pbip_model_guide.py
    - **Governed value set codes** shows ~26 rows (OMB rollup + pilot codes incl. gender identity), not 900+ HL7 detailed race codes.
    - **HL7 ADT context** shows `field_id` (e.g. `PID-15` for language); CE fields also show `hl7_ce_encoding` like `PID-10.1^PID-10.2`.
 8. Commit (see [Git commit policy](#git-commit-policy)).
-9. Notify reviewers: “Published — please `git pull` and Refresh.”
+9. Notify reviewers: “Published - please `git pull` and Refresh.”
 
 ### Reviewer
 
@@ -155,7 +155,7 @@ Open PBIP → **Refresh** → verify the concept(s) under review.
 **Commit message pattern:**
 
 ```text
-Steward publish: Patient.race, Patient.ethnicity — approval + survivorship review
+Steward publish: Patient.race, Patient.ethnicity - approval + survivorship review
 ```
 
 **Do not commit:** `.venv/`, `node_modules/`, local PBIP cache, secrets.
@@ -177,7 +177,7 @@ Steward reviews `Source_Value_Crosswalk` in Excel (`approval_status` starts as `
 
 ---
 
-## Production checklist — close Phase 1 (five demographics)
+## Production checklist - close Phase 1 (five demographics)
 
 Complete before calling the demographics pilot **operationally done**:
 
@@ -185,7 +185,7 @@ Complete before calling the demographics pilot **operationally done**:
 
 - [x] Replace placeholder `SHIE Data Governance` with **named stewards** on all five pilot rows (`Ajay Prashar`)
 - [ ] All five `approval_status` = `Approved` (or documented exception in **Steward_Queue**)
-- [x] `Patient.gender_id` CCDA path filled or explicitly documented as N/A (`partial`; note: govern via FHIR US Core Observation — rarely in CCDA)
+- [x] `Patient.gender_id` CCDA path filled or explicitly documented as N/A (`partial`; note: govern via FHIR US Core Observation - rarely in CCDA)
 - [ ] `data_quality_notes` reviewed against `docs/shie-standards-reference.md`
 - [ ] Source_Availability: honest `availability` per `source_id` (not `unknown` without reason)
 
@@ -203,7 +203,7 @@ Complete before calling the demographics pilot **operationally done**:
 
 ---
 
-## Production checklist — ongoing publish (each batch)
+## Production checklist - ongoing publish (each batch)
 
 Use for every curation batch after Phase 1:
 
@@ -275,7 +275,7 @@ Stewards should only need **import** for daily work.
 | Parquet path error on open | Clone path must match `C:\AI\chi-data-dictionary-catalog` or re-point TMDL |
 | Import script fails | Workbook open in Excel? Close file and retry |
 | Excel repair prompt on open | See `docs/excel-workbook-generation-rules.md`; regenerate with `generate_steward_workbook.py` |
-| UTF-8 BOM error on PBIP | PBIP JSON must be UTF-8 without BOM — see `docs/power-bi-concept-profile-setup.md` |
+| UTF-8 BOM error on PBIP | PBIP JSON must be UTF-8 without BOM - see `docs/power-bi-concept-profile-setup.md` |
 | Merge conflict on `.xlsx` | Avoid concurrent edits; publisher resolves with steward |
 
 ---

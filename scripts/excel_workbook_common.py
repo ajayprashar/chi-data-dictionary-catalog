@@ -49,7 +49,7 @@ def add_excel_table(ws: Worksheet, table_name: str) -> None:
     )
     ws.add_table(table)
     ws.freeze_panes = "A2"
-    # Do not set ws.auto_filter here — the Table definition already includes
+    # Do not set ws.auto_filter here - the Table definition already includes
     # autoFilter; a worksheet-level duplicate triggers Excel's repair dialog.
 
 

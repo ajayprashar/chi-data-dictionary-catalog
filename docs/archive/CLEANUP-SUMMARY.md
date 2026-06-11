@@ -1,6 +1,6 @@
 # File Cleanup Summary
 
-> **Status note (historical snapshot):** March 2026 one-time cleanup. A follow-up repo cleanup (June 2026) removed legacy `.pbix`, `.tmp/` exports, and orphaned scripts — see `docs/cleanup-methodology.md`. Use `README.md` and `TECH-SPEC.md` for current structure.
+> **Status note (historical snapshot):** March 2026 one-time cleanup. A follow-up repo cleanup (June 2026) removed legacy `.pbix`, `.tmp/` exports, and orphaned scripts - see `docs/cleanup-methodology.md`. Use `README.md` and `TECH-SPEC.md` for current structure.
 
 **Date:** March 4, 2026
 
@@ -69,36 +69,36 @@ python -c "import pandas as pd; cat = pd.read_parquet('ddc-master_patient_catalo
 ## Current File Structure (Clean)
 
 ### Core Parquet Files ([OK] Current Schema)
-- `ddc-master_patient_catalog.parquet` — 46 rows, 20 columns
-- `ddc-master_patient_dictionary.parquet` — 46 rows, 21 columns
-- `ddc-hl7_adt_catalog.parquet` — 47 rows (ADT message mappings)
-- `ddc-ccda_catalog.parquet` — 34 rows (CCDA XML mappings)
-- `ddc-data_source_availability.parquet` — 46 rows (NEW: source availability matrix)
+- `ddc-master_patient_catalog.parquet` - 46 rows, 20 columns
+- `ddc-master_patient_dictionary.parquet` - 46 rows, 21 columns
+- `ddc-hl7_adt_catalog.parquet` - 47 rows (ADT message mappings)
+- `ddc-ccda_catalog.parquet` - 34 rows (CCDA XML mappings)
+- `ddc-data_source_availability.parquet` - 46 rows (NEW: source availability matrix)
 
 ### Scripts ([OK] Up to Date)
-- `scripts/split_to_catalog_and_dictionary.py` — CSV splitter with full HIE schema
-- `scripts/build_adt_catalog_from_mapping.py` — ADT catalog builder
-- `scripts/build_ccda_catalog_from_mapping.py` — CCDA catalog builder
-- `scripts/build_data_source_availability.py` — NEW: source availability builder
+- `scripts/split_to_catalog_and_dictionary.py` - CSV splitter with full HIE schema
+- `scripts/build_adt_catalog_from_mapping.py` - ADT catalog builder
+- `scripts/build_ccda_catalog_from_mapping.py` - CCDA catalog builder
+- `scripts/build_data_source_availability.py` - NEW: source availability builder
 
 ### Application ([OK] Updated)
-- `workbooks/pbip/chi-data-dictionary-catalog.pbip` — Power BI read surface (replaces retired local web viewer)
-- `chi-data-dictionary-catalog.ipynb` — Jupyter notebook for optional ad-hoc data exploration
+- `workbooks/pbip/chi-data-dictionary-catalog.pbip` - Power BI read surface (replaces retired local web viewer)
+- `chi-data-dictionary-catalog.ipynb` - Jupyter notebook for optional ad-hoc data exploration
 
 ### Documentation ([OK] Current)
-- `README.md` — Quick start guide
-- `readme-prd.md` — Executive PRD
-- `TECH-SPEC.md` — Technical specification (updated with new schema)
-- `docs/archive/EVALUATION.md` — HIE interoperability evaluation (4.7/5)
-- `docs/archive/GAPS-CLOSED.md` — Implementation summary
-- `docs/archive/hl7_ccd_fhir_consideration.md` — Strategic analysis
-- `ccd_interface_mapping.md` — CCD mapping reference
+- `README.md` - Quick start guide
+- `readme-prd.md` - Executive PRD
+- `TECH-SPEC.md` - Technical specification (updated with new schema)
+- `docs/archive/EVALUATION.md` - HIE interoperability evaluation (4.7/5)
+- `docs/archive/GAPS-CLOSED.md` - Implementation summary
+- `docs/archive/hl7_ccd_fhir_consideration.md` - Strategic analysis
+- `ccd_interface_mapping.md` - CCD mapping reference
 
 ### Data & Configuration ([OK] Valid)
-- `data/` — Mapping CSVs, feed profiles
-- `docs/` — Additional documentation
-- `.gitignore` — Properly configured
-- `requirements.txt` — Python dependencies
+- `data/` - Mapping CSVs, feed profiles
+- `docs/` - Additional documentation
+- `.gitignore` - Properly configured
+- `requirements.txt` - Python dependencies
 
 ---
 

@@ -7,7 +7,7 @@ Table 4/5/2 CASE blocks). Does not overwrite value set bindings or members.
 Responsible scope:
   - Source strings → standard codes (CDCREC OMB, BCP 47, US Core birth sex)
   - NOT a duplicate of HL7 Value_Set_Members (run build_value_set_members.py separately)
-  - NOT county language reporting groups (Asian, European other) — those stay in Dictionary
+  - NOT county language reporting groups (Asian, European other) - those stay in Dictionary
 """
 
 from __future__ import annotations
@@ -262,7 +262,7 @@ def build_crosswalk_rows() -> list[dict[str, str]]:
                 target_code=target_code,
                 target_display=target_display,
                 mapping_type=mapping_type,
-                notes=f"{AUTHORITY}; Table 2 SexID — not Patient.gender_id",
+                notes=f"{AUTHORITY}; Table 2 SexID - not Patient.gender_id",
             ),
         )
 

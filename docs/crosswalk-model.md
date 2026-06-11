@@ -1,6 +1,6 @@
 # Crosswalk and Value Set Model
 
-How CHI documents **which standards apply**, **which codes are governed**, and **how source values map** — without duplicating full terminology catalogs (DAP remains system of record per `TECH-SPEC.md` §1.7).
+How CHI documents **which standards apply**, **which codes are governed**, and **how source values map** - without duplicating full terminology catalogs (DAP remains system of record per `TECH-SPEC.md` §1.7).
 
 **Related:** `docs/shie-standards-reference.md`, `docs/operational-runbook.md`, `docs/demographics-pilot-plan.md`
 
@@ -89,7 +89,7 @@ python scripts/seed_county_master_crosswalk.py
 # PBIP readability (CE field merge + hide HL7 detailed codes in report load):
 python scripts/enrich_parquet_for_pbi.py
 
-# Pilot value set bindings + member seed (maintainers — does not overwrite crosswalk):
+# Pilot value set bindings + member seed (maintainers - does not overwrite crosswalk):
 python scripts/seed_value_sets_pilot.py
 
 # Regenerate steward workbook after parquet rebuilds:
@@ -110,10 +110,10 @@ Refresh Power BI → **Standards & Contexts** shows **Governed value set** and *
 | Race / ethnicity | [HL7 Race/Ethnicity ValueSet](https://terminology.hl7.org/) | Expanding beyond OMB pilot subset |
 | Language | BCP 47 / IANA | Large language crosswalk from partner intake |
 | Gender identity | HL7 `gender-identity` minimum set (SNOMED) + partner extensions | Minimum set seeded; source-string crosswalk when partner inventory arrives |
-| **ICD-10-CM / ICD-9** | CMS / NLM / **DAP** | Clinical concepts (problems, diagnoses) — **not demographics pilot** |
+| **ICD-10-CM / ICD-9** | CMS / NLM / **DAP** | Clinical concepts (problems, diagnoses) - **not demographics pilot** |
 | SNOMED / LOINC clinical | **DAP** | Clinical attributes |
 
-For production clinical expansion, reference DAP by ID in `authority_reference` or a future `dap_value_set_id` column — do not import full ICD tables into this repo unless CHI explicitly chooses a local overlay.
+For production clinical expansion, reference DAP by ID in `authority_reference` or a future `dap_value_set_id` column - do not import full ICD tables into this repo unless CHI explicitly chooses a local overlay.
 
 ---
 
@@ -142,11 +142,11 @@ Mappings are defined in **`data/county_survivorship_mappings.py`** (full SQL CAS
 | `Race` | `Patient.race` | CDCREC OMB rollup codes |
 | `Ethnicity` | `Patient.ethnicity` | CDCREC OMB rollup codes |
 | `Language` | `Patient.language` | BCP 47 tags |
-| `SexID` | `Patient.birth_sex` | US Core birth sex (`M`/`F`) — **not** `Patient.gender_id` |
+| `SexID` | `Patient.birth_sex` | US Core birth sex (`M`/`F`) - **not** `Patient.gender_id` |
 
 Rows ship with `approval_status` = `draft` until the steward validates in Excel and publishes.
 
-**Still separate:** CMT ADT `PID-10` / `PID-22` CE codes (often low fill) — add under `source_id` = `cmt` when a validated ADT code list is available.
+**Still separate:** CMT ADT `PID-10` / `PID-22` CE codes (often low fill) - add under `source_id` = `cmt` when a validated ADT code list is available.
 
 Set `approval_status` to `Approved` when mappings are steward-signed.
 

@@ -10,9 +10,9 @@ Local proof-of-concept: **one steward workbook** is the primary surface for a **
 
 | Authoring (in scope) | Optional read | Deferred |
 |----------------------|---------------|----------|
-| `chi-steward-workbook.xlsx` — edit Catalog + Dictionary + Source_Availability | Power BI PBIP (`workbooks/pbip/chi-data-dictionary-catalog.pbip`) | SharePoint / team portals |
+| `chi-steward-workbook.xlsx` - edit Catalog + Dictionary + Source_Availability | Power BI PBIP (`workbooks/pbip/chi-data-dictionary-catalog.pbip`) | SharePoint / team portals |
 | 5 demographics pilot (`Patient.race`, `.ethnicity`, `.language`, `.gender_id`, `.birth_sex`) | See `docs/power-bi-concept-profile-setup.md` | All 28 data sources |
-| `semantic_id` as join key | Jupyter notebook — ad-hoc DuckDB queries only | Partner intake (until onboarding a source) |
+| `semantic_id` as join key | Jupyter notebook - ad-hoc DuckDB queries only | Partner intake (until onboarding a source) |
 | Round-trip: Excel → parquet in this folder | | Full FHIR inventory curation |
 
 **POC success** = a steward can open the workbook, review one concept in `Concept_Explorer`, and see catalog + dictionary + source link on one `semantic_id`.
@@ -66,7 +66,7 @@ flowchart LR
    python scripts/import_steward_workbook_to_parquet.py
    ```
 
-3. **Review** — open `workbooks/pbip/chi-data-dictionary-catalog.pbip` and **Refresh** (see `docs/power-bi-concept-profile-setup.md`).
+3. **Review** - open `workbooks/pbip/chi-data-dictionary-catalog.pbip` and **Refresh** (see `docs/power-bi-concept-profile-setup.md`).
 
 **Reverse direction** (only when scripts rebuild parquet, not daily use):
 
@@ -117,7 +117,7 @@ See **Table_Index** sheet for the full map. Naming pattern: `chi_{artifact}` in 
 | `Steward_Queue` | Optional | Workflow notes |
 | `ADT_Mappings` | Optional | HL7 demo / CMT work |
 | `CCDA_Mappings` | Optional | CCD demo |
-| `FHIR_Inventory` | Defer | Large reference inventory |
+| `FHIR_Inventory` | Defer | Reference scaffold from FHIR R5 bundles (`fhir_release_5/`) - not the governed R4 dictionary |
 | `Business_Rules` | Defer | Until rule authoring needed |
 | `_Model`, `Lookup_Lists` | Auto | Hidden support sheets |
 
@@ -125,9 +125,9 @@ See **Table_Index** sheet for the full map. Naming pattern: `chi_{artifact}` in 
 
 `Source_Availability` columns:
 
-- `semantic_id` — governed concept
-- `source_id` — data source (e.g. `cmt`)
-- `availability` — `full`, `partial`, `none`, `unknown`
+- `semantic_id` - governed concept
+- `source_id` - data source (e.g. `cmt`)
+- `availability` - `full`, `partial`, `none`, `unknown`
 
 ---
 
@@ -137,7 +137,7 @@ See **Table_Index** sheet for the full map. Naming pattern: `chi_{artifact}` in 
 
 Use when onboarding an external source (jail, HMIS, etc.). Not required for the demographics POC.
 
-**Crosswalk_Template** — partner documents local code → CHI standard mappings (same columns as steward **Source_Value_Crosswalk**). See **`docs/partner-crosswalk-template.md`**.
+**Crosswalk_Template** - partner documents local code → CHI standard mappings (same columns as steward **Source_Value_Crosswalk**). See **`docs/partner-crosswalk-template.md`**.
 
 Each data sheet is a named Excel Table (`chi_intake_*`). Allowed values are in **Lookup_Lists** (no dropdown validations).
 
@@ -184,8 +184,8 @@ python scripts/split_to_catalog_and_dictionary.py path\to\combined_export.csv
 
 ## Related documents
 
-- `README.md` — quick start
-- `docs/demographics-pilot-plan.md` — pilot status and checklist
-- `docs/power-bi-concept-profile-setup.md` — Power BI viewer (refresh after import)
-- `TECH-SPEC.md` — full column schemas (reference, not required for daily POC use)
-- `docs/cmt-adt-feed-and-master-patient.md` — ADT mapping context
+- `README.md` - quick start
+- `docs/demographics-pilot-plan.md` - pilot status and checklist
+- `docs/power-bi-concept-profile-setup.md` - Power BI viewer (refresh after import)
+- `TECH-SPEC.md` - full column schemas (reference, not required for daily POC use)
+- `docs/cmt-adt-feed-and-master-patient.md` - ADT mapping context

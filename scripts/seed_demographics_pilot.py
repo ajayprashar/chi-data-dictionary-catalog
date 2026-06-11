@@ -100,20 +100,20 @@ DICTIONARY_UPDATES: dict[str, dict[str, str]] = {
             "Most recent valid value with timestamp\n"
             "US Core: Observation LOINC 76691-5\n"
             "Equity rollup may collapse transition labels; detail kept for drill-through\n"
-            "Not CMT SexID — that governs Patient.birth_sex only"
+            "Not CMT SexID - that governs Patient.birth_sex only"
         ),
         "data_quality_notes": (
             "US Core: Observation LOINC 76691-5\n"
             "Answers: HL7 gender-identity ValueSet (SNOMED minimum, extensible)\n"
             "OID: urn:oid:2.16.840.1.113883.6.96\n"
             "Not: Patient.birth_sex / CMT SexID\n"
-            "County Table 2: SBR administrative rollup only — not this element"
+            "County Table 2: SBR administrative rollup only - not this element"
         ),
         "data_source_rank_reference": "Patient-facing and community sources prioritized over administrative SexID.",
     },
     "Patient.birth_sex": {
         "chi_survivorship_logic": (
-            "County: CMT SexID — ignore Unknown (U) as null at master level\n"
+            "County: CMT SexID - ignore Unknown (U) as null at master level\n"
             "Most recently modified among valid values\n"
             "Reliability-weighted when sources conflict; UMPI matching\n"
             "Clinical/legal sources may trump self-report per policy\n"
@@ -121,7 +121,7 @@ DICTIONARY_UPDATES: dict[str, dict[str, str]] = {
         ),
         "data_quality_notes": (
             "US Core: us-core-birthsex extension on Patient\n"
-            "Administrative sex codes — not CDCREC race/ethnicity\n"
+            "Administrative sex codes - not CDCREC race/ethnicity\n"
             "NullFlavor: Unknown (U) treated as null at master level\n"
             "UMPI matching; not interchangeable with gender identity (LOINC 76691-5)\n"
             "County Table 2 Gender Groupings for SBR rollup"

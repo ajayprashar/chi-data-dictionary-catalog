@@ -1,9 +1,9 @@
 table ddc-application_guide
-	lineageTag: 5115d0728243512591fb
+	lineageTag: a15bb3406d559da616ae
 
 	column guide_id
 		dataType: string
-		lineageTag: 030a5abb39d9af3550fa
+		lineageTag: 21ae888da8f217e74620
 		summarizeBy: none
 		sourceColumn: guide_id
 
@@ -11,7 +11,7 @@ table ddc-application_guide
 
 	column page_id
 		dataType: string
-		lineageTag: 642ab9abf9052d83864a
+		lineageTag: 4c7aac528dbd4885fe09
 		summarizeBy: none
 		sourceColumn: page_id
 
@@ -19,7 +19,7 @@ table ddc-application_guide
 
 	column page_display_name
 		dataType: string
-		lineageTag: bcff48a2d7b903b2b50f
+		lineageTag: b8a5bed3cafedcedd6b4
 		summarizeBy: none
 		sourceColumn: page_display_name
 
@@ -27,7 +27,7 @@ table ddc-application_guide
 
 	column page_purpose
 		dataType: string
-		lineageTag: 3e6e3ab2f17260227eba
+		lineageTag: 0858a1edcccd6554bfa4
 		summarizeBy: none
 		sourceColumn: page_purpose
 
@@ -35,7 +35,7 @@ table ddc-application_guide
 
 	column page_interop_summary
 		dataType: string
-		lineageTag: d0545c808689681173bc
+		lineageTag: 44698844b09eb1f51da6
 		summarizeBy: none
 		sourceColumn: page_interop_summary
 
@@ -43,7 +43,7 @@ table ddc-application_guide
 
 	column primary_audience
 		dataType: string
-		lineageTag: dd579ce999925e097884
+		lineageTag: 869244a91b2372a9d76c
 		summarizeBy: none
 		sourceColumn: primary_audience
 
@@ -51,7 +51,7 @@ table ddc-application_guide
 
 	column visual_title
 		dataType: string
-		lineageTag: 21221fb2d247e1bb241e
+		lineageTag: 25ce2246ff92eeb9bf6b
 		summarizeBy: none
 		sourceColumn: visual_title
 
@@ -59,7 +59,7 @@ table ddc-application_guide
 
 	column sort_order
 		dataType: string
-		lineageTag: 4bc0e07d1df055e409ac
+		lineageTag: f1d54ee6979dfea62197
 		summarizeBy: none
 		sourceColumn: sort_order
 
@@ -67,7 +67,7 @@ table ddc-application_guide
 
 	column semantic_model_table
 		dataType: string
-		lineageTag: a7f10bc301adb4d32038
+		lineageTag: 70eda170d2a4371a682f
 		summarizeBy: none
 		sourceColumn: semantic_model_table
 
@@ -75,7 +75,7 @@ table ddc-application_guide
 
 	column column_name
 		dataType: string
-		lineageTag: dc7131577f74aac4680f
+		lineageTag: cce43ba3d1ee1b99410c
 		summarizeBy: none
 		sourceColumn: column_name
 
@@ -83,7 +83,7 @@ table ddc-application_guide
 
 	column layer
 		dataType: string
-		lineageTag: eca28b89149ebd3408bf
+		lineageTag: e372ab9972d00543d69f
 		summarizeBy: none
 		sourceColumn: layer
 
@@ -91,7 +91,7 @@ table ddc-application_guide
 
 	column layer_question
 		dataType: string
-		lineageTag: 0e9889bb0df61f8c4ca2
+		lineageTag: 6650da3ceb21a6b6c445
 		summarizeBy: none
 		sourceColumn: layer_question
 
@@ -99,7 +99,7 @@ table ddc-application_guide
 
 	column purpose_short
 		dataType: string
-		lineageTag: e2eeeafa0b5bea48badf
+		lineageTag: 6441d2d5188dc1dce404
 		summarizeBy: none
 		sourceColumn: purpose_short
 
@@ -107,7 +107,7 @@ table ddc-application_guide
 
 	column interop_role
 		dataType: string
-		lineageTag: 1180d359e0065bf70828
+		lineageTag: 6cae75385bb7abc3a3d2
 		summarizeBy: none
 		sourceColumn: interop_role
 
@@ -115,7 +115,7 @@ table ddc-application_guide
 
 	column standards_touchpoint
 		dataType: string
-		lineageTag: 6fe344912c66e2e8657d
+		lineageTag: 3f14c22a1bf9d8acc379
 		summarizeBy: none
 		sourceColumn: standards_touchpoint
 
@@ -123,7 +123,7 @@ table ddc-application_guide
 
 	column standards_url
 		dataType: string
-		lineageTag: 7335a9c69322f646c3f7
+		lineageTag: 99bf08b984c7aec54caf
 		summarizeBy: none
 		sourceColumn: standards_url
 
@@ -131,7 +131,7 @@ table ddc-application_guide
 
 	column exchange_formats
 		dataType: string
-		lineageTag: d890aeec20e30145daa6
+		lineageTag: 77f1d21811c09186d00a
 		summarizeBy: none
 		sourceColumn: exchange_formats
 
@@ -139,7 +139,7 @@ table ddc-application_guide
 
 	column excel_sheet
 		dataType: string
-		lineageTag: 25b0effbb2564da8f417
+		lineageTag: bda2942e90ab02d0e84e
 		summarizeBy: none
 		sourceColumn: excel_sheet
 
@@ -147,7 +147,7 @@ table ddc-application_guide
 
 	column excel_table
 		dataType: string
-		lineageTag: 0c15f06b862b5376840a
+		lineageTag: cd1389b7cc6f4ed0e2af
 		summarizeBy: none
 		sourceColumn: excel_table
 
@@ -155,7 +155,7 @@ table ddc-application_guide
 
 	column editable_in_excel
 		dataType: string
-		lineageTag: d5fc9fddc948177733ce
+		lineageTag: b99f5452d06feef8cfe2
 		summarizeBy: none
 		sourceColumn: editable_in_excel
 
@@ -163,7 +163,7 @@ table ddc-application_guide
 
 	column steward_action
 		dataType: string
-		lineageTag: 7ab8fc4ea0832c546073
+		lineageTag: 2fa4c8d2d3faea177114
 		summarizeBy: none
 		sourceColumn: steward_action
 
@@ -171,7 +171,7 @@ table ddc-application_guide
 
 	column review_on_page
 		dataType: string
-		lineageTag: f5762b26cda586073ef1
+		lineageTag: 90a89b9221e90d6e4888
 		summarizeBy: none
 		sourceColumn: review_on_page
 
@@ -179,7 +179,7 @@ table ddc-application_guide
 
 	column pilot_example
 		dataType: string
-		lineageTag: e86cd3323ed39d9d11b8
+		lineageTag: 5f3051aa74dfceb74358
 		summarizeBy: none
 		sourceColumn: pilot_example
 
@@ -187,7 +187,7 @@ table ddc-application_guide
 
 	column doc_ref
 		dataType: string
-		lineageTag: aac3e041d1ece21447f8
+		lineageTag: 60e7d7c1dd39195df5c9
 		summarizeBy: none
 		sourceColumn: doc_ref
 
@@ -204,4 +204,3 @@ table ddc-application_guide
 	annotation PBI_NavigationStepName = Navigation
 
 	annotation PBI_ResultType = Table
-

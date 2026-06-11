@@ -41,7 +41,7 @@ def _is_empty(value: object) -> bool:
     if isinstance(value, float) and pd.isna(value):
         return True
     text = str(value).strip()
-    return text in ("", "—", "unknown", "nan", "None")
+    return text in ("", "-", "unknown", "nan", "None")
 
 
 def build_guide_rows() -> list[dict]:
@@ -98,24 +98,24 @@ def _gap_reason(check: dict, value: object, approval_status: str) -> str | None:
     mode = check["gap_if"]
     if mode == "empty_or_not_approved":
         if _is_empty(value):
-            return "Missing value — Concept Profile will show blank"
+            return "Missing value - Concept Profile will show blank"
         if str(value).strip().lower() != "approved":
             return f"Not Approved (current: {value})"
         return None
     if mode == "empty" and _is_empty(value):
-        return "Missing value — Concept Profile will show blank"
+        return "Missing value - Concept Profile will show blank"
     return None
 
 
 def _source_availability_gap(semantic_id: str, src_df: pd.DataFrame) -> str | None:
     rows = src_df[src_df["semantic_id"] == semantic_id] if not src_df.empty and "semantic_id" in src_df.columns else pd.DataFrame()
     if rows.empty:
-        return "No Source_Availability row — add link in workbook"
+        return "No Source_Availability row - add link in workbook"
     if "availability" not in rows.columns:
         return None
     values = [str(v).strip().lower() for v in rows["availability"].tolist()]
     if not values or all(v in ("", "unknown") for v in values):
-        return "All sources unknown — set availability in Source_Availability sheet"
+        return "All sources unknown - set availability in Source_Availability sheet"
     return None
 
 
@@ -265,7 +265,7 @@ def main() -> None:
     print(f"Wrote {len(rows)} guide rows to {out}")
     print(f"Wrote {len(gap_rows)} curation gap rows to {gaps_out} ({len(pilot_gaps)} pilot)")
     if defaults:
-        print(f"  {len(defaults)} row(s) still use DEFAULT_FIELD prose — extend FIELD_GUIDE in pbip_report_manifest.py")
+        print(f"  {len(defaults)} row(s) still use DEFAULT_FIELD prose - extend FIELD_GUIDE in pbip_report_manifest.py")
 
 
 if __name__ == "__main__":

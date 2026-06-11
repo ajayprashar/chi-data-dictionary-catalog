@@ -8,10 +8,10 @@
 
 The CMT content helps in four ways:
 
-1. **Populate and validate the ADT catalog** — The data quality report is a field-level inventory (Segment + HL7 Field → L2 column). It can drive or validate `ddc-hl7_adt_catalog.parquet` and link ADT fields to master patient `semantic_id`s.
-2. **Source-specific feed profile** — Segment availability, fill rates, and “Recommended” (Mandatory / Good to have) describe what the CMT feed actually sends. That can live in a CMT feed profile (separate from the source-agnostic catalog).
-3. **Governance and prioritization** — Fill rates, mandatory vs optional, and INV/SYN comments show which elements are critical for Master Patient and where there are open questions or deviations.
-4. **Documentation and alignment** — Segment/event distribution and “expected but not received” segments (AL1, NK1, GT1) document real-world ADT usage for architects and interface teams.
+1. **Populate and validate the ADT catalog** - The data quality report is a field-level inventory (Segment + HL7 Field → L2 column). It can drive or validate `ddc-hl7_adt_catalog.parquet` and link ADT fields to master patient `semantic_id`s.
+2. **Source-specific feed profile** - Segment availability, fill rates, and “Recommended” (Mandatory / Good to have) describe what the CMT feed actually sends. That can live in a CMT feed profile (separate from the source-agnostic catalog).
+3. **Governance and prioritization** - Fill rates, mandatory vs optional, and INV/SYN comments show which elements are critical for Master Patient and where there are open questions or deviations.
+4. **Documentation and alignment** - Segment/event distribution and “expected but not received” segments (AL1, NK1, GT1) document real-world ADT usage for architects and interface teams.
 
 ---
 
@@ -31,10 +31,10 @@ The CMT **data quality report** provides:
 | Segment             | Maps to `segment_id` (PID, PV1, PD1, IN1, DG1, PV2) |
 | HL7 Field           | Maps to `field_id` (e.g. PID.5.1 → PID-5 component 1; PID.7.1 → PID-7) |
 | INV Table (L2)      | Schema context (e.g. PD_ACTIVITY) |
-| Column Name         | L2 column (e.g. LN, FN, DOB, RACE) — **link to semantic_id** via mapping |
+| Column Name         | L2 column (e.g. LN, FN, DOB, RACE) - **link to semantic_id** via mapping |
 | Display Name        | Human-readable name for `field_name` or documentation |
 | Description        | Use in `notes` or dictionary text |
-| Recommended        | Mandatory / Good to have — informs governance and validation rules |
+| Recommended        | Mandatory / Good to have - informs governance and validation rules |
 
 **L2 column → semantic_id mapping (examples):**
 
@@ -70,10 +70,10 @@ Useful to capture in a **CMT feed profile** (separate doc or artifact):
   - Expected per ACH but not received: AL1, NK1, GT1  
 
 - **Event type distribution**  
-  - A08 ~93%; A01, A02, A03 much lower — so “update” events dominate; useful for interface and validation design.
+  - A08 ~93%; A01, A02, A03 much lower - so “update” events dominate; useful for interface and validation design.
 
 - **Per-field fill rates and quality**  
-  - E.g. PID.5.3 (Middle Name) 77.53% fill; PID.10 (Race) 0% fill; many IN1/DG1 fields 0% — sets expectations for Master Patient survivorship and matching.
+  - E.g. PID.5.3 (Middle Name) 77.53% fill; PID.10 (Race) 0% fill; many IN1/DG1 fields 0% - sets expectations for Master Patient survivorship and matching.
 
 - **Mandatory vs optional (as implemented)**  
   - Mandatory fields with low fill (e.g. Encounter Type, Encounter ID, Discharge Disposition) and agreed handling (e.g. reject vs ingest as-is) from INV/SYN comments.
@@ -116,7 +116,7 @@ The CMT report supports Master Patient **governance**:
    One markdown table or small CSV/Parquet under `docs/` or `data/`: segment availability, event type summary, and optionally per-field fill rate and “Recommended” from the report. Keep the main ADT catalog source-agnostic.
 
 3. **Build script**  
-   `python scripts/build_adt_catalog_from_mapping.py` — Reads the mapping CSV and writes **ddc-hl7_adt_catalog.parquet** in the project root. Run after editing the mapping. Options: `-m path/to/mapping.csv`, `-o path/to/output.parquet`.
+   `python scripts/build_adt_catalog_from_mapping.py` - Reads the mapping CSV and writes **ddc-hl7_adt_catalog.parquet** in the project root. Run after editing the mapping. Options: `-m path/to/mapping.csv`, `-o path/to/output.parquet`.
 
 4. **PRD**  
    **readme-prd.md** references the CMT feed, mapping, feed profile, and build script in Artifacts and Data pipeline.

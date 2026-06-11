@@ -1,6 +1,6 @@
-# CHI Metadata Catalog — HIE Interoperability Best Practices Evaluation
+# CHI Metadata Catalog - HIE Interoperability Best Practices Evaluation
 
-> **Status note (historical snapshot):** March 2026 evaluation. Terminology, value sets, crosswalk, and PBIP were implemented afterward — see `docs/crosswalk-model.md`, `docs/sources-of-truth.md`, and `docs/operational-runbook.md`. Treat `README.md` and `TECH-SPEC.md` as the current architecture contract.
+> **Status note (historical snapshot):** March 2026 evaluation. Terminology, value sets, crosswalk, and PBIP were implemented afterward - see `docs/crosswalk-model.md`, `docs/sources-of-truth.md`, and `docs/operational-runbook.md`. Treat `README.md` and `TECH-SPEC.md` as the current architecture contract.
 
 **Evaluation Date:** March 4, 2026
 
@@ -19,9 +19,9 @@ This document is long and detailed. If you are an interoperability, interface, o
 - **What this is**: an independent review of the CHI metadata catalog against common HIE best practices (identity, survivorship, standards, consent, etc.).
 - **Key takeaway**: the current POC has a **strong architecture** and is suitable for a demographics‑focused HIE pilot; remaining gaps are mostly normal "POC to production" items.
 - **Where to look first**:
-  - **Implementation Summary (next section)** — what we changed after the review (new columns, new table, documentation updates).
-  - **Executive Summary** — short narrative of strengths, score, and overall assessment.
-  - **Priority Gaps for Production HIE** — high‑level list of what would be needed before going live.
+  - **Implementation Summary (next section)** - what we changed after the review (new columns, new table, documentation updates).
+  - **Executive Summary** - short narrative of strengths, score, and overall assessment.
+  - **Priority Gaps for Production HIE** - high‑level list of what would be needed before going live.
 - **How to use this**: treat it as a **checklist and reference** when planning a production roadmap; you do not need to read every domain section unless you are designing technical details.
 
 You can stop after these sections if you just need a leadership‑level understanding. The rest of the file is a deep technical dive for architects and engineers.
@@ -35,19 +35,19 @@ Following the initial evaluation, the following gaps were addressed through **me
 ### [OK] Implemented (16 new columns + 1 new table)
 
 **Catalog Additions (10 new columns):**
-- `data_steward`, `steward_contact`, `approval_status` — Governance & stewardship assignment
-- `schema_version`, `last_modified_date` — Version control & change tracking
-- `identifier_type`, `identifier_authority` — Multi-source identity management taxonomy
-- `hipaa_category`, `fhir_security_label`, `consent_category` — Enhanced security & consent classification
+- `data_steward`, `steward_contact`, `approval_status` - Governance & stewardship assignment
+- `schema_version`, `last_modified_date` - Version control & change tracking
+- `identifier_type`, `identifier_authority` - Multi-source identity management taxonomy
+- `hipaa_category`, `fhir_security_label`, `consent_category` - Enhanced security & consent classification
 
 **Dictionary Additions (8 new columns):**
-- `fhir_must_support`, `fhir_profile`, `fhir_cardinality` — FHIR US Core compliance metadata
-- `identity_resolution_notes` — Match logic transparency
-- `tie_breaker_rule`, `conflict_detection_enabled`, `manual_override_allowed` — Survivorship conflict resolution enhancements
-- `de_identification_method` — Privacy & de-identification strategy
+- `fhir_must_support`, `fhir_profile`, `fhir_cardinality` - FHIR US Core compliance metadata
+- `identity_resolution_notes` - Match logic transparency
+- `tie_breaker_rule`, `conflict_detection_enabled`, `manual_override_allowed` - Survivorship conflict resolution enhancements
+- `de_identification_method` - Privacy & de-identification strategy
 
 **New Table:**
-- `ddc-data_source_availability.parquet` — Links data sources (feed profiles) to semantic IDs with availability, completeness, and timeliness metadata
+- `ddc-data_source_availability.parquet` - Links data sources (feed profiles) to semantic IDs with availability, completeness, and timeliness metadata
 
 **Documentation Updates:**
 - Added **Identity Resolution Strategy** section (TECH-SPEC 1.4)
@@ -622,34 +622,34 @@ Add to catalog:
 
 ## Critical Strengths for HIE
 
-1. **Three-Domain Separation** — Best-in-class governance architecture
-2. **Attribute-Specific Survivorship** — Exactly how national HIEs (Carequality, CommonWell) operate
-3. **Address Coherence** — Prevents common data quality failure mode
-4. **Roll-Up Strategy** — Supports both granular collection and compliant reporting
-5. **Message Format Separation** — Avoids coupling that breaks at scale
-6. **Backward Compatibility** — Production-grade schema evolution strategy
+1. **Three-Domain Separation** - Best-in-class governance architecture
+2. **Attribute-Specific Survivorship** - Exactly how national HIEs (Carequality, CommonWell) operate
+3. **Address Coherence** - Prevents common data quality failure mode
+4. **Roll-Up Strategy** - Supports both granular collection and compliant reporting
+5. **Message Format Separation** - Avoids coupling that breaks at scale
+6. **Backward Compatibility** - Production-grade schema evolution strategy
 
 ---
 
 ## Priority Gaps for Production HIE
 
 ### P1 (Required for Production)
-1. **Machine-Readable Source Hierarchy** — Current text format won't scale
-2. **Data Source Availability Table** — Links feed profiles to catalog
-3. **Provenance Tracking** — Field-level source + timestamp
-4. **Stewardship Assignment** — Who owns each semantic_id
-5. **Consent Framework** — FHIR Consent resource integration
+1. **Machine-Readable Source Hierarchy** - Current text format won't scale
+2. **Data Source Availability Table** - Links feed profiles to catalog
+3. **Provenance Tracking** - Field-level source + timestamp
+4. **Stewardship Assignment** - Who owns each semantic_id
+5. **Consent Framework** - FHIR Consent resource integration
 
 ### P2 (Needed for Clinical HIE)
-1. **Terminology/Value Set Tables** — LOINC, SNOMED, RxNorm bindings
-2. **Clinical Data Elements** — Extend beyond demographics to problems, meds, vitals
-3. **CQM/eCQM Mapping** — Link to quality measures
-4. **SDOH Screening Instruments** — PRAPARE, AHC-HRSN
+1. **Terminology/Value Set Tables** - LOINC, SNOMED, RxNorm bindings
+2. **Clinical Data Elements** - Extend beyond demographics to problems, meds, vitals
+3. **CQM/eCQM Mapping** - Link to quality measures
+4. **SDOH Screening Instruments** - PRAPARE, AHC-HRSN
 
 ### P3 (Nice to Have)
-1. **Data Quality Scoring** — Completeness, timeliness, accuracy metrics
-2. **Approval Workflow** — Draft/review/approved state machine
-3. **Version Control** — Schema change history
+1. **Data Quality Scoring** - Completeness, timeliness, accuracy metrics
+2. **Approval Workflow** - Draft/review/approved state machine
+3. **Version Control** - Schema change history
 
 ---
 
@@ -732,12 +732,12 @@ The architecture would score **highly** in any Carequality, CommonWell, or state
 
 ## References
 
-- **TECH-SPEC.md** — Section 1.4 HIE Interoperability Alignment
-- **docs/archive/hl7_ccd_fhir_consideration.md** — L0-L6 flow and crosswalk strategy
-- **USCDI v4** — https://www.healthit.gov/isa/united-states-core-data-interoperability-uscdi
-- **FHIR US Core 6.1.0** — http://hl7.org/fhir/us/core/
-- **Carequality Interoperability Framework** — https://carequality.org/
-- **CommonWell Health Alliance** — https://www.commonwellalliance.org/
+- **TECH-SPEC.md** - Section 1.4 HIE Interoperability Alignment
+- **docs/archive/hl7_ccd_fhir_consideration.md** - L0-L6 flow and crosswalk strategy
+- **USCDI v4** - https://www.healthit.gov/isa/united-states-core-data-interoperability-uscdi
+- **FHIR US Core 6.1.0** - http://hl7.org/fhir/us/core/
+- **Carequality Interoperability Framework** - https://carequality.org/
+- **CommonWell Health Alliance** - https://www.commonwellalliance.org/
 
 ---
 

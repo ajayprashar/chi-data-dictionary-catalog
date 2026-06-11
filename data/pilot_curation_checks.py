@@ -1,4 +1,4 @@
-"""Concept Profile curation checks — used by generate_pbip_model_guide.py (Phase 3)."""
+"""Concept Profile curation checks - used by generate_pbip_model_guide.py (Phase 3)."""
 
 from __future__ import annotations
 

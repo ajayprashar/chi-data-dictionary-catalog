@@ -1,4 +1,4 @@
-# HIE Evaluation Gaps — Implementation Summary
+# HIE Evaluation Gaps - Implementation Summary
 
 > **Status note (historical snapshot):** This is a completion log from the original gap-closure pass. For current behavior and workflows, use `README.md`, `TECH-SPEC.md`, and `docs/excel-workbook-guide.md`.
 
@@ -16,9 +16,9 @@ Following the HIE Interoperability Best Practices Evaluation (see `docs/archive/
 **Problem:** No ownership tracking or approval workflow state.
 
 **Solution:** Added to `MASTER_PATIENT_CATALOG`:
-- `data_steward` — Name of data steward responsible for this element
-- `steward_contact` — Contact information (email, Slack) for steward
-- `approval_status` — Workflow state: "draft" | "review" | "approved" | "deprecated"
+- `data_steward` - Name of data steward responsible for this element
+- `steward_contact` - Contact information (email, Slack) for steward
+- `approval_status` - Workflow state: "draft" | "review" | "approved" | "deprecated"
 
 **Impact:** Enables governance transparency, supports data stewardship accountability.
 
@@ -29,8 +29,8 @@ Following the HIE Interoperability Best Practices Evaluation (see `docs/archive/
 **Problem:** No change tracking or version control for schema evolution.
 
 **Solution:** Added to `MASTER_PATIENT_CATALOG`:
-- `schema_version` — Schema version for this element (e.g., "1.0", "2.1")
-- `last_modified_date` — ISO 8601 date of last modification (e.g., "2026-03-04")
+- `schema_version` - Schema version for this element (e.g., "1.0", "2.1")
+- `last_modified_date` - ISO 8601 date of last modification (e.g., "2026-03-04")
 
 **Impact:** Supports schema change management, enables backward compatibility tracking.
 
@@ -45,9 +45,9 @@ Following the HIE Interoperability Best Practices Evaluation (see `docs/archive/
 - Added to `MASTER_PATIENT_DICTIONARY`: `identity_resolution_notes`
 
 **Details:**
-- `identifier_type` — Taxonomy: MRN, SSN, DL, State_ID for multi-source identity tracking
-- `identifier_authority` — Issuing authority: State_of_California, SSA, Hospital_MRN
-- `identity_resolution_notes` — Match logic transparency: probabilistic linkage strategy, confidence thresholds, match/no-match rules
+- `identifier_type` - Taxonomy: MRN, SSN, DL, State_ID for multi-source identity tracking
+- `identifier_authority` - Issuing authority: State_of_California, SSA, Hospital_MRN
+- `identity_resolution_notes` - Match logic transparency: probabilistic linkage strategy, confidence thresholds, match/no-match rules
 
 **Impact:** Supports multi-source identity tracking, documents Verato MPI match strategy.
 
@@ -58,12 +58,12 @@ Following the HIE Interoperability Best Practices Evaluation (see `docs/archive/
 **Problem:** Basic privacy classification insufficient for HIPAA/42 CFR Part 2 compliance and FHIR security labeling.
 
 **Solution:** Added to `MASTER_PATIENT_CATALOG`:
-- `hipaa_category` — "PII" | "PHI" | "SUD_Part2" | "" for HIPAA/42 CFR Part 2 compliance
-- `fhir_security_label` — "N" (normal), "R" (restricted), "V" (very restricted) per FHIR security labeling
-- `consent_category` — "general" | "research" | "sensitive" for consent directive mapping
+- `hipaa_category` - "PII" | "PHI" | "SUD_Part2" | "" for HIPAA/42 CFR Part 2 compliance
+- `fhir_security_label` - "N" (normal), "R" (restricted), "V" (very restricted) per FHIR security labeling
+- `consent_category` - "general" | "research" | "sensitive" for consent directive mapping
 
 Added to `MASTER_PATIENT_DICTIONARY`:
-- `de_identification_method` — "redact" | "suppress" | "generalize" | "pseudonymize" for research/public health use
+- `de_identification_method` - "redact" | "suppress" | "generalize" | "pseudonymize" for research/public health use
 
 **Impact:** Enables attribute-level security segmentation, supports FHIR Consent resource integration path, documents de-identification strategy.
 
@@ -74,9 +74,9 @@ Added to `MASTER_PATIENT_DICTIONARY`:
 **Problem:** Missing US Core Must Support flags and profile references for validation.
 
 **Solution:** Added to `MASTER_PATIENT_DICTIONARY`:
-- `fhir_must_support` — "true" if US Core Must Support element; "false" otherwise
-- `fhir_profile` — US Core profile URL (e.g., "http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient")
-- `fhir_cardinality` — Cardinality constraint: "0..1" | "1..1" | "0..*" | "1..*"
+- `fhir_must_support` - "true" if US Core Must Support element; "false" otherwise
+- `fhir_profile` - US Core profile URL (e.g., "http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient")
+- `fhir_cardinality` - Cardinality constraint: "0..1" | "1..1" | "0..*" | "1..*"
 
 **Impact:** Enables automated FHIR validation, supports US Core compliance checking, documents profile conformance.
 
@@ -87,9 +87,9 @@ Added to `MASTER_PATIENT_DICTIONARY`:
 **Problem:** No tie-breaker rules, conflict detection, or manual override capability.
 
 **Solution:** Added to `MASTER_PATIENT_DICTIONARY`:
-- `tie_breaker_rule` — "most_recent" | "most_complete" | "source_reliability_score" for equal-rank conflicts
-- `conflict_detection_enabled` — "true" | "false" for logging when sources disagree
-- `manual_override_allowed` — "true" | "false" for steward intervention capability
+- `tie_breaker_rule` - "most_recent" | "most_complete" | "source_reliability_score" for equal-rank conflicts
+- `conflict_detection_enabled` - "true" | "false" for logging when sources disagree
+- `manual_override_allowed` - "true" | "false" for steward intervention capability
 
 **Impact:** Formalizes conflict resolution strategy, enables data quality auditing, supports steward intervention.
 
@@ -121,41 +121,41 @@ Added to `MASTER_PATIENT_DICTIONARY`:
 ## Files Modified
 
 ### Schema and Scripts
-1. **`scripts/split_to_catalog_and_dictionary.py`** — Added 16 new columns to CATALOG_COLUMNS and DICTIONARY_COLUMNS definitions
-2. **`scripts/build_data_source_availability.py`** — New script to build source availability matrix
+1. **`scripts/split_to_catalog_and_dictionary.py`** - Added 16 new columns to CATALOG_COLUMNS and DICTIONARY_COLUMNS definitions
+2. **`scripts/build_data_source_availability.py`** - New script to build source availability matrix
 
 ### Application
-3. **Power BI PBIP** — Concept Profile and governance pages for read-only review (retired local web viewer)
-4. **`chi-data-dictionary-catalog.ipynb`** — Optional DuckDB/Parquet exploration notebook
+3. **Power BI PBIP** - Concept Profile and governance pages for read-only review (retired local web viewer)
+4. **`chi-data-dictionary-catalog.ipynb`** - Optional DuckDB/Parquet exploration notebook
 
 ### Data
-5. **`ddc-master_patient_catalog.parquet`** — Upgraded from 10 to 20 columns via `--upgrade-schema`
-6. **`ddc-master_patient_dictionary.parquet`** — Upgraded from 12 to 21 columns via `--upgrade-schema`
-7. **`ddc-data_source_availability.parquet`** — New table: 46 rows (1 source × 46 semantic IDs)
+5. **`ddc-master_patient_catalog.parquet`** - Upgraded from 10 to 20 columns via `--upgrade-schema`
+6. **`ddc-master_patient_dictionary.parquet`** - Upgraded from 12 to 21 columns via `--upgrade-schema`
+7. **`ddc-data_source_availability.parquet`** - New table: 46 rows (1 source × 46 semantic IDs)
 
 ### Documentation
-8. **`TECH-SPEC.md`** — Added Identity Resolution Strategy (1.4), Security & PHI Handling (1.5), HIE Maturity summary, updated all schema tables (4.1, 4.2, 4.5), updated UI layout (6.4), updated pipeline (7)
-9. **`README.md`** — Updated to reference docs/archive/EVALUATION.md, data source availability build step
-10. **`docs/archive/EVALUATION.md`** — Added Implementation Summary (this section)
+8. **`TECH-SPEC.md`** - Added Identity Resolution Strategy (1.4), Security & PHI Handling (1.5), HIE Maturity summary, updated all schema tables (4.1, 4.2, 4.5), updated UI layout (6.4), updated pipeline (7)
+9. **`README.md`** - Updated to reference docs/archive/EVALUATION.md, data source availability build step
+10. **`docs/archive/EVALUATION.md`** - Added Implementation Summary (this section)
 
 ---
 
 ## What Remains Deferred
 
 ### Runtime/Operational Concerns (not metadata schema)
-- [ERROR] Field-level provenance (source_system_id + timestamp per actual attribute value) — requires runtime data model changes
-- [ERROR] Transformation audit trails — operational logging, not metadata
-- [ERROR] Encryption specifications — deployment/operations concern
-- [ERROR] Actual data quality scoring — requires feed data profiling engine
+- [ERROR] Field-level provenance (source_system_id + timestamp per actual attribute value) - requires runtime data model changes
+- [ERROR] Transformation audit trails - operational logging, not metadata
+- [ERROR] Encryption specifications - deployment/operations concern
+- [ERROR] Actual data quality scoring - requires feed data profiling engine
 
 ### Beyond Demographics POC Scope
-- [ERROR] Terminology/value set tables — Domain 3: Clinical Governance
-- [ERROR] Clinical data elements — problems, medications, vitals, procedures
+- [ERROR] Terminology/value set tables - Domain 3: Clinical Governance
+- [ERROR] Clinical data elements - problems, medications, vitals, procedures
 - [ERROR] eCQM/HEDIS quality measure linkage
 - [ERROR] SDOH screening instruments (PRAPARE, AHC-HRSN)
 
 ### Production-Scale Concerns
-- [ERROR] Machine-readable source hierarchy — current text format sufficient for POC
+- [ERROR] Machine-readable source hierarchy - current text format sufficient for POC
 - [ERROR] Partitioning strategy for large-scale deployment
 - [ERROR] Delta lake incremental updates
 - [ERROR] Distributed query engine (Spark, Trino)
@@ -175,7 +175,7 @@ Added to `MASTER_PATIENT_DICTIONARY`:
 | Source Hierarchy & Trust | 4/5 | **5/5** | [OK] +1.0 (availability table) |
 | **Overall Average** | **4.1/5** | **4.7/5** | [OK] **+0.6** |
 
-**New Overall Score: 4.7/5** — Exceptional for a POC, production-ready for demographics-focused HIE.
+**New Overall Score: 4.7/5** - Exceptional for a POC, production-ready for demographics-focused HIE.
 
 ---
 
@@ -238,4 +238,4 @@ The POC now includes **all metadata schema enhancements** recommended in the HIE
 - [OK] Data source availability matrix
 - [OK] Schema versioning & change tracking
 
-**What remains for production:** Operational concerns (provenance tracking, data quality scoring, encryption) and clinical scope expansion (terminology, value sets, clinical data elements) — both are standard "POC to production" transitions, not architectural gaps.
+**What remains for production:** Operational concerns (provenance tracking, data quality scoring, encryption) and clinical scope expansion (terminology, value sets, clinical data elements) - both are standard "POC to production" transitions, not architectural gaps.
