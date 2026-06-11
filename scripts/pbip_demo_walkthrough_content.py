@@ -17,14 +17,14 @@ STEPS_LINES = [
     "   Read FHIR R4 path, governed codes, crosswalk, then ADT (field_id + CE encoding) and C-CDA XPath.",
     "2. Repeat with Patient.language - ADT field_id should show PID-15 (hl7_ce_encoding may be blank).",
     "3. Concept Profile - governance cards, survivorship, and source availability for the same concept.",
-    "4. Field guide - filter by page or visual; steward_action shows which Excel sheet to edit.",
+    "4. Guide · Field guide - filter by page or visual; steward_action shows which Excel sheet to edit.",
     "5. Governance Overview - portfolio KPIs and full concept list (most rows are not yet curated).",
 ]
 
 PERSONA_LINES = [
     "Program / governance - Concept Profile + Governance Overview",
-    "Interface / standards engineering - Standards & Contexts + Field guide",
-    "New to CHI metadata - Start here, then this Demo tab",
+    "Interface / standards engineering - Standards & Contexts + Guide · Field guide",
+    "New to CHI metadata - Guide · Start here, then this Demo tour tab",
 ]
 
 TIPS_LINES = [

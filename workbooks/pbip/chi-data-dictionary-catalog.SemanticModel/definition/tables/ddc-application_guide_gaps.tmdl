@@ -1,9 +1,9 @@
 table ddc-application_guide_gaps
-	lineageTag: db90a3b8790fb7f5343b
+	lineageTag: 237f3e6c1c10fca7a4b6
 
 	column gap_id
 		dataType: string
-		lineageTag: 2ba55fcbbb9bb925349b
+		lineageTag: 3f8c4228597a5b805418
 		summarizeBy: none
 		sourceColumn: gap_id
 
@@ -11,7 +11,7 @@ table ddc-application_guide_gaps
 
 	column semantic_id
 		dataType: string
-		lineageTag: 80c0f3df403c82a5397a
+		lineageTag: ff1dabf2badacad22026
 		summarizeBy: none
 		sourceColumn: semantic_id
 
@@ -19,7 +19,7 @@ table ddc-application_guide_gaps
 
 	column pilot_scope
 		dataType: string
-		lineageTag: 91a19c3dcdbe9b7a67ca
+		lineageTag: 63060120d3fbe86f7574
 		summarizeBy: none
 		sourceColumn: pilot_scope
 
@@ -27,7 +27,7 @@ table ddc-application_guide_gaps
 
 	column approval_status
 		dataType: string
-		lineageTag: 34e5d150f70304f84e75
+		lineageTag: a20594da6c8ab545e9fe
 		summarizeBy: none
 		sourceColumn: approval_status
 
@@ -35,7 +35,7 @@ table ddc-application_guide_gaps
 
 	column report_page
 		dataType: string
-		lineageTag: b6813609839accfbb05f
+		lineageTag: 455a936c0da0d0d2e8e7
 		summarizeBy: none
 		sourceColumn: report_page
 
@@ -43,7 +43,7 @@ table ddc-application_guide_gaps
 
 	column report_column
 		dataType: string
-		lineageTag: 6bba7d9f1c8a777200df
+		lineageTag: bd9d396ee6fabef22ad6
 		summarizeBy: none
 		sourceColumn: report_column
 
@@ -51,7 +51,7 @@ table ddc-application_guide_gaps
 
 	column excel_sheet
 		dataType: string
-		lineageTag: 5c82adb7c3f12b36044e
+		lineageTag: 6192902a4c8da8c940f8
 		summarizeBy: none
 		sourceColumn: excel_sheet
 
@@ -59,7 +59,7 @@ table ddc-application_guide_gaps
 
 	column source_column
 		dataType: string
-		lineageTag: 2011bc657cb465dab94a
+		lineageTag: 673726afbfc1c9c701d3
 		summarizeBy: none
 		sourceColumn: source_column
 
@@ -67,7 +67,7 @@ table ddc-application_guide_gaps
 
 	column gap_reason
 		dataType: string
-		lineageTag: 4912bee70dbf5a91ad5c
+		lineageTag: 2dea31fb1c869fc9c7a6
 		summarizeBy: none
 		sourceColumn: gap_reason
 
@@ -75,7 +75,7 @@ table ddc-application_guide_gaps
 
 	column steward_action
 		dataType: string
-		lineageTag: 6bfd3c5676642f900ac4
+		lineageTag: afe768054b316efd3de7
 		summarizeBy: none
 		sourceColumn: steward_action
 
@@ -83,7 +83,7 @@ table ddc-application_guide_gaps
 
 	column sort_order
 		dataType: string
-		lineageTag: 14c77c573bfce80e540b
+		lineageTag: 83eb74321aa3c10ab652
 		summarizeBy: none
 		sourceColumn: sort_order
 

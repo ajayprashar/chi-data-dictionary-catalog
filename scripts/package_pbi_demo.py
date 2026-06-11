@@ -55,7 +55,7 @@ echo Opening CHI Data Dictionary Catalog in Power BI Desktop...
 start "" "%~dp0workbooks\\pbip\\chi-data-dictionary-catalog.pbip"
 echo.
 echo After Power BI opens: Home -^> Refresh from the REPORT view (not Transform data).
-echo Start on the Demo walkthrough tab, then follow the steps on screen.
+echo Start on the Guide · Demo tour tab, then follow the steps on screen.
 pause
 """
 
@@ -67,7 +67,7 @@ Extract this zip so the folder exists at:
   C:\\AI\\chi-data-dictionary-catalog\\
 
 Quick start: double-click OPEN-DEMO.bat (or open the PBIP path below).
-Read DEMO-WALKTHROUGH.txt for the same steps as the in-report Demo walkthrough tab.
+Read DEMO-WALKTHROUGH.txt for the same steps as the in-report Guide · Demo tour tab.
 
 Required layout after extract:
 
@@ -96,7 +96,7 @@ Open in Power BI Desktop:
 
   workbooks\\pbip\\chi-data-dictionary-catalog.pbip
 
-Default tab: Demo walkthrough (5-minute tour). Then Home -> Refresh from the REPORT view.
+Default tab: Guide · Demo tour (5-minute walkthrough). Then Home -> Refresh from the REPORT view.
 
 Power Query preview crash (0x80131623 on ddc-ccda_catalog, etc.):
   This is a known Power BI Desktop Mashup bug with PBIP + parquet preview,

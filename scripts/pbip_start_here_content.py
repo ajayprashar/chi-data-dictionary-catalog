@@ -30,11 +30,12 @@ SOURCES_LINES = [
 
 HOW_TO_USE_LINES = [
     "1. Guide · Start here - purpose and sources of truth (this page).",
-    "2. Guide · Demo walkthrough - 5-minute tour (default landing for demos).",
-    "3. Guide · Field guide - column purpose, steward workflow, and curation gaps (slicers).",
-    "4. Standards & Contexts - terminology, crosswalk, ADT/CCDA per semantic_id.",
-    "5. Concept Profile - governance, FHIR R4 implementation, survivorship, source availability.",
-    "6. Governance Overview - portfolio KPIs and full concept list.",
+    "2. Guide · Demo tour - 5-minute walkthrough (default landing for demos).",
+    "3. Guide · National standards - external authorities (FHIR R4, USCDI, terminology).",
+    "4. Standards & Contexts - per-concept mapping: FHIR, codes, crosswalk, ADT/CCDA.",
+    "5. Concept Profile - governance, survivorship, and source availability.",
+    "6. Guide · Field guide - column purpose, steward workflow, and curation gaps.",
+    "7. Governance Overview - portfolio KPIs and full concept list.",
     "",
     "Tip: On Standards & Contexts, set Show concepts = yes and pick Patient.race or Patient.language.",
 ]

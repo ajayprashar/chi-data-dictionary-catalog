@@ -43,7 +43,7 @@ from enhance_pbip_report import (  # noqa: E402
 )
 from generate_pbip_model_guide import generate as generate_guide  # noqa: E402
 from generate_pbip_model_guide import generate_gaps  # noqa: E402
-from pbip_layout_constants import DEFAULT_LANDING_PAGE_ID, TAB_FIELD_GUIDE  # noqa: E402
+from pbip_layout_constants import TAB_FIELD_GUIDE  # noqa: E402
 from pbip_report_manifest import (  # noqa: E402
     GUIDE_COLUMNS,
     GUIDE_PARQUET,
@@ -348,22 +348,6 @@ def build_field_guide_page(page_dir: Path) -> None:
         write_visual(page_dir, v)
 
 
-def update_pages_json() -> None:
-    pages_json = REPORT / "pages" / "pages.json"
-    data = json.loads(pages_json.read_text(encoding="utf-8"))
-    order = [p for p in data.get("pageOrder", []) if p != PAGE_FIELD_GUIDE]
-    if PAGE_START_HERE in order:
-        idx = order.index(PAGE_START_HERE) + 1
-        order.insert(idx, PAGE_FIELD_GUIDE)
-    else:
-        order.insert(0, PAGE_FIELD_GUIDE)
-    data["pageOrder"] = order
-    data["activePageName"] = DEFAULT_LANDING_PAGE_ID
-    if "landingPageName" in data:
-        data["landingPageName"] = DEFAULT_LANDING_PAGE_ID
-    write_text_utf8_no_bom(pages_json, json.dumps(data, indent=2))
-
-
 def main() -> None:
     generate_guide()
     generate_gaps()
@@ -381,7 +365,10 @@ def main() -> None:
         informational=True,
     )
     build_field_guide_page(page_dir)
-    update_pages_json()
+    from enhance_pbip_report import sync_pages_json, sync_page_tab_styles  # noqa: E402
+
+    sync_pages_json()
+    sync_page_tab_styles()
     print(f"Wrote {GUIDE_PARQUET} and PBIP page: {FIELD_GUIDE_DISPLAY_NAME} ({PAGE_FIELD_GUIDE})")
     print("  Re-open chi-data-dictionary-catalog.pbip in Power BI Desktop and Refresh.")
 

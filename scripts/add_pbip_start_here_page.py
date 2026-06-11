@@ -162,11 +162,11 @@ def build_start_here_page(page_dir: Path) -> None:
     header_h = 128
     col_w = (content_w - 16) // 2
     row1_y = header_h + 12
-    panel_h = 328
+    panel_h = 360
     callout_y = row1_y + panel_h + 12
     callout_h = 48
     row2_y = callout_y + callout_h + 12
-    how_to_h = 248  # 8 body lines + title band; 184px caused stacked/overlapping text in PBI
+    how_to_h = 300  # 9+ body lines + title band; short panels caused stacked text in PBI
     footer_h = 52
 
     visuals = [
@@ -196,15 +196,6 @@ def build_start_here_page(page_dir: Path) -> None:
         write_visual(page_dir, v)
 
 
-def update_pages_json() -> None:
-    pages_json = REPORT / "pages" / "pages.json"
-    data = json.loads(pages_json.read_text(encoding="utf-8"))
-    order = data.get("pageOrder", [])
-    rest = [p for p in order if p != START_HERE_PAGE_ID]
-    data["pageOrder"] = [START_HERE_PAGE_ID, *rest]
-    write_text_utf8_no_bom(pages_json, json.dumps(data, indent=2))
-
-
 def main() -> None:
     page_dir = REPORT / "pages" / START_HERE_PAGE_ID
     page_dir.mkdir(parents=True, exist_ok=True)
@@ -217,7 +208,10 @@ def main() -> None:
         informational=True,
     )
     build_start_here_page(page_dir)
-    update_pages_json()
+    from enhance_pbip_report import sync_pages_json, sync_page_tab_styles  # noqa: E402
+
+    sync_pages_json()
+    sync_page_tab_styles()
     print(f"Wrote PBIP page: {START_HERE_DISPLAY_NAME} ({START_HERE_PAGE_ID})")
     print("  Landing page unchanged (use add_pbip_demo_page.py to set Demo tab landing).")
     print("  Re-open chi-data-dictionary-catalog.pbip in Power BI Desktop.")

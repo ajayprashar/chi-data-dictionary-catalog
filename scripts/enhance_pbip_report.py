@@ -21,8 +21,8 @@ from pbip_layout_constants import (  # noqa: E402
     CONTENT_W,
     concept_profile_layout,
     DEFAULT_LANDING_PAGE_ID,
-    DEMO_LANDING_PAGE_ID,
     DEMO_PAGE_ID,
+    DEMO_LANDING_PAGE_ID,
     FHIR_STANDARDS_COLUMNS,
     FHIR_STANDARDS_TABLE_H,
     PAGE_MARGIN,
@@ -37,11 +37,26 @@ from pbip_layout_constants import (  # noqa: E402
     STANDARDS_ADT_CALLOUT_H,
     STANDARDS_TABLE_GAP,
     standards_page_y_positions,
+    PAGE_CONCEPT_PROFILE_ID,
+    PAGE_GOVERNANCE_ID,
+    PAGE_STANDARDS_REF_ID,
+    PAGE_TAB_ORDER,
+    PAGE_FIELD_GUIDE_ID,
+    PAGE_START_HERE_ID,
+    STANDARDS_PAGE_ID,
+    TAB_CONCEPT_PROFILE,
     TAB_DEMO,
     TAB_FIELD_GUIDE,
+    TAB_GOVERNANCE_OVERVIEW,
+    TAB_STANDARDS_CONTEXTS,
+    TAB_STANDARDS_REF,
     TAB_START_HERE,
     PAGE_BG_FUNCTIONAL,
     PAGE_BG_INFORMATIONAL,
+)
+
+PAGES_JSON_SCHEMA = (
+    "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/pagesMetadata/1.1.0/schema.json"
 )
 
 REPO = Path(__file__).resolve().parent.parent
@@ -1024,23 +1039,32 @@ def update_report_json() -> None:
     write_text_utf8_no_bom(path, json.dumps(data, indent=2))
 
 
+def sync_pages_json(*, landing_page_id: str = DEMO_LANDING_PAGE_ID) -> None:
+    """Write canonical tab order and landing page to pages.json."""
+    pages_json = REPORT / "pages" / "pages.json"
+    data: dict = {}
+    if pages_json.is_file():
+        data = json.loads(pages_json.read_text(encoding="utf-8"))
+    data["$schema"] = PAGES_JSON_SCHEMA
+    data["pageOrder"] = list(PAGE_TAB_ORDER)
+    data["landingPageName"] = landing_page_id
+    data["activePageName"] = landing_page_id
+    write_text_utf8_no_bom(pages_json, json.dumps(data, indent=2))
+
+
 def sync_page_tab_styles() -> None:
     """Refresh tab labels and guide vs functional canvas colors without rebuilding visuals."""
-    from add_pbip_start_here_page import START_HERE_PAGE_ID
-    from pbip_report_manifest import PAGE_FIELD_GUIDE
-
-    profile_id = "abc963c80ac5ed2deeb4"
-    standards_id = "d4e5f6a7b8c901234567"
-    overview_id = "c8f1a2b3d4e5f6071829"
-    pages: list[tuple[Path, str, str, int, int, bool]] = [
-        (REPORT / "pages" / START_HERE_PAGE_ID, START_HERE_PAGE_ID, TAB_START_HERE, PAGE_PROFILE_W, PAGE_PROFILE_H, True),
-        (REPORT / "pages" / DEMO_PAGE_ID, DEMO_PAGE_ID, TAB_DEMO, PAGE_PROFILE_W, PAGE_PROFILE_H, True),
-        (REPORT / "pages" / PAGE_FIELD_GUIDE, PAGE_FIELD_GUIDE, TAB_FIELD_GUIDE, PAGE_PROFILE_W, PAGE_PROFILE_H, True),
-        (REPORT / "pages" / profile_id, profile_id, "Concept Profile", PAGE_PROFILE_W, PAGE_PROFILE_H, False),
-        (REPORT / "pages" / standards_id, standards_id, "Standards & Contexts", PAGE_PROFILE_W, PAGE_PROFILE_H, False),
-        (REPORT / "pages" / overview_id, overview_id, "Governance Overview", PAGE_OVERVIEW_W, PAGE_OVERVIEW_H, False),
+    pages: list[tuple[str, str, int, int, bool]] = [
+        (PAGE_START_HERE_ID, TAB_START_HERE, PAGE_PROFILE_W, PAGE_PROFILE_H, True),
+        (DEMO_PAGE_ID, TAB_DEMO, PAGE_PROFILE_W, PAGE_PROFILE_H, True),
+        (PAGE_STANDARDS_REF_ID, TAB_STANDARDS_REF, PAGE_PROFILE_W, PAGE_PROFILE_H, True),
+        (STANDARDS_PAGE_ID, TAB_STANDARDS_CONTEXTS, PAGE_PROFILE_W, PAGE_PROFILE_H, False),
+        (PAGE_CONCEPT_PROFILE_ID, TAB_CONCEPT_PROFILE, PAGE_PROFILE_W, PAGE_PROFILE_H, False),
+        (PAGE_FIELD_GUIDE_ID, TAB_FIELD_GUIDE, PAGE_PROFILE_W, PAGE_PROFILE_H, True),
+        (PAGE_GOVERNANCE_ID, TAB_GOVERNANCE_OVERVIEW, PAGE_OVERVIEW_W, PAGE_OVERVIEW_H, False),
     ]
-    for page_dir, page_id, display_name, width, height, informational in pages:
+    for page_id, display_name, width, height, informational in pages:
+        page_dir = REPORT / "pages" / page_id
         if page_dir.is_dir():
             write_page_json(
                 page_dir,
@@ -1091,46 +1115,33 @@ def write_page_json(
 def main() -> None:
     from add_pbip_demo_page import build_demo_page
     from add_pbip_start_here_page import START_HERE_PAGE_ID
-    from pbip_report_manifest import PAGE_FIELD_GUIDE
 
-    start_id = START_HERE_PAGE_ID
-    demo_id = DEMO_PAGE_ID
-    field_guide_id = PAGE_FIELD_GUIDE
-    profile_id = "abc963c80ac5ed2deeb4"
-    standards_id = "d4e5f6a7b8c901234567"
-    overview_id = "c8f1a2b3d4e5f6071829"
-    start_page = REPORT / "pages" / start_id
-    demo_page = REPORT / "pages" / demo_id
-    field_guide_page = REPORT / "pages" / field_guide_id
-    profile_page = REPORT / "pages" / profile_id
-    standards_page = REPORT / "pages" / standards_id
-    overview_page = REPORT / "pages" / overview_id
-    for p in (start_page, demo_page, field_guide_page, profile_page, standards_page, overview_page):
+    start_page = REPORT / "pages" / START_HERE_PAGE_ID
+    demo_page = REPORT / "pages" / DEMO_PAGE_ID
+    standards_ref_page = REPORT / "pages" / PAGE_STANDARDS_REF_ID
+    field_guide_page = REPORT / "pages" / PAGE_FIELD_GUIDE_ID
+    profile_page = REPORT / "pages" / PAGE_CONCEPT_PROFILE_ID
+    standards_page = REPORT / "pages" / STANDARDS_PAGE_ID
+    overview_page = REPORT / "pages" / PAGE_GOVERNANCE_ID
+    for p in (
+        start_page,
+        demo_page,
+        standards_ref_page,
+        field_guide_page,
+        profile_page,
+        standards_page,
+        overview_page,
+    ):
         p.mkdir(parents=True, exist_ok=True)
 
-    write_page_json(start_page, start_id, TAB_START_HERE, width=PAGE_PROFILE_W, height=PAGE_PROFILE_H, informational=True)
-    write_page_json(demo_page, demo_id, TAB_DEMO, width=PAGE_PROFILE_W, height=PAGE_PROFILE_H, informational=True)
-    write_page_json(field_guide_page, field_guide_id, TAB_FIELD_GUIDE, width=PAGE_PROFILE_W, height=PAGE_PROFILE_H, informational=True)
-    write_page_json(profile_page, profile_id, "Concept Profile", width=PAGE_PROFILE_W, height=PAGE_PROFILE_H)
-    write_page_json(standards_page, standards_id, "Standards & Contexts", width=PAGE_PROFILE_W, height=PAGE_PROFILE_H)
-    write_page_json(overview_page, overview_id, "Governance Overview", width=PAGE_OVERVIEW_W, height=PAGE_OVERVIEW_H)
-    write_text_utf8_no_bom(
-        REPORT / "pages" / "pages.json",
-        json.dumps(
-            {
-                "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/pagesMetadata/1.1.0/schema.json",
-                "pageOrder": [start_id, demo_id, field_guide_id, profile_id, standards_id, overview_id],
-                "activePageName": DEMO_LANDING_PAGE_ID,
-                "landingPageName": DEMO_LANDING_PAGE_ID,
-            },
-            indent=2,
-        ),
-    )
+    sync_pages_json()
+    sync_page_tab_styles()
 
     THEME_DIR.mkdir(parents=True, exist_ok=True)
     sync_semantic_model()
     write_chi_theme()
     update_report_json()
+    from add_pbip_standards_reference_page import build_standards_reference_page
     from add_pbip_start_here_page import build_start_here_page
     from add_pbip_documentation_page import build_field_guide_page, write_gaps_table_tmdl, write_guide_table_tmdl
     from add_pbip_documentation_page import sync_model_tmdl as sync_guide_model
@@ -1144,10 +1155,13 @@ def main() -> None:
     sync_guide_model()
     build_start_here_page(start_page)
     build_demo_page(demo_page)
+    build_standards_reference_page(standards_ref_page)
     build_field_guide_page(field_guide_page)
     build_concept_profile_page(profile_page)
     build_standards_contexts_page(standards_page)
     build_overview_page(overview_page)
+    sync_pages_json()
+    sync_page_tab_styles()
     print(f"Regenerated PBIP report and semantic model at {PBIP}")
 
 

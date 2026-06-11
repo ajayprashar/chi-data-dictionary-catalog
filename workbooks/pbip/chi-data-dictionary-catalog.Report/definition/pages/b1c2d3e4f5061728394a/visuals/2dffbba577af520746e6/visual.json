@@ -1,0 +1,273 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
+  "name": "2dffbba577af520746e6",
+  "position": {
+    "x": 968,
+    "y": 272,
+    "z": 5,
+    "height": 300,
+    "width": 920,
+    "tabOrder": 5
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "CDCREC Race / Ethnicity (OID 2.16.840.1.113883.6.238) - ",
+                    "textStyle": {
+                      "fontSize": "11pt",
+                      "color": "#000000",
+                      "fontWeight": "bold"
+                    }
+                  },
+                  {
+                    "value": "Patient.race, Patient.ethnicity",
+                    "textStyle": {
+                      "fontSize": "11pt",
+                      "color": "#000000"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "HL7 v3 NullFlavor (OID 2.16.840.1.113883.5.1008) - ",
+                    "textStyle": {
+                      "fontSize": "11pt",
+                      "color": "#000000",
+                      "fontWeight": "bold"
+                    }
+                  },
+                  {
+                    "value": "unknown vs declined vs not asked",
+                    "textStyle": {
+                      "fontSize": "11pt",
+                      "color": "#000000"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "BCP 47 (urn:ietf:bcp:47) - ",
+                    "textStyle": {
+                      "fontSize": "11pt",
+                      "color": "#000000",
+                      "fontWeight": "bold"
+                    }
+                  },
+                  {
+                    "value": "primary FHIR binding for Patient.language",
+                    "textStyle": {
+                      "fontSize": "11pt",
+                      "color": "#000000"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "LOINC (OID 2.16.840.1.113883.6.1) - ",
+                    "textStyle": {
+                      "fontSize": "11pt",
+                      "color": "#000000",
+                      "fontWeight": "bold"
+                    }
+                  },
+                  {
+                    "value": "e.g. 76691-5 Gender identity for Patient.gender_id",
+                    "textStyle": {
+                      "fontSize": "11pt",
+                      "color": "#000000"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "SNOMED CT - ",
+                    "textStyle": {
+                      "fontSize": "11pt",
+                      "color": "#000000",
+                      "fontWeight": "bold"
+                    }
+                  },
+                  {
+                    "value": "coded clinical concepts where US Core bindings apply",
+                    "textStyle": {
+                      "fontSize": "11pt",
+                      "color": "#000000"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "ISO 639 - ",
+                    "textStyle": {
+                      "fontSize": "11pt",
+                      "color": "#000000",
+                      "fontWeight": "bold"
+                    }
+                  },
+                  {
+                    "value": "stewardship / crosswalk only; not primary FHIR exchange binding",
+                    "textStyle": {
+                      "fontSize": "11pt",
+                      "color": "#000000"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Terminology authorities'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "14D"
+                }
+              }
+            },
+            "fontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#FFFFFF'"
+                    }
+                  }
+                }
+              }
+            },
+            "background": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#0047AB'"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#FFF9E6'"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#0047AB'"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "padding": [
+        {
+          "properties": {
+            "top": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
+                }
+              }
+            },
+            "bottom": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
+                }
+              }
+            },
+            "left": {
+              "expr": {
+                "Literal": {
+                  "Value": "12D"
+                }
+              }
+            },
+            "right": {
+              "expr": {
+                "Literal": {
+                  "Value": "12D"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

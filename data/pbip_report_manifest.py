@@ -5,18 +5,29 @@ Synced with enhance_pbip_report.py visuals and pbip_layout_constants.py.
 
 from __future__ import annotations
 
-# Page IDs match workbooks/pbip/.../pages/pages.json
-PAGE_START_HERE = "e1f2a3b4c5d607182934"
-PAGE_DEMO = "a9b8c7d6e5f403120918"
-PAGE_CONCEPT_PROFILE = "abc963c80ac5ed2deeb4"
-PAGE_STANDARDS = "d4e5f6a7b8c901234567"
-PAGE_GOVERNANCE = "c8f1a2b3d4e5f6071829"
-PAGE_FIELD_GUIDE = "f7a8b9c0d1e2f304152637"
+import sys
+from pathlib import Path
 
-# Tab labels - informational pages use Guide · prefix (see pbip_layout_constants.py).
-TAB_START_HERE = "Guide · Start here"
-TAB_DEMO = "Guide · Demo walkthrough"
-TAB_FIELD_GUIDE = "Guide · Field guide"
+_SCRIPTS = Path(__file__).resolve().parent.parent / "scripts"
+if str(_SCRIPTS) not in sys.path:
+    sys.path.insert(0, str(_SCRIPTS))
+
+from pbip_layout_constants import (  # noqa: E402
+    DEMO_PAGE_ID as PAGE_DEMO,
+    PAGE_CONCEPT_PROFILE_ID as PAGE_CONCEPT_PROFILE,
+    PAGE_FIELD_GUIDE_ID as PAGE_FIELD_GUIDE,
+    PAGE_GOVERNANCE_ID as PAGE_GOVERNANCE,
+    PAGE_STANDARDS_REF_ID,
+    PAGE_START_HERE_ID as PAGE_START_HERE,
+    STANDARDS_PAGE_ID as PAGE_STANDARDS,
+    TAB_CONCEPT_PROFILE,
+    TAB_DEMO,
+    TAB_FIELD_GUIDE,
+    TAB_GOVERNANCE_OVERVIEW,
+    TAB_STANDARDS_CONTEXTS,
+    TAB_STANDARDS_REF,
+    TAB_START_HERE,
+)
 
 GUIDE_TABLE = "ddc-application_guide"
 GUIDE_PARQUET = "ddc-application_guide.parquet"
@@ -37,29 +48,36 @@ PAGES: list[dict] = [
         "primary_audience": "All",
     },
     {
-        "page_id": PAGE_FIELD_GUIDE,
-        "page_display_name": TAB_FIELD_GUIDE,
-        "page_purpose": "Self-documentation: every report column, layer, and interoperability role.",
-        "page_interop_summary": "Use slicers to find why a column exists and how it supports exchange.",
+        "page_id": PAGE_STANDARDS_REF_ID,
+        "page_display_name": TAB_STANDARDS_REF,
+        "page_purpose": "Static lookup of national and exchange standards (FHIR R4, USCDI, terminology authorities).",
+        "page_interop_summary": "External sources of truth - not per-concept CHI bindings.",
         "primary_audience": "All",
     },
     {
         "page_id": PAGE_STANDARDS,
-        "page_display_name": "Standards & Contexts",
+        "page_display_name": TAB_STANDARDS_CONTEXTS,
         "page_purpose": "Healthcare standards, terminology, crosswalk, and legacy message placement for one semantic_id.",
         "page_interop_summary": "Answers: How does CHI bind US Core/FHIR, governed codes, and HL7/CCDA paths?",
         "primary_audience": "Standards / interface engineering",
     },
     {
         "page_id": PAGE_CONCEPT_PROFILE,
-        "page_display_name": "Concept Profile",
+        "page_display_name": TAB_CONCEPT_PROFILE,
         "page_purpose": "Full stewarded profile: governance, implementation, survivorship, and source coverage.",
         "page_interop_summary": "Answers: Who approved this concept, how is it implemented, how do we resolve conflicts?",
         "primary_audience": "Stewards / reviewers",
     },
     {
+        "page_id": PAGE_FIELD_GUIDE,
+        "page_display_name": TAB_FIELD_GUIDE,
+        "page_purpose": "Self-documentation: every report column, layer, and interoperability role.",
+        "page_interop_summary": "Use slicers to find why a column exists and how it supports exchange.",
+        "primary_audience": "Stewards",
+    },
+    {
         "page_id": PAGE_GOVERNANCE,
-        "page_display_name": "Governance Overview",
+        "page_display_name": TAB_GOVERNANCE_OVERVIEW,
         "page_purpose": "Portfolio KPIs and classification across all governed concepts.",
         "page_interop_summary": "Leadership view of approval status and pilot scope - not message-level mapping.",
         "primary_audience": "Leadership / governance",

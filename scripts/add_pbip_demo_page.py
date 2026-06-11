@@ -110,22 +110,6 @@ def build_demo_page(page_dir: Path) -> None:
         write_visual(page_dir, v)
 
 
-def update_pages_json(*, landing_page_id: str = DEMO_LANDING_PAGE_ID) -> None:
-    pages_json = REPORT / "pages" / "pages.json"
-    data = json.loads(pages_json.read_text(encoding="utf-8"))
-    order = [p for p in data.get("pageOrder", []) if p not in (START_HERE_PAGE_ID, DEMO_PAGE_ID)]
-    if START_HERE_PAGE_ID in data.get("pageOrder", []):
-        order.insert(0, START_HERE_PAGE_ID)
-    else:
-        order.insert(0, START_HERE_PAGE_ID)
-    order.insert(1, DEMO_PAGE_ID)
-    data["pageOrder"] = order
-    data["activePageName"] = landing_page_id
-    if "landingPageName" in data:
-        data["landingPageName"] = landing_page_id
-    write_text_utf8_no_bom(pages_json, json.dumps(data, indent=2))
-
-
 def main() -> None:
     page_dir = REPORT / "pages" / DEMO_PAGE_ID
     page_dir.mkdir(parents=True, exist_ok=True)
@@ -138,7 +122,10 @@ def main() -> None:
         informational=True,
     )
     build_demo_page(page_dir)
-    update_pages_json()
+    from enhance_pbip_report import sync_pages_json, sync_page_tab_styles  # noqa: E402
+
+    sync_pages_json(landing_page_id=DEMO_LANDING_PAGE_ID)
+    sync_page_tab_styles()
     print(f"Wrote PBIP page: {DEMO_DISPLAY_NAME} ({DEMO_PAGE_ID})")
     print(f"  Default landing page: {DEMO_DISPLAY_NAME} ({DEMO_LANDING_PAGE_ID})")
     print("  Re-open chi-data-dictionary-catalog.pbip in Power BI Desktop and Refresh.")
