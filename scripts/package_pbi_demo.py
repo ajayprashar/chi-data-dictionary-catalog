@@ -22,6 +22,7 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(REPO_ROOT / "scripts"))
 PBIP_DIR = REPO_ROOT / "workbooks" / "pbip"
 DEFAULT_OUT = REPO_ROOT / "workbooks" / f"chi-ddc-demo-{date.today().isoformat()}.zip"
 
@@ -48,12 +49,25 @@ SKIP_SUFFIXES = {
     ".pbi/editorSettings.json",
 }
 
+OPEN_DEMO_BAT = """@echo off
+cd /d "%~dp0"
+echo Opening CHI Data Dictionary Catalog in Power BI Desktop...
+start "" "%~dp0workbooks\\pbip\\chi-data-dictionary-catalog.pbip"
+echo.
+echo After Power BI opens: Home -^> Refresh from the REPORT view (not Transform data).
+echo Start on the Demo walkthrough tab, then follow the steps on screen.
+pause
+"""
+
 README = """CHI Data Dictionary Catalog - Power BI demo package
 =====================================================
 
 Extract this zip so the folder exists at:
 
   C:\\AI\\chi-data-dictionary-catalog\\
+
+Quick start: double-click OPEN-DEMO.bat (or open the PBIP path below).
+Read DEMO-WALKTHROUGH.txt for the same steps as the in-report Demo walkthrough tab.
 
 Required layout after extract:
 
@@ -82,7 +96,7 @@ Open in Power BI Desktop:
 
   workbooks\\pbip\\chi-data-dictionary-catalog.pbip
 
-Then Home -> Refresh from the REPORT view (do not open Transform data unless you must).
+Default tab: Demo walkthrough (5-minute tour). Then Home -> Refresh from the REPORT view.
 
 Power Query preview crash (0x80131623 on ddc-ccda_catalog, etc.):
   This is a known Power BI Desktop Mashup bug with PBIP + parquet preview,
@@ -115,9 +129,13 @@ def write_pbi_compatible_parquet(src: Path, dest: Path) -> None:
 
 
 def package(out_zip: Path, *, native_parquet: bool = False) -> None:
-    guide_script = REPO_ROOT / "scripts" / "generate_pbip_model_guide.py"
-    if not (REPO_ROOT / "ddc-application_guide.parquet").exists() and guide_script.is_file():
-        subprocess.run([sys.executable, str(guide_script)], check=True, cwd=REPO_ROOT)
+    apply_script = REPO_ROOT / "scripts" / "apply_pbip_usability.py"
+    if apply_script.is_file():
+        subprocess.run([sys.executable, str(apply_script)], check=True, cwd=REPO_ROOT)
+    else:
+        guide_script = REPO_ROOT / "scripts" / "generate_pbip_model_guide.py"
+        if guide_script.is_file():
+            subprocess.run([sys.executable, str(guide_script)], check=True, cwd=REPO_ROOT)
     missing = [name for name in PARQUET_FILES if not (REPO_ROOT / name).exists()]
     missing += [name for name in EXCEL_FILES if not (REPO_ROOT / name).exists()]
     if missing:
@@ -131,8 +149,12 @@ def package(out_zip: Path, *, native_parquet: bool = False) -> None:
 
     with tempfile.TemporaryDirectory() as tmp:
         tmp_path = Path(tmp)
+        from pbip_demo_walkthrough_content import render_demo_walkthrough_txt
+
         with zipfile.ZipFile(out_zip, "w", compression=zipfile.ZIP_DEFLATED) as zf:
             zf.writestr(f"{root_name}/DEMO-README.txt", README)
+            zf.writestr(f"{root_name}/DEMO-WALKTHROUGH.txt", render_demo_walkthrough_txt())
+            zf.writestr(f"{root_name}/OPEN-DEMO.bat", OPEN_DEMO_BAT)
 
             for name in PARQUET_FILES:
                 src = REPO_ROOT / name

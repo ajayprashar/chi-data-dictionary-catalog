@@ -67,7 +67,18 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    import_workbook(Path(args.workbook), Path(args.repo_root))
+    repo = Path(args.repo_root)
+    import_workbook(Path(args.workbook), repo)
+
+    enrich_script = Path(__file__).resolve().parent / "enrich_parquet_for_pbi.py"
+    if enrich_script.is_file():
+        import importlib.util
+
+        spec = importlib.util.spec_from_file_location("enrich_parquet_for_pbi", enrich_script)
+        if spec and spec.loader:
+            mod = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(mod)
+            mod.main()
 
 
 if __name__ == "__main__":

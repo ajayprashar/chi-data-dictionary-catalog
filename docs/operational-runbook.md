@@ -257,6 +257,8 @@ When SharePoint becomes available, move the workbook and published parquet to a 
 | `validate_pbip_manifest.py` | Compare manifest VISUALS to live PBIP `visual.json` columns | Maintainer; before/after layout edits |
 | `add_pbip_documentation_page.py` | Field guide PBIP tab + semantic model table | Maintainer; after guide parquet regen |
 | `add_pbip_start_here_page.py` | Start here tab (purpose + sources of truth) | Maintainer; safe to re-run |
+| `add_pbip_demo_page.py` | Demo walkthrough tab (5-minute tour; sets demo landing) | Maintainer; safe to re-run |
+| `apply_pbip_usability.py` | Enrich catalog + rebuild Standards/Concept/Demo pages | Maintainer; before demo zip |
 | `patch_pbip_readability.py` | Slicer width, table word wrap, FHIR columns, vertical layout | Maintainer; safe to re-run |
 | `seed_demographics_pilot.py` | Multiline `data_quality_notes` / survivorship for five pilots | After note edits |
 | `build_*` / `split_*` / `build_standards_inventories.py` | Mapping CSV or schema rebuilds | Maintainer only |

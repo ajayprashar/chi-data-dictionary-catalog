@@ -34,7 +34,7 @@ from enhance_pbip_report import (  # noqa: E402
     write_text_utf8_no_bom,
     write_visual,
 )
-from pbip_layout_constants import DEFAULT_LANDING_PAGE_ID  # noqa: E402
+from pbip_layout_constants import TAB_START_HERE  # noqa: E402
 from pbip_start_here_content import (  # noqa: E402
     HOW_TO_USE_LINES,
     PAGE_SUBTITLE,
@@ -46,7 +46,7 @@ from pbip_start_here_content import (  # noqa: E402
 )
 
 START_HERE_PAGE_ID = "e1f2a3b4c5d607182934"
-START_HERE_DISPLAY_NAME = "Start here"
+START_HERE_DISPLAY_NAME = TAB_START_HERE
 
 
 def _body_paragraphs(lines: list[str], *, size: str = "12pt") -> list[dict]:
@@ -204,7 +204,6 @@ def update_pages_json() -> None:
     order = data.get("pageOrder", [])
     rest = [p for p in order if p != START_HERE_PAGE_ID]
     data["pageOrder"] = [START_HERE_PAGE_ID, *rest]
-    data["activePageName"] = DEFAULT_LANDING_PAGE_ID
     write_text_utf8_no_bom(pages_json, json.dumps(data, indent=2))
 
 
@@ -217,11 +216,12 @@ def main() -> None:
         START_HERE_DISPLAY_NAME,
         width=PAGE_PROFILE_W,
         height=PAGE_PROFILE_H,
+        informational=True,
     )
     build_start_here_page(page_dir)
     update_pages_json()
     print(f"Wrote PBIP page: {START_HERE_DISPLAY_NAME} ({START_HERE_PAGE_ID})")
-    print(f"  Default landing page: Standards & Contexts ({DEFAULT_LANDING_PAGE_ID})")
+    print("  Landing page unchanged (use add_pbip_demo_page.py to set Demo tab landing).")
     print("  Re-open chi-data-dictionary-catalog.pbip in Power BI Desktop.")
 
 

@@ -234,6 +234,14 @@ table ddc-master_patient_catalog
 
 		annotation SummarizationSetBy = Automatic
 
+	column is_demographics_pilot
+		dataType: string
+		lineageTag: 533c62228ff5db9af4d4
+		summarizeBy: none
+		sourceColumn: is_demographics_pilot
+
+		annotation SummarizationSetBy = Automatic
+
 	partition ddc-master_patient_catalog = m
 		mode: import
 		source =

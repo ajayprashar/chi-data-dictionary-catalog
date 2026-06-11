@@ -29,13 +29,14 @@ SOURCES_LINES = [
 ]
 
 HOW_TO_USE_LINES = [
-    "1. Start here - purpose and sources of truth (this page).",
-    "2. Field guide - column purpose, Catalog vs Dictionary layer, and HIE interoperability role (slicers).",
-    "3. Standards & Contexts - default landing: terminology, crosswalk, ADT/CCDA per semantic_id.",
-    "4. Concept Profile - governance, FHIR implementation, survivorship, source availability.",
-    "5. Governance Overview - portfolio KPIs and full concept list.",
+    "1. Guide · Start here — purpose and sources of truth (this page).",
+    "2. Guide · Demo walkthrough — 5-minute tour (default landing for demos).",
+    "3. Guide · Field guide — column purpose, steward workflow, and curation gaps (slicers).",
+    "4. Standards & Contexts - terminology, crosswalk, ADT/CCDA per semantic_id.",
+    "5. Concept Profile - governance, FHIR implementation, survivorship, source availability.",
+    "6. Governance Overview - portfolio KPIs and full concept list.",
     "",
-    "Tip: Use the semantic_id slicer on Standards & Contexts or Concept Profile to drill into one concept.",
+    "Tip: On Standards & Contexts, set Show concepts = yes and pick Patient.race or Patient.language.",
 ]
 
 PILOT_CALLOUT = (

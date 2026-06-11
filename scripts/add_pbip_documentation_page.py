@@ -43,7 +43,7 @@ from enhance_pbip_report import (  # noqa: E402
 )
 from generate_pbip_model_guide import generate as generate_guide  # noqa: E402
 from generate_pbip_model_guide import generate_gaps  # noqa: E402
-from pbip_layout_constants import DEFAULT_LANDING_PAGE_ID  # noqa: E402
+from pbip_layout_constants import DEFAULT_LANDING_PAGE_ID, TAB_FIELD_GUIDE  # noqa: E402
 from pbip_report_manifest import (  # noqa: E402
     GUIDE_COLUMNS,
     GUIDE_PARQUET,
@@ -60,7 +60,7 @@ from pilot_curation_checks import (  # noqa: E402
 
 GUIDE = GUIDE_TABLE
 REPO_PARQUET = r"C:\AI\chi-data-dictionary-catalog"
-FIELD_GUIDE_DISPLAY_NAME = "Field guide"
+FIELD_GUIDE_DISPLAY_NAME = TAB_FIELD_GUIDE
 
 DETAIL_COLUMNS = [
     "column_name",
@@ -378,6 +378,7 @@ def main() -> None:
         FIELD_GUIDE_DISPLAY_NAME,
         width=PAGE_PROFILE_W,
         height=PAGE_PROFILE_H,
+        informational=True,
     )
     build_field_guide_page(page_dir)
     update_pages_json()

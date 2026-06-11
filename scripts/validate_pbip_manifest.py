@@ -12,13 +12,15 @@ REPO = Path(__file__).resolve().parent.parent
 REPORT_PAGES = REPO / "workbooks" / "pbip" / "chi-data-dictionary-catalog.Report" / "definition" / "pages"
 
 sys.path.insert(0, str(REPO / "data"))
+sys.path.insert(0, str(REPO / "scripts"))
+from pbip_layout_constants import DEMO_PAGE_ID  # noqa: E402
 from pbip_report_manifest import (  # noqa: E402
     PAGE_FIELD_GUIDE,
     PAGE_START_HERE,
     VISUALS,
 )
 
-SKIP_PAGES = {PAGE_START_HERE, PAGE_FIELD_GUIDE}
+SKIP_PAGES = {PAGE_START_HERE, PAGE_FIELD_GUIDE, DEMO_PAGE_ID}
 
 
 @dataclass(frozen=True)

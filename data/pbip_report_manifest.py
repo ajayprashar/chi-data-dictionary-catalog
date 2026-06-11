@@ -7,10 +7,16 @@ from __future__ import annotations
 
 # Page IDs match workbooks/pbip/.../pages/pages.json
 PAGE_START_HERE = "e1f2a3b4c5d607182934"
+PAGE_DEMO = "a9b8c7d6e5f403120918"
 PAGE_CONCEPT_PROFILE = "abc963c80ac5ed2deeb4"
 PAGE_STANDARDS = "d4e5f6a7b8c901234567"
 PAGE_GOVERNANCE = "c8f1a2b3d4e5f6071829"
 PAGE_FIELD_GUIDE = "f7a8b9c0d1e2f304152637"
+
+# Tab labels — informational pages use Guide · prefix (see pbip_layout_constants.py).
+TAB_START_HERE = "Guide · Start here"
+TAB_DEMO = "Guide · Demo walkthrough"
+TAB_FIELD_GUIDE = "Guide · Field guide"
 
 GUIDE_TABLE = "ddc-application_guide"
 GUIDE_PARQUET = "ddc-application_guide.parquet"
@@ -18,14 +24,21 @@ GUIDE_PARQUET = "ddc-application_guide.parquet"
 PAGES: list[dict] = [
     {
         "page_id": PAGE_START_HERE,
-        "page_display_name": "Start here",
+        "page_display_name": TAB_START_HERE,
         "page_purpose": "Orientation: purpose, sources of truth, and how to navigate the report.",
         "page_interop_summary": "Explains layered HIE model (WHAT/HOW/WHERE/WHICH) before drilling into data.",
         "primary_audience": "All",
     },
     {
+        "page_id": PAGE_DEMO,
+        "page_display_name": TAB_DEMO,
+        "page_purpose": "5-minute guided tour: pilots, slicers, and where to drill next.",
+        "page_interop_summary": "Demo landing page — walk through Patient.race and related pilots.",
+        "primary_audience": "All",
+    },
+    {
         "page_id": PAGE_FIELD_GUIDE,
-        "page_display_name": "Field guide",
+        "page_display_name": TAB_FIELD_GUIDE,
         "page_purpose": "Self-documentation: every report column, layer, and interoperability role.",
         "page_interop_summary": "Use slicers to find why a column exists and how it supports exchange.",
         "primary_audience": "All",
@@ -113,7 +126,7 @@ VISUALS: list[dict] = [
     },
     {
         "page_id": PAGE_STANDARDS,
-        "visual_title": "Governed value set codes (OMB rollup & pilot; full HL7 expansion in Excel)",
+        "visual_title": "Governed value set codes",
         "semantic_model_table": "ddc-value_set_member",
         "layer": "Terminology",
         "columns": [

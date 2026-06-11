@@ -12,8 +12,9 @@ The report includes four pages:
 
 | Page | Purpose |
 |------|---------|
-| **Start here** | Purpose, sources-of-truth layers, how to navigate the report (static text) |
-| **Field guide** | In-report column reference — layer (Catalog/Dictionary/Context), interoperability role, Excel source (slicers) |
+| **Guide · Start here** | Purpose, sources-of-truth layers, how to navigate the report (static text; cream canvas) |
+| **Guide · Demo walkthrough** | 5-minute guided tour (default landing in demo package; cream canvas) |
+| **Guide · Field guide** | In-report column reference — layer (Catalog/Dictionary/Context), interoperability role, Excel source (slicers; cream canvas) |
 | **Concept Profile** | One `semantic_id` — governance, FHIR/US Core, **survivorship**, sources |
 | **Standards & Contexts** | Same slicer — FHIR/terminology notes, value sets, crosswalk, **HL7 ADT**, **C-CDA** (no survivorship column on FHIR table) |
 | **Governance Overview** | Portfolio KPIs, classification/approval charts, full concept table |
@@ -30,7 +31,7 @@ python scripts/add_pbip_documentation_page.py
 
 The Field guide tab includes **page summary cards**, **steward workflow** (Excel sheet → import → Refresh), an **editable in Excel** slicer, column detail with `steward_action` / `review_on_page`, and a **curation gaps** table (`ddc-application_guide_gaps.parquet`) built from live catalog/dictionary parquet. Regenerate gaps after each steward publish. After changing PBIP table columns, update `data/pbip_report_manifest.py` so validation stays green.
 
-**Default landing page:** **Standards & Contexts** (opens on load). **Start here** remains the first tab for orientation.
+**Default landing page:** **Guide · Demo walkthrough** in the demo package; **Standards & Contexts** in maintainer full regen unless overridden. Guide tabs use a cream canvas and `Guide ·` prefix; functional tabs use a white canvas.
 
 Semantic model tables: catalog, dictionary, source availability, **ADT catalog**, **CCDA catalog**, **value set members**, **source crosswalk** (joined on `semantic_id`).
 

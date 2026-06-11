@@ -11,21 +11,33 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "data"))
 from pbip_layout_constants import (  # noqa: E402
-    CONTENT_W,
-    DEFAULT_LANDING_PAGE_ID,
+    ADT_CALLOUT_TEXT,
     ADT_CONTEXT_COLUMNS,
     ADT_CONTEXT_TITLE,
+    CONCEPT_BLANK_CALLOUT,
+    CONTENT_W,
+    DEFAULT_LANDING_PAGE_ID,
+    DEMO_LANDING_PAGE_ID,
+    DEMO_PAGE_ID,
     FHIR_STANDARDS_COLUMNS,
     FHIR_STANDARDS_TABLE_H,
     PAGE_MARGIN,
+    PILOT_SLICER_TITLE,
     SLICER_H_PROFILE,
     SLICER_H_STANDARDS,
+    SLICER_TITLE,
     SLICER_W,
     STANDARDS_HALF_TABLE_H,
     STANDARDS_HEADER_H,
     STANDARDS_LAYER_H,
+    STANDARDS_ADT_CALLOUT_H,
     STANDARDS_TABLE_GAP,
     standards_page_y_positions,
+    TAB_DEMO,
+    TAB_FIELD_GUIDE,
+    TAB_START_HERE,
+    PAGE_BG_FUNCTIONAL,
+    PAGE_BG_INFORMATIONAL,
 )
 
 REPO = Path(__file__).resolve().parent.parent
@@ -321,38 +333,57 @@ def shape_rect(name: str, x: float, y: float, w: float, h: float, z: int, color:
     )
 
 
-def slicer_dropdown(name: str, x: float, y: float, w: float, h: float, z: int, entity: str, prop: str, default_value: str) -> dict:
+def slicer_dropdown(
+    name: str,
+    x: float,
+    y: float,
+    w: float,
+    h: float,
+    z: int,
+    entity: str,
+    prop: str,
+    default_value: str,
+    *,
+    title: str | None = None,
+    source_alias: str = "c",
+) -> dict:
+    objects: dict = {
+        "data": [{"properties": {"mode": {"expr": {"Literal": {"Value": "'Dropdown'"}}}}}],
+        "header": [{"properties": {"show": lit_bool(False)}}],
+        "items": [{"properties": {"fontSize": lit_pt(14), "fontColor": {"solid": {"color": lit_str(TEXT_BLACK)}}}}],
+        "selection": [{"properties": {"selectAllCheckboxEnabled": lit_bool(True)}}],
+        "general": [{
+            "properties": {
+                "filter": {
+                    "filter": {
+                        "Version": 2,
+                        "From": [{"Name": source_alias, "Entity": entity, "Type": 0}],
+                        "Where": [{
+                            "Condition": {
+                                "In": {
+                                    "Expressions": [{
+                                        "Column": {
+                                            "Expression": {"SourceRef": {"Source": source_alias}},
+                                            "Property": prop,
+                                        }
+                                    }],
+                                    "Values": [[{"Literal": {"Value": f"'{default_value}'"}}]],
+                                }
+                            }
+                        }],
+                    }
+                }
+            }
+        }],
+    }
     return visual_container(
         name, x, y, w, h, z,
         {
             "visualType": "slicer",
             "query": {"queryState": {"Values": {"projections": [{**projection(entity, prop), "active": True}]}}},
-            "objects": {
-                "data": [{"properties": {"mode": {"expr": {"Literal": {"Value": "'Dropdown'"}}}}}],
-                "header": [{"properties": {"show": lit_bool(False)}}],
-                "items": [{"properties": {"fontSize": lit_pt(14), "fontColor": {"solid": {"color": lit_str(TEXT_BLACK)}}}}],
-                "selection": [{"properties": {"selectAllCheckboxEnabled": lit_bool(True)}}],
-                "general": [{
-                    "properties": {
-                        "filter": {
-                            "filter": {
-                                "Version": 2,
-                                "From": [{"Name": "c", "Entity": entity, "Type": 0}],
-                                "Where": [{
-                                    "Condition": {
-                                        "In": {
-                                            "Expressions": [{"Column": {"Expression": {"SourceRef": {"Source": "c"}}, "Property": prop}}],
-                                            "Values": [[{"Literal": {"Value": f"'{default_value}'"}}]],
-                                        }
-                                    }
-                                }],
-                            }
-                        }
-                    }
-                }],
-            },
+            "objects": objects,
             "visualContainerObjects": container_title(
-                "Select governed concept (semantic_id)",
+                title or SLICER_TITLE,
                 bg=PRIMARY_YELLOW,
                 fg=TEXT_BLACK,
                 size=14,
@@ -449,7 +480,9 @@ def build_concept_profile_page(page_dir: Path) -> None:
     header_h = 128
     slicer_y = header_h + 12
     slicer_h = SLICER_H_PROFILE
-    cards_y = slicer_y + slicer_h + 16
+    callout_y = slicer_y + slicer_h + 8
+    callout_h = 40
+    cards_y = callout_y + callout_h + 12
     card_h = 156
     tables_y = cards_y + card_h + 20
     biz_h = 318
@@ -469,6 +502,11 @@ def build_concept_profile_page(page_dir: Path) -> None:
             size="13pt", color=TEXT_WHITE, transparent=True,
         ),
         slicer_dropdown(vid(), margin, slicer_y, SLICER_W, slicer_h, 3, CATALOG, "semantic_id", "Patient.race"),
+        textbox(
+            vid(), margin, callout_y, content_w, callout_h, 4,
+            CONCEPT_BLANK_CALLOUT,
+            size="11pt", color=TEXT_BLACK,
+        ),
         *[
             card(
                 vid(),
@@ -476,7 +514,7 @@ def build_concept_profile_page(page_dir: Path) -> None:
                 cards_y,
                 360,
                 card_h,
-                4 + idx,
+                5 + idx,
                 CATALOG,
                 measure_name,
                 measure=True,
@@ -485,12 +523,12 @@ def build_concept_profile_page(page_dir: Path) -> None:
             for idx, (measure_name, value_pt) in enumerate(PROFILE_CARD_MEASURES)
         ],
         table_ex(
-            vid(), margin, tables_y, 1184, biz_h, 9, CATALOG,
+            vid(), margin, tables_y, 1184, biz_h, 10, CATALOG,
             ["uscdi_description", "ruleset_category", "uscdi_data_class", "uscdi_data_element", "hipaa_category", "steward_contact"],
             title="Business & USCDI governance",
         ),
         table_ex(
-            vid(), margin, dict_y, 1184, dict_h, 10, DICTIONARY,
+            vid(), margin, dict_y, 1184, dict_h, 11, DICTIONARY,
             [
                 "fhir_r4_path",
                 "fhir_profile",
@@ -502,13 +540,13 @@ def build_concept_profile_page(page_dir: Path) -> None:
             title="Implementation & survivorship (FHIR + standards)",
         ),
         table_ex(
-            vid(), margin + 1200, tables_y, 656, dict_y + dict_h - tables_y, 11, SOURCES,
+            vid(), margin + 1200, tables_y, 656, dict_y + dict_h - tables_y, 12, SOURCES,
             ["source_id", "availability", "completeness_pct", "timeliness_sla_hours", "notes"],
             title="Source availability",
         ),
-        shape_rect(vid(), 0, h - footer_h, w, footer_h, 12, PRIMARY_YELLOW),
+        shape_rect(vid(), 0, h - footer_h, w, footer_h, 13, PRIMARY_YELLOW),
         textbox(
-            vid(), margin, h - footer_h + 10, content_w, 36, 13,
+            vid(), margin, h - footer_h + 10, content_w, 36, 14,
             "Read-only view. Edit chi-steward-workbook.xlsx, run import_steward_workbook_to_parquet.py, then Refresh.",
             size="12pt", color=TEXT_BLACK, transparent=True,
         ),
@@ -532,10 +570,13 @@ def build_standards_contexts_page(page_dir: Path) -> None:
     fhir_h = FHIR_STANDARDS_TABLE_H
     codes_y = layout["codes_y"]
     codes_h = STANDARDS_HALF_TABLE_H
+    adt_callout_y = layout["adt_callout_y"]
     adt_ccda_y = layout["adt_y"]
-    adt_h = STANDARDS_HALF_TABLE_H
+    adt_h = layout["adt_h"]
     footer_h = 52
     half_w = (content_w - 16) // 2
+    concept_slicer_w = int(SLICER_W * 0.62)
+    pilot_slicer_w = content_w - concept_slicer_w - 16
     visuals = [
         shape_rect(vid(), 0, 0, w, header_h, 0, PRIMARY_BLUE),
         textbox(
@@ -553,19 +594,28 @@ def build_standards_contexts_page(page_dir: Path) -> None:
             STANDARDS_LAYER_TEXT,
             size="12pt", color=TEXT_BLACK,
         ),
-        slicer_dropdown(vid(), margin, slicer_y, SLICER_W, slicer_h, 4, CATALOG, "semantic_id", "Patient.race"),
+        slicer_dropdown(
+            vid(), margin, slicer_y, concept_slicer_w, slicer_h, 4,
+            CATALOG, "semantic_id", "Patient.race",
+        ),
+        slicer_dropdown(
+            vid(), margin + concept_slicer_w + 16, slicer_y, pilot_slicer_w, slicer_h, 5,
+            CATALOG, "is_demographics_pilot", "yes",
+            title=PILOT_SLICER_TITLE,
+            source_alias="p",
+        ),
         table_ex(
-            vid(), margin, tables_y, content_w, fhir_h, 5, DICTIONARY,
+            vid(), margin, tables_y, content_w, fhir_h, 6, DICTIONARY,
             FHIR_STANDARDS_COLUMNS,
             title="FHIR R4 + US Core (Dictionary)",
         ),
         table_ex(
-            vid(), margin, codes_y, half_w, codes_h, 6, VALUE_MEMBER,
+            vid(), margin, codes_y, half_w, codes_h, 7, VALUE_MEMBER,
             ["semantic_id", "code_system_oid", "code", "display", "member_type", "binding_strength", "notes"],
             title="Governed value set codes",
         ),
         table_ex(
-            vid(), margin + half_w + 16, codes_y, half_w, codes_h, 7, SOURCE_XW,
+            vid(), margin + half_w + 16, codes_y, half_w, codes_h, 8, SOURCE_XW,
             [
                 "source_id",
                 "source_field",
@@ -578,19 +628,24 @@ def build_standards_contexts_page(page_dir: Path) -> None:
             ],
             title="Source value crosswalk",
         ),
+        textbox(
+            vid(), margin, adt_callout_y, half_w, STANDARDS_ADT_CALLOUT_H - 4, 9,
+            ADT_CALLOUT_TEXT,
+            size="11pt", color=TEXT_BLACK,
+        ),
         table_ex(
-            vid(), margin, adt_ccda_y, half_w, adt_h, 8, ADT,
+            vid(), margin, adt_ccda_y, half_w, adt_h, 10, ADT,
             ADT_CONTEXT_COLUMNS,
             title=ADT_CONTEXT_TITLE,
         ),
         table_ex(
-            vid(), margin + half_w + 16, adt_ccda_y, half_w, adt_h, 9, CCDA,
+            vid(), margin + half_w + 16, adt_ccda_y, half_w, adt_h, 11, CCDA,
             ["semantic_id", "section_name", "entry_type", "xml_path", "mapping_status", "notes"],
             title="C-CDA / CCD context",
         ),
-        shape_rect(vid(), 0, h - footer_h, w, footer_h, 10, PRIMARY_YELLOW),
+        shape_rect(vid(), 0, h - footer_h, w, footer_h, 12, PRIMARY_YELLOW),
         textbox(
-            vid(), margin, h - footer_h + 10, content_w, 36, 11,
+            vid(), margin, h - footer_h + 10, content_w, 36, 13,
             "Standards: docs/shie-standards-reference.md | Crosswalk model: docs/crosswalk-model.md",
             size="12pt", color=TEXT_BLACK, transparent=True,
         ),
@@ -909,7 +964,44 @@ def update_report_json() -> None:
     write_text_utf8_no_bom(path, json.dumps(data, indent=2))
 
 
-def write_page_json(page_dir: Path, page_id: str, display_name: str, *, width: int, height: int) -> None:
+def sync_page_tab_styles() -> None:
+    """Refresh tab labels and guide vs functional canvas colors without rebuilding visuals."""
+    from add_pbip_start_here_page import START_HERE_PAGE_ID
+    from pbip_report_manifest import PAGE_FIELD_GUIDE
+
+    profile_id = "abc963c80ac5ed2deeb4"
+    standards_id = "d4e5f6a7b8c901234567"
+    overview_id = "c8f1a2b3d4e5f6071829"
+    pages: list[tuple[Path, str, str, int, int, bool]] = [
+        (REPORT / "pages" / START_HERE_PAGE_ID, START_HERE_PAGE_ID, TAB_START_HERE, PAGE_PROFILE_W, PAGE_PROFILE_H, True),
+        (REPORT / "pages" / DEMO_PAGE_ID, DEMO_PAGE_ID, TAB_DEMO, PAGE_PROFILE_W, PAGE_PROFILE_H, True),
+        (REPORT / "pages" / PAGE_FIELD_GUIDE, PAGE_FIELD_GUIDE, TAB_FIELD_GUIDE, PAGE_PROFILE_W, PAGE_PROFILE_H, True),
+        (REPORT / "pages" / profile_id, profile_id, "Concept Profile", PAGE_PROFILE_W, PAGE_PROFILE_H, False),
+        (REPORT / "pages" / standards_id, standards_id, "Standards & Contexts", PAGE_PROFILE_W, PAGE_PROFILE_H, False),
+        (REPORT / "pages" / overview_id, overview_id, "Governance Overview", PAGE_OVERVIEW_W, PAGE_OVERVIEW_H, False),
+    ]
+    for page_dir, page_id, display_name, width, height, informational in pages:
+        if page_dir.is_dir():
+            write_page_json(
+                page_dir,
+                page_id,
+                display_name,
+                width=width,
+                height=height,
+                informational=informational,
+            )
+
+
+def write_page_json(
+    page_dir: Path,
+    page_id: str,
+    display_name: str,
+    *,
+    width: int,
+    height: int,
+    informational: bool = False,
+) -> None:
+    bg = PAGE_BG_INFORMATIONAL if informational else PAGE_BG_FUNCTIONAL
     write_text_utf8_no_bom(
         page_dir / "page.json",
         json.dumps(
@@ -924,7 +1016,7 @@ def write_page_json(page_dir: Path, page_id: str, display_name: str, *, width: i
                     "background": [
                         {
                             "properties": {
-                                "color": {"solid": {"color": {"expr": {"Literal": {"Value": f"'{TEXT_WHITE}'"}}}}},
+                                "color": {"solid": {"color": {"expr": {"Literal": {"Value": f"'{bg}'"}}}}},
                                 "transparency": {"expr": {"Literal": {"Value": "0D"}}},
                             }
                         }
@@ -937,24 +1029,28 @@ def write_page_json(page_dir: Path, page_id: str, display_name: str, *, width: i
 
 
 def main() -> None:
-    from add_pbip_start_here_page import START_HERE_PAGE_ID, START_HERE_DISPLAY_NAME
+    from add_pbip_demo_page import build_demo_page
+    from add_pbip_start_here_page import START_HERE_PAGE_ID
     from pbip_report_manifest import PAGE_FIELD_GUIDE
 
     start_id = START_HERE_PAGE_ID
+    demo_id = DEMO_PAGE_ID
     field_guide_id = PAGE_FIELD_GUIDE
     profile_id = "abc963c80ac5ed2deeb4"
     standards_id = "d4e5f6a7b8c901234567"
     overview_id = "c8f1a2b3d4e5f6071829"
     start_page = REPORT / "pages" / start_id
+    demo_page = REPORT / "pages" / demo_id
     field_guide_page = REPORT / "pages" / field_guide_id
     profile_page = REPORT / "pages" / profile_id
     standards_page = REPORT / "pages" / standards_id
     overview_page = REPORT / "pages" / overview_id
-    for p in (start_page, field_guide_page, profile_page, standards_page, overview_page):
+    for p in (start_page, demo_page, field_guide_page, profile_page, standards_page, overview_page):
         p.mkdir(parents=True, exist_ok=True)
 
-    write_page_json(start_page, start_id, START_HERE_DISPLAY_NAME, width=PAGE_PROFILE_W, height=PAGE_PROFILE_H)
-    write_page_json(field_guide_page, field_guide_id, "Field guide", width=PAGE_PROFILE_W, height=PAGE_PROFILE_H)
+    write_page_json(start_page, start_id, TAB_START_HERE, width=PAGE_PROFILE_W, height=PAGE_PROFILE_H, informational=True)
+    write_page_json(demo_page, demo_id, TAB_DEMO, width=PAGE_PROFILE_W, height=PAGE_PROFILE_H, informational=True)
+    write_page_json(field_guide_page, field_guide_id, TAB_FIELD_GUIDE, width=PAGE_PROFILE_W, height=PAGE_PROFILE_H, informational=True)
     write_page_json(profile_page, profile_id, "Concept Profile", width=PAGE_PROFILE_W, height=PAGE_PROFILE_H)
     write_page_json(standards_page, standards_id, "Standards & Contexts", width=PAGE_PROFILE_W, height=PAGE_PROFILE_H)
     write_page_json(overview_page, overview_id, "Governance Overview", width=PAGE_OVERVIEW_W, height=PAGE_OVERVIEW_H)
@@ -963,8 +1059,9 @@ def main() -> None:
         json.dumps(
             {
                 "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/pagesMetadata/1.1.0/schema.json",
-                "pageOrder": [start_id, field_guide_id, profile_id, standards_id, overview_id],
-                "activePageName": DEFAULT_LANDING_PAGE_ID,
+                "pageOrder": [start_id, demo_id, field_guide_id, profile_id, standards_id, overview_id],
+                "activePageName": DEMO_LANDING_PAGE_ID,
+                "landingPageName": DEMO_LANDING_PAGE_ID,
             },
             indent=2,
         ),
@@ -986,6 +1083,7 @@ def main() -> None:
     write_gaps_table_tmdl()
     sync_guide_model()
     build_start_here_page(start_page)
+    build_demo_page(demo_page)
     build_field_guide_page(field_guide_page)
     build_concept_profile_page(profile_page)
     build_standards_contexts_page(standards_page)
