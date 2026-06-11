@@ -88,6 +88,8 @@ PBIP layout (maintainers): `python scripts/add_pbip_start_here_page.py` · `pyth
 
 Interop context parquet (`ddc-hl7_adt_catalog`, `ddc-ccda_catalog`) links the same `semantic_id` to **HL7 ADT** and **C-CDA** paths. Terminology layer: `ddc-value_set_binding`, `ddc-value_set_member`, `ddc-source_value_crosswalk` - see `docs/crosswalk-model.md`. Optional: `ddc-fhir_inventory`, `ddc-business_rules`.
 
+PBIP-only (not from steward import): `ddc-application_guide.parquet` and `ddc-application_guide_gaps.parquet` power the in-report **Guide · Field guide** tab. See `docs/faq.md` → *Why does the PBIP semantic model have nine tables?*
+
 ---
 
 ### Data model

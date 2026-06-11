@@ -8,15 +8,16 @@ Read-only **governed catalog and dictionary viewer** (see `docs/product-vision.m
 workbooks/pbip/chi-data-dictionary-catalog.pbip
 ```
 
-The report includes four pages:
+The report includes seven tabs (left-to-right):
 
 | Page | Purpose |
 |------|---------|
 | **Guide · Start here** | Purpose, sources-of-truth layers, how to navigate the report (static text; cream canvas) |
-| **Guide · Demo walkthrough** | 5-minute guided tour (default landing in demo package; cream canvas) |
-| **Guide · Field guide** | In-report column reference - layer (Catalog/Dictionary/Context), interoperability role, Excel source (slicers; cream canvas) |
+| **Guide · Demo tour** | 5-minute guided tour (default landing in demo package; cream canvas) |
+| **Guide · National standards** | Static lookup of external authorities (FHIR R4, USCDI, terminology; cream canvas) |
+| **Standards & Contexts** | Per `semantic_id` - FHIR/terminology, value sets, crosswalk, **HL7 ADT**, **C-CDA** (no survivorship column on FHIR table) |
 | **Concept Profile** | One `semantic_id` - governance, FHIR/US Core, **survivorship**, sources |
-| **Standards & Contexts** | Same slicer - FHIR/terminology notes, value sets, crosswalk, **HL7 ADT**, **C-CDA** (no survivorship column on FHIR table) |
+| **Guide · Field guide** | In-report column reference + curation gaps (slicers; cream canvas) |
 | **Governance Overview** | Portfolio KPIs, classification/approval charts, full concept table |
 
 Add or refresh **Start here** only: `python scripts/add_pbip_start_here_page.py` (does not rebuild other pages).
@@ -31,11 +32,18 @@ python scripts/add_pbip_documentation_page.py
 
 The Field guide tab includes **page summary cards**, **steward workflow** (Excel sheet → import → Refresh), an **editable in Excel** slicer, column detail with `steward_action` / `review_on_page`, and a **curation gaps** table (`ddc-application_guide_gaps.parquet`) built from live catalog/dictionary parquet. Regenerate gaps after each steward publish. After changing PBIP table columns, update `data/pbip_report_manifest.py` so validation stays green.
 
-**Default landing page:** **Guide · Demo walkthrough** in the demo package; **Standards & Contexts** in maintainer full regen unless overridden. Guide tabs use a cream canvas and `Guide ·` prefix; functional tabs use a white canvas.
+**Default landing page:** **Guide · Demo tour** in the demo package; **Standards & Contexts** in maintainer full regen unless overridden. Guide tabs use a cream canvas and `Guide ·` prefix; functional tabs use a white canvas.
 
-Semantic model tables: catalog, dictionary, source availability, **ADT catalog**, **CCDA catalog**, **value set members**, **source crosswalk** (joined on `semantic_id`).
+### Semantic model: nine tables
 
-**Pages are task lenses, not catalog-vs-dictionary tabs.** The catalog/dictionary split is per column and per source table; pages mix both by design. See **`docs/faq.md`**.
+| Group | Tables | Source |
+|-------|--------|--------|
+| **Governed data (7)** | `ddc-master_patient_catalog`, `ddc-master_patient_dictionary`, `ddc-data_source_availability`, `ddc-hl7_adt_catalog`, `ddc-ccda_catalog`, `ddc-value_set_member`, `ddc-source_value_crosswalk` | Steward workbook → `import_steward_workbook_to_parquet.py`; joined on `semantic_id` |
+| **Field guide (2)** | `ddc-application_guide`, `ddc-application_guide_gaps` | **Not** from steward import; `generate_pbip_model_guide.py` from manifest + curation checks |
+
+The two guide tables exist so **Guide · Field guide** can use slicers and tables instead of hard-coded text. They document the report and flag missing steward fields; they are not part of the catalog spine. Full rationale: **`docs/faq.md`** → *Why does the PBIP semantic model have nine tables?*
+
+**Pages are task lenses, not catalog-vs-dictionary tabs.** The catalog/dictionary split is per column and per source table; pages mix both by design.
 
 After steward Excel edits: `python scripts/import_steward_workbook_to_parquet.py` → **Refresh** in Power BI.
 
@@ -91,7 +99,7 @@ python scripts/package_pbi_demo.py
 
 Writes `workbooks/chi-ddc-demo-YYYY-MM-DD.zip` containing:
 
-- 7 `ddc-*.parquet` files (rewritten to Parquet 1.0 for Desktop compatibility)
+- 9 `ddc-*.parquet` files (7 governed data + 2 field guide; rewritten to Parquet 1.0 for Desktop compatibility)
 - `workbooks/chi-steward-workbook.xlsx` and `workbooks/chi-partner-intake-workbook.xlsx`
 - `workbooks/pbip/` (report + semantic model; excludes local `.pbi` cache)
 
@@ -103,7 +111,7 @@ Writes `workbooks/chi-ddc-demo-YYYY-MM-DD.zip` containing:
 4. **Home → Refresh**.
 5. **View → Zoom → 100%**.
 
-If you cannot use `C:\AI\chi-data-dictionary-catalog`: **Transform data → Data source settings** → point all seven parquet queries at the folder where you placed `ddc-*.parquet`.
+If you cannot use `C:\AI\chi-data-dictionary-catalog`: **Transform data → Data source settings** → point all nine parquet queries at the folder where you placed `ddc-*.parquet`.
 
 ### Optional: single-file `.pbix` (often fails)
 
@@ -124,7 +132,7 @@ If export still fails, use the demo zip or **Publish** to a Power BI workspace a
 
 Before PBIP, stewards could build a one-off `.pbix` by connecting to parquet manually. That path is **deprecated**:
 
-- Use **`workbooks/pbip/chi-data-dictionary-catalog.pbip`** (four pages, full semantic model).
+- Use **`workbooks/pbip/chi-data-dictionary-catalog.pbip`** (seven tabs, nine-table semantic model).
 - Do not commit `workbooks/*.pbix` (gitignored).
 - Regenerate layout with `enhance_pbip_report.py` / `patch_pbip_readability.py` instead of hand-building visuals.
 

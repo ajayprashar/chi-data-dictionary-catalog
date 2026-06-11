@@ -28,10 +28,12 @@ Terminology / crosswalk → WHICH codes; local → standard
 
 | Page | What it is for | Tables used (often mixed on one page) |
 |------|----------------|----------------------------------------|
-| **Start here** | Orientation | None (static text) |
-| **Field guide** | In-report documentation | `ddc-application_guide` - filter by page and visual; column layer and interop role |
+| **Guide · Start here** | Orientation | None (static text) |
+| **Guide · Demo tour** | 5-minute walkthrough (demo landing) | None (static text) |
+| **Guide · National standards** | External standards lookup | None (static text) |
 | **Standards & Contexts** | Standards + interoperability for one concept | Slicer: catalog. Tables: dictionary (FHIR), value sets, crosswalk, ADT catalog, CCDA catalog |
 | **Concept Profile** | Full stewarded profile for one concept | Catalog (governance), dictionary (FHIR + **survivorship**), source availability |
+| **Guide · Field guide** | In-report documentation | `ddc-application_guide`, `ddc-application_guide_gaps` |
 | **Governance Overview** | Portfolio KPIs | Mostly catalog |
 
 A single page can show **catalog columns and dictionary columns side by side**. The split is **per column / per source table**, not per tab.
@@ -97,9 +99,53 @@ Stable spine joining catalog, dictionary, terminology, crosswalk, ADT/CCDA, and 
 
 ---
 
+## Why does the PBIP semantic model have nine tables?
+
+The model has **seven governed data tables** (from steward Excel → import) plus **two guide tables** (generated for the Field guide tab). They serve different purposes.
+
+### Seven data tables (governed catalog spine)
+
+Published by `python scripts/import_steward_workbook_to_parquet.py`. Joined on **`semantic_id`** for concept drill-down.
+
+| Table | Source | Role |
+|-------|--------|------|
+| `ddc-master_patient_catalog` | Steward workbook **Catalog** | WHAT CHI governs |
+| `ddc-master_patient_dictionary` | Steward workbook **Dictionary** | HOW it is implemented (FHIR, survivorship) |
+| `ddc-data_source_availability` | Steward workbook **Source_Availability** | Where source data exists |
+| `ddc-hl7_adt_catalog` | Steward workbook **ADT_Mappings** | HL7 v2 ADT placement |
+| `ddc-ccda_catalog` | Steward workbook **CCDA_Mappings** | C-CDA placement |
+| `ddc-value_set_member` | Steward workbook **Value_Set_Members** | Governed codes |
+| `ddc-source_value_crosswalk` | Steward workbook **Source_Value_Crosswalk** | Local source strings → standards |
+
+### Two guide tables (in-report documentation)
+
+**Not** from the steward workbook. Regenerated from repo metadata and live parquet checks.
+
+| Table | Source | Role |
+|-------|--------|------|
+| `ddc-application_guide` | `data/pbip_report_manifest.py` via `scripts/generate_pbip_model_guide.py` | Column dictionary: purpose, Excel sheet, steward action, interoperability role |
+| `ddc-application_guide_gaps` | `data/pilot_curation_checks.py` via same script | Missing Concept Profile fields per `semantic_id` (pilots + backlog) |
+
+**Why add them to the model?** Power BI needs queryable tables for the **Guide · Field guide** slicers and tables. Keeping the guide as data (not hard-coded text in visuals) means:
+
+- Layout or column changes update from `pbip_report_manifest.py` after validation.
+- Curation gaps refresh from catalog/dictionary parquet after each steward publish.
+- Stewards see **what each column means** and **what is still empty** without leaving the report.
+
+Guide tables are **not** joined to the `semantic_id` spine; they document the report itself.
+
+```text
+Steward Excel  →  import  →  7 ddc-* data parquets  →  Concept Profile / Standards & Contexts / …
+Repo manifest  →  generate  →  2 ddc-application_* parquets  →  Guide · Field guide only
+```
+
+See also: `docs/operational-runbook.md` (publish checklist), `docs/power-bi-concept-profile-setup.md` (regen commands).
+
+---
+
 ## Where is the in-report field guide?
 
-Open the **Field guide** tab in Power BI. Use slicers to pick a report page, table/visual, and whether the column is **editable in Excel**. **Summary cards** show page purpose, interoperability summary, and primary audience. The detail table links each column to **steward_action** (workbook sheet → import → Refresh) and **review_on_page** (usually Concept Profile). The **curation gaps** table lists missing Concept Profile fields for demographics pilots and non-Approved concepts (from live parquet).
+Open the **Guide · Field guide** tab in Power BI. Use slicers to pick a report page, table/visual, and whether the column is **editable in Excel**. **Summary cards** show page purpose, interoperability summary, and primary audience. The detail table links each column to **steward_action** (workbook sheet → import → Refresh) and **review_on_page** (usually Concept Profile). The **curation gaps** table lists missing Concept Profile fields for demographics pilots and non-Approved concepts (from live parquet).
 
 Regenerate after layout or steward publish:
 

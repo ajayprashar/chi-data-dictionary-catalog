@@ -106,7 +106,7 @@ Power Query preview crash (0x80131623 on ddc-ccda_catalog, etc.):
 
 If you cannot use C:\\AI\\chi-data-dictionary-catalog on the demo PC:
   Transform data -> Data source settings -> change the folder for all
-  seven parquet queries to wherever you extracted the ddc-*.parquet files.
+  nine parquet queries to wherever you extracted the ddc-*.parquet files.
 
 A single-file .pbix is not required for this demo. PBIP is the maintained
 report format in git.
