@@ -38,6 +38,20 @@ PILOT_CALLOUT = (
     "Patient.gender_id | Patient.birth_sex"
 )
 
+PILOT_QUICK_REF_TITLE = "Pilot quick reference (ADT + FHIR)"
+
+PILOT_QUICK_REF_LINES = [
+    "Five Approved demographics pilots — open Standards & Contexts, set Show concepts = yes, then pick any row below.",
+    "",
+    "Patient.race — ADT field_id PID-10 | hl7_ce_encoding PID-10.1^PID-10.2 | US Core race extension",
+    "Patient.ethnicity — ADT PID-22 | hl7_ce_encoding PID-22.1^PID-22.2 | US Core ethnicity extension",
+    "Patient.language — ADT PID-15 | hl7_ce_encoding blank (single component, not a CE pair)",
+    "Patient.birth_sex — ADT PID-8 | US Core birthSex extension",
+    "Patient.gender_id — FHIR Observation LOINC 76691-5 | ADT row not yet in catalog",
+    "",
+    "hl7_ce_encoding appears only when both code and text components are mapped (race, ethnicity).",
+]
+
 
 def render_demo_walkthrough_txt() -> str:
     sections = [
@@ -58,7 +72,9 @@ def render_demo_walkthrough_txt() -> str:
         "-" * 4,
         *TIPS_LINES,
         "",
-        PILOT_CALLOUT,
+        PILOT_QUICK_REF_TITLE,
+        "-" * len(PILOT_QUICK_REF_TITLE),
+        *PILOT_QUICK_REF_LINES,
         "",
         "Open: workbooks\\pbip\\chi-data-dictionary-catalog.pbip",
         "Or double-click OPEN-DEMO.bat in the extracted folder.",

@@ -14,7 +14,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from add_pbip_start_here_page import (  # noqa: E402
     START_HERE_PAGE_ID,
-    callout_banner,
     section_panel,
 )
 from enhance_pbip_report import (  # noqa: E402
@@ -38,7 +37,8 @@ from pbip_demo_walkthrough_content import (  # noqa: E402
     PAGE_SUBTITLE,
     PAGE_TITLE,
     PERSONA_LINES,
-    PILOT_CALLOUT,
+    PILOT_QUICK_REF_LINES,
+    PILOT_QUICK_REF_TITLE,
     STEPS_LINES,
     TIPS_LINES,
 )
@@ -54,11 +54,13 @@ def build_demo_page(page_dir: Path) -> None:
     content_w = w - (margin * 2)
     header_h = 128
     row1_y = header_h + 12
-    panel_h = 300
-    callout_y = row1_y + panel_h + 12
-    callout_h = 48
-    row2_y = callout_y + callout_h + 12
-    row3_y = row2_y + 200
+    steps_h = 268
+    quick_ref_y = row1_y + steps_h + 12
+    quick_ref_h = 228
+    row2_y = quick_ref_y + quick_ref_h + 12
+    row2_h = 168
+    row3_y = row2_y + row2_h + 12
+    about_h = 80
     footer_h = 52
 
     visuals = [
@@ -73,20 +75,29 @@ def build_demo_page(page_dir: Path) -> None:
             PAGE_SUBTITLE,
             size="13pt", color=TEXT_WHITE, transparent=True,
         ),
-        section_panel(margin, row1_y, content_w, panel_h, 3, "Follow these steps", STEPS_LINES, body_size="12pt"),
-        callout_banner(margin, callout_y, content_w, callout_h, 4, PILOT_CALLOUT),
-        section_panel(margin, row2_y, (content_w - 16) // 2, 184, 5, "Who uses which tab", PERSONA_LINES),
+        section_panel(margin, row1_y, content_w, steps_h, 3, "Follow these steps", STEPS_LINES, body_size="12pt"),
+        section_panel(
+            margin,
+            quick_ref_y,
+            content_w,
+            quick_ref_h,
+            4,
+            PILOT_QUICK_REF_TITLE,
+            PILOT_QUICK_REF_LINES,
+            body_size="11pt",
+        ),
+        section_panel(margin, row2_y, (content_w - 16) // 2, row2_h, 5, "Who uses which tab", PERSONA_LINES),
         section_panel(
             margin + (content_w - 16) // 2 + 16,
             row2_y,
             (content_w - 16) // 2,
-            184,
+            row2_h,
             6,
             "Tips",
             TIPS_LINES,
             body_size="11pt",
         ),
-        section_panel(margin, row3_y, content_w, 88, 7, "About this report", INTRO_LINES, body_size="11pt"),
+        section_panel(margin, row3_y, content_w, about_h, 7, "About this report", INTRO_LINES, body_size="11pt"),
         shape_rect(vid(), 0, h - footer_h, w, footer_h, 8, PRIMARY_YELLOW),
         textbox(
             vid(), margin, h - footer_h + 10, content_w, 36, 9,
