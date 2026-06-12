@@ -1,0 +1,321 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
+  "name": "658f21374f9824e5886e",
+  "position": {
+    "x": 32,
+    "y": 368,
+    "z": 4,
+    "height": 300,
+    "width": 1856,
+    "tabOrder": 4
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Five Approved demographics pilots - ",
+                    "textStyle": {
+                      "fontSize": "13pt",
+                      "color": "#000000",
+                      "fontFace": "Segoe UI Semibold",
+                      "fontWeight": "bold"
+                    }
+                  },
+                  {
+                    "value": "open Standards & Contexts, set Demographics pilot only = yes, then pick any row below.",
+                    "textStyle": {
+                      "fontSize": "13pt",
+                      "color": "#000000",
+                      "fontFace": "Segoe UI"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "",
+                    "textStyle": {
+                      "fontSize": "6pt",
+                      "color": "#000000",
+                      "fontFace": "Segoe UI"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "Patient.race - ",
+                    "textStyle": {
+                      "fontSize": "13pt",
+                      "color": "#000000",
+                      "fontFace": "Segoe UI Semibold",
+                      "fontWeight": "bold"
+                    }
+                  },
+                  {
+                    "value": "ADT field_id PID-10 | hl7_ce_encoding PID-10.1^PID-10.2 | US Core race extension",
+                    "textStyle": {
+                      "fontSize": "13pt",
+                      "color": "#000000",
+                      "fontFace": "Segoe UI"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "Patient.ethnicity - ",
+                    "textStyle": {
+                      "fontSize": "13pt",
+                      "color": "#000000",
+                      "fontFace": "Segoe UI Semibold",
+                      "fontWeight": "bold"
+                    }
+                  },
+                  {
+                    "value": "ADT PID-22 | hl7_ce_encoding PID-22.1^PID-22.2 | US Core ethnicity extension",
+                    "textStyle": {
+                      "fontSize": "13pt",
+                      "color": "#000000",
+                      "fontFace": "Segoe UI"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "Patient.language - ",
+                    "textStyle": {
+                      "fontSize": "13pt",
+                      "color": "#000000",
+                      "fontFace": "Segoe UI Semibold",
+                      "fontWeight": "bold"
+                    }
+                  },
+                  {
+                    "value": "ADT PID-15 | hl7_ce_encoding blank (single component, not a CE pair)",
+                    "textStyle": {
+                      "fontSize": "13pt",
+                      "color": "#000000",
+                      "fontFace": "Segoe UI"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "Patient.birth_sex - ",
+                    "textStyle": {
+                      "fontSize": "13pt",
+                      "color": "#000000",
+                      "fontFace": "Segoe UI Semibold",
+                      "fontWeight": "bold"
+                    }
+                  },
+                  {
+                    "value": "ADT PID-8 | US Core birthSex extension",
+                    "textStyle": {
+                      "fontSize": "13pt",
+                      "color": "#000000",
+                      "fontFace": "Segoe UI"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "Patient.gender_id - ",
+                    "textStyle": {
+                      "fontSize": "13pt",
+                      "color": "#000000",
+                      "fontFace": "Segoe UI Semibold",
+                      "fontWeight": "bold"
+                    }
+                  },
+                  {
+                    "value": "FHIR R4 Observation LOINC 76691-5 | ADT row not yet in catalog",
+                    "textStyle": {
+                      "fontSize": "13pt",
+                      "color": "#000000",
+                      "fontFace": "Segoe UI"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "",
+                    "textStyle": {
+                      "fontSize": "6pt",
+                      "color": "#000000",
+                      "fontFace": "Segoe UI"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "hl7_ce_encoding appears only when both code and text components are mapped (race, ethnicity).",
+                    "textStyle": {
+                      "fontSize": "13pt",
+                      "color": "#000000",
+                      "fontFace": "Segoe UI"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Pilot quick reference (ADT + FHIR R4)'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "14D"
+                }
+              }
+            },
+            "fontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#FFFFFF'"
+                    }
+                  }
+                }
+              }
+            },
+            "background": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#0047AB'"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#FFF9E6'"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#0047AB'"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "padding": [
+        {
+          "properties": {
+            "top": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
+                }
+              }
+            },
+            "bottom": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
+                }
+              }
+            },
+            "left": {
+              "expr": {
+                "Literal": {
+                  "Value": "12D"
+                }
+              }
+            },
+            "right": {
+              "expr": {
+                "Literal": {
+                  "Value": "12D"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

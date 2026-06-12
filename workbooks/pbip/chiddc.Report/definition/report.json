@@ -50,6 +50,17 @@
           "type": "BaseTheme"
         }
       ]
+    },
+    {
+      "name": "RegisteredResources",
+      "type": "RegisteredResources",
+      "items": [
+        {
+          "name": "chiddcsemantic.png",
+          "path": "chiddcsemantic.png",
+          "type": "Image"
+        }
+      ]
     }
   ],
   "settings": {

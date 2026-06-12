@@ -19,6 +19,7 @@ from enhance_pbip_report import (  # noqa: E402
     TEXT_BLACK,
     TEXT_WHITE,
     clear_visuals,
+    page_header_title,
     shape_rect,
     textbox,
     vid,
@@ -28,6 +29,7 @@ from enhance_pbip_report import (  # noqa: E402
 )
 from pbip_layout_constants import (  # noqa: E402
     GUIDE_FOOTER_PT,
+    PAGE_HEADER_H,
     PAGE_STANDARDS_REF_ID,
     TAB_STANDARDS_REF,
 )
@@ -48,7 +50,7 @@ def build_standards_reference_page(page_dir: Path) -> None:
     w, h = PAGE_PROFILE_W, PAGE_PROFILE_H
     margin = 32
     content_w = w - (margin * 2)
-    header_h = 128
+    header_h = PAGE_HEADER_H
     footer_h = 52
     content_bottom = h - footer_h - 12
     row1_y = header_h + 12
@@ -62,17 +64,12 @@ def build_standards_reference_page(page_dir: Path) -> None:
 
     visuals = [
         shape_rect(vid(), 0, 0, w, header_h, 0, PRIMARY_BLUE),
-        textbox(
-            vid(), margin, 20, 1400, 56, 1,
-            PAGE_TITLE,
-            bold=True, size="28pt", color=TEXT_WHITE, transparent=True,
+        page_header_title(vid(), content_w, 1, TAB_STANDARDS_REF),
+        section_panel(
+            margin, row1_y, content_w, layer_h, 2,
+            f"How standards layer together - {PAGE_SUBTITLE.lower()}",
+            LAYER_LINES,
         ),
-        textbox(
-            vid(), margin, 80, 1750, 44, 2,
-            PAGE_SUBTITLE,
-            size="13pt", color=TEXT_WHITE, transparent=True,
-        ),
-        section_panel(margin, row1_y, content_w, layer_h, 3, "How standards layer together", LAYER_LINES),
         section_panel(
             margin, cols_y, col_w, cols_h, 4,
             "Exchange & content standards", EXCHANGE_STANDARDS_LINES,

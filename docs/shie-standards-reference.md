@@ -4,7 +4,7 @@ Governed interoperability and terminology standards used by **SHIE (Community He
 
 **Related:** `docs/demographics-pilot-plan.md` (pilot curation), `docs/sources-of-truth.md` (layered authority), `TECH-SPEC.md` (schemas), `ccd_interface_mapping.md` (CCD paths).
 
-**Notion mirror:** [Authoritative Standards / Sources of Truth](https://app.notion.com/p/33c5d66c407f80e59365d15fbb23d639) — keep this doc and that page aligned.
+**Notion mirror:** [Authoritative Standards / Sources of Truth](https://app.notion.com/p/33c5d66c407f80e59365d15fbb23d639) - keep this doc and that page aligned.
 
 OIDs and canonical URIs belong in the table below where they help implementers. Implementation guides without a single code-system OID use the canonical URL or note that identifiers vary by profile, template, or interface.
 
@@ -36,19 +36,19 @@ Governance **approval** (`approval_status` = Approved) is steward sign-off on me
 | Standard | Governed version | Code system / OID / canonical URI | Base reference | SHIE use |
 |----------|------------------|-----------------------------------|----------------|----------|
 | HL7 v2.x ADT | Current operational versions in scope, including v2.3 where required by SHIE interfaces | Interface profile, HL7 version, message type (ADT in MSH-9) - not a single code-system OID | https://hl7-definition.caristix.com/v2/ | Inbound event-based exchange; ADT field mapping (`ADT_Mappings`) |
-| HL7 CDA / C-CDA | **C-CDA R2.1** (CDA R2) — current IGs in scope for federal/clinical-summary exchange | Template IDs vary by document/section/entry (`templateId`) | https://www.hl7.org/implement/standards/product_brief.cfm?product_id=492 | Clinical summary documents; CCD paths (`CCDA_Mappings`) |
+| HL7 CDA / C-CDA | **C-CDA R2.1** (CDA R2) - current IGs in scope for federal/clinical-summary exchange | Template IDs vary by document/section/entry (`templateId`) | https://www.hl7.org/implement/standards/product_brief.cfm?product_id=492 | Clinical summary documents; CCD paths (`CCDA_Mappings`) |
 | HL7 FHIR | **R4 (4.0.1)** | Canonical base: `http://hl7.org/fhir` | https://hl7.org/fhir/R4/ | Primary structure, cardinality, resource mapping (`fhir_r4_path`) |
 | USCDI | **v3** = ONC certification baseline (2026); **v3.1+** = SVAP / target content | National data-content baseline - not a terminology code system | https://www.healthit.gov/isa/united-states-core-data-interoperability-uscdi | Catalog identity: `uscdi_element`, `uscdi_description` |
 | US Core | FHIR R4-aligned IG set used by SHIE (pin IG version in steward notes when certifying) | `http://hl7.org/fhir/us/core` | https://hl7.org/fhir/us/core/ | `fhir_profile` for Patient demographics extensions and Observations |
-| LOINC | Current release in environment | OID: `urn:oid:2.16.840.1.113883.6.1`; canonical: `http://loinc.org` | https://loinc.org/ | Observation codes — e.g. `76691-5` Gender identity for `Patient.gender_id` |
-| Innovaccer DAP | Enterprise terminology at scale (referenced) | Platform-managed value sets — not duplicated in CHI catalog | (internal DAP reference) | Cited in dictionary notes; local codes map via crosswalk — not national truth |
+| LOINC | Current release in environment | OID: `urn:oid:2.16.840.1.113883.6.1`; canonical: `http://loinc.org` | https://loinc.org/ | Observation codes - e.g. `76691-5` Gender identity for `Patient.gender_id` |
+| Innovaccer DAP | Enterprise terminology at scale (referenced) | Platform-managed value sets - not duplicated in CHI catalog | (internal DAP reference) | Cited in dictionary notes; local codes map via crosswalk - not national truth |
 | CDCREC Race / HL7 Race Value Set | Current HL7 THO version in environment | OID: `urn:oid:2.16.840.1.113883.6.238` | https://terminology.hl7.org/7.1.0/en/ValueSet-v3-Race.html | `Patient.race` - FHIR `ombCategory` + `detailed` |
 | CDCREC Ethnicity / HL7 Ethnicity Value Set | Current HL7 THO version in environment | OID: `urn:oid:2.16.840.1.113883.6.238` | https://terminology.hl7.org/7.1.0/en/ValueSet-v3-Ethnicity.html | `Patient.ethnicity` - FHIR ethnicity extension |
 | HL7 v3 NullFlavor | Current HL7 THO version in environment | OID: `urn:oid:2.16.840.1.113883.5.1008`; http://terminology.hl7.org/CodeSystem/v3-NullFlavor | https://terminology.hl7.org/CodeSystem-v3-NullFlavor.html | Unknown, asked-declined, not asked, no information - do not collapse for reporting |
 | SNOMED CT | Current release in environment | http://snomed.info/sct; OID: `urn:oid:2.16.840.1.113883.6.96` | https://www.snomed.org/ | Coded clinical concepts; gender identity where applicable |
 | HL7 v3 MaritalStatus | Current published reference | http://terminology.hl7.org/CodeSystem/v3-MaritalStatus; OID: `urn:oid:2.16.840.1.113883.5.2` | https://terminology.hl7.org/CodeSystem-v3-MaritalStatus.html | Marital status terminology (not in 5-attribute pilot) |
-| BCP 47 Language Tags | Current convention for FHIR bindings | `urn:ietf:bcp:47` | https://www.rfc-editor.org/rfc/rfc5646 | **Primary** FHIR binding for `Patient.language` |
-| ISO 639 language references | Stewardship / crosswalk only | ISO 639 code lists | https://www.loc.gov/standards/iso639-2/php/code_list.php | Local legacy lists and reporting - not primary FHIR exchange binding |
+| BCP 47 Language Tags | Current convention for FHIR bindings | `urn:ietf:bcp:47` | https://www.rfc-editor.org/rfc/rfc5646 | **Primary** FHIR binding for `Patient.language` (RFC 5646 tags; language subtag often from ISO 639) |
+| ISO 639 language references | Stewardship / crosswalk only | ISO 639 code lists | https://www.loc.gov/standards/iso639-2/php/code_list.php | Legacy intake and county labels map **into** BCP 47 for exchange - not the FHIR binding OID |
 | FHIR Provenance | R4 | http://hl7.org/fhir/StructureDefinition/Provenance | https://hl7.org/fhir/provenance.html | Optional: source attribution for conflicting demographics |
 | FIPS County Codes | FIPS 6-4 | ANSI / FIPS county lists | https://www.census.gov/library/reference/code-lists/ansi.html | County ID in address / SDOH (not pilot) |
 | FIPS State / ANSI State | FIPS 5-2 / INCITS 38:2009 | ANSI / FIPS state lists | https://www.census.gov/library/reference/code-lists/ansi.html | `Patient.address.state`; postal vs numeric FIPS |

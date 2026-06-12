@@ -1,0 +1,38 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
+  "name": "a882300256cb084ace85",
+  "position": {
+    "x": 32,
+    "y": 208,
+    "z": 6,
+    "height": 40,
+    "width": 1856,
+    "tabOrder": 6
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Publish ritual: chi-steward-workbook.xlsx \u2192 save \u2192 python scripts/import_steward_workbook_to_parquet.py \u2192 Refresh PBIP | Concept Profile: pick semantic_id slicer after publish | docs/excel-workbook-guide.md",
+                    "textStyle": {
+                      "fontSize": "13pt",
+                      "color": "#000000",
+                      "fontFace": "Segoe UI"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

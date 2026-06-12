@@ -1,6 +1,6 @@
 # FAQ - Catalog, dictionary, and Power BI
 
-Short answers for stewards, reviewers, and demo audiences. Deep detail: `docs/product-vision.md`, `docs/sources-of-truth.md`, `docs/demographics-pilot-plan.md`.
+Short answers for stewards, reviewers, and program staff. Deep detail: `docs/product-vision.md`, `docs/sources-of-truth.md`, `docs/demographics-pilot-plan.md`.
 
 ---
 
@@ -24,18 +24,18 @@ Terminology / crosswalk → WHICH codes; local → standard
 
 ## Is a "Concept" the same as an "Element"?
 
-**Usually yes** — in this project, both words mean **one governed piece of patient information**, identified by a single `semantic_id`.
+**Usually yes** - in this project, both words mean **one governed piece of patient information**, identified by a single `semantic_id`.
 
 | Term | Typical use here | Example |
 |------|------------------|---------|
-| **Concept** | Steward and demo language; Power BI **Concept Profile** | "Review the **concept** `Patient.race`" |
+| **Concept** | Steward and report language; Power BI **Concept Profile** | "Review the **concept** `Patient.race`" |
 | **Element** | Catalog/dictionary and USCDI-aligned language | "The catalog lists one **element** per `semantic_id`" |
 | **`semantic_id`** | Stable ID both terms point to | `Patient.name_first` |
 
 **Definitions**
 
-- **Concept** — A patient attribute CHI officially governs (name, race, address, etc.). One concept = one row in the catalog and one row in the dictionary, joined by `semantic_id`.
-- **Element** — The same governed attribute when described as a **catalog row** or a **field on a standards checklist**. "Data element" in the PRD and "governed concept" in the vision statement refer to the same grain.
+- **Concept** - A patient attribute CHI officially governs (name, race, address, etc.). One concept = one row in the catalog and one row in the dictionary, joined by `semantic_id`.
+- **Element** - The same governed attribute when described as a **catalog row** or a **field on a standards checklist**. "Data element" in the PRD and "governed concept" in the vision statement refer to the same grain.
 
 They are **not** interchangeable when **USCDI** uses "Element" for its own labels (see below).
 
@@ -45,8 +45,8 @@ Imagine a **school registration form** online:
 
 | Blank on the form | What it is in CHI terms |
 |-------------------|-------------------------|
-| **First name** | One **concept** and one **element** — CHI ID: `Patient.name_first` |
-| **Last name** | A different **concept** / **element** — CHI ID: `Patient.name_last` |
+| **First name** | One **concept** and one **element** - CHI ID: `Patient.name_first` |
+| **Last name** | A different **concept** / **element** - CHI ID: `Patient.name_last` |
 
 Both blanks are about "name," but CHI tracks them as **two separate concepts** (two `semantic_id`s), not one.
 
@@ -69,6 +69,38 @@ See also `TECH-SPEC.md` §2.2.1 (table naming) and §3.1 (catalog grain).
 
 ---
 
+## Governed value set codes vs Source value crosswalk?
+
+On **Standards & Contexts**, both tables filter to the same `semantic_id` (e.g. Patient.race). They answer different questions:
+
+| Table | Question | Excel sheet |
+|-------|----------|-------------|
+| **Governed value set codes** (left) | *Which standard codes does CHI allow for this concept?* | `Value_Set_Members` |
+| **Source value crosswalk** (right) | *When a partner sends this local value, which governed code do we use?* | `Source_Value_Crosswalk` |
+
+**Example:** The left table lists `2054-5` Black or African American as an approved CDCREC code. The right table might map a county source display **African American** → target code **`2054-5`**.
+
+Crosswalk `target_code` values should align with codes in the governed list. Survivorship rules live on **Concept Profile**, not on this tab.
+
+Detail: `docs/crosswalk-model.md`.
+
+---
+
+## When to use Standards & Contexts vs Concept Profile?
+
+Both pages filter to one `semantic_id`. Pick the tab by question:
+
+| Question | Tab | What you see |
+|----------|-----|----------------|
+| Which **standard codes** does CHI allow? How do **partner values** map to them? | **Standards & Contexts** | Governed value set codes (left), source crosswalk (right), FHIR path/profile, ADT field_id, C-CDA XML path |
+| Who **approved** this concept? What is the **survivorship** rule? Which **sources** can supply it? | **Concept Profile** | USCDI governance, dictionary (including `chi_survivorship_logic`), source availability |
+
+**Rule of thumb:** codes and message placement → **Standards & Contexts**; steward approval and survivorship → **Concept Profile**.
+
+For column-level detail and Excel edit paths, use **Guide · Field guide**.
+
+---
+
 ## Do Power BI tabs map to Catalog vs Dictionary tables?
 
 **No.** PBIP pages are **task lenses** on the same `semantic_id` spine, not one tab per parquet table.
@@ -76,7 +108,7 @@ See also `TECH-SPEC.md` §2.2.1 (table naming) and §3.1 (catalog grain).
 | Page | What it is for | Tables used (often mixed on one page) |
 |------|----------------|----------------------------------------|
 | **Guide · Start here** | Orientation | None (static text) |
-| **Guide · Demo tour** | 5-minute walkthrough (demo landing) | None (static text) |
+| **Guide · Walkthrough** | 5-minute guided tour | None (static text) |
 | **Guide · National standards** | External standards lookup | None (static text) |
 | **Standards & Contexts** | Standards + interoperability for one concept | Slicer: catalog. Tables: dictionary (FHIR), value sets, crosswalk, ADT catalog, CCDA catalog |
 | **Concept Profile** | Full stewarded profile for one concept | Catalog (governance), dictionary (FHIR + **survivorship**), source availability |
@@ -107,7 +139,7 @@ Only the first pair (master catalog + dictionary) is the core **catalog vs dicti
 |--------|--------|
 | **Author** governance, FHIR, survivorship | `workbooks/chi-steward-workbook.xlsx` (Catalog, Dictionary, Source_Availability, ADT/CCDA sheets) |
 | **Publish** machine copy | `python scripts/import_steward_workbook_to_parquet.py` |
-| **Read / demo** | `workbooks/pbip/chiddc.pbip` → **Refresh** |
+| **Read / review** | `workbooks/pbip/chiddc.pbip` → **Refresh** |
 
 Excel is source of human edits. Power BI is read-only after publish. Do not expect PBIP tabs to mirror Excel sheet names 1:1.
 
@@ -130,13 +162,13 @@ After import + Refresh (see `docs/demographics-pilot-plan.md` for pilot detail):
 
 ---
 
-## Does the catalog/dictionary split matter for demos?
+## Does the catalog/dictionary split matter for new users?
 
 | Audience | What matters |
 |----------|----------------|
 | **Stewards** | **Yes** - put fields in the right Excel sheet; wrong sheet breaks governance intent. |
 | **Reviewers** | **Yes** - approval and survivorship live in different tables by design. |
-| **Demo viewers** | **Light touch** - explain WHAT / HOW / WHERE layers; they do not need to memorize which tab maps to which table. |
+| **New reviewers** | **Light touch** - explain WHAT / HOW / WHERE layers; they do not need to memorize which tab maps to which table. |
 
 ---
 

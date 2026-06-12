@@ -26,6 +26,8 @@ from enhance_pbip_report import (  # noqa: E402
     lit_bool,
     lit_pt,
     lit_str,
+    page_header_title,
+    registered_image,
     shape_rect,
     text_run_style,
     textbox,
@@ -35,11 +37,16 @@ from enhance_pbip_report import (  # noqa: E402
     write_text_utf8_no_bom,
     write_visual,
 )
-from pbip_layout_constants import GUIDE_BODY_PT, GUIDE_FOOTER_PT, TAB_START_HERE  # noqa: E402
+from pbip_layout_constants import (  # noqa: E402
+    GUIDE_BODY_PT,
+    GUIDE_FOOTER_PT,
+    PAGE_HEADER_H,
+    TAB_START_HERE,
+)
+from pbip_paths import SEMANTIC_DIAGRAM_FILE  # noqa: E402
 from pbip_start_here_content import (  # noqa: E402
+    DIAGRAM_CAPTION,
     HOW_TO_USE_LINES,
-    PAGE_SUBTITLE,
-    PAGE_TITLE,
     PILOT_CALLOUT,
     PURPOSE_LINES,
     SOURCES_LINES,
@@ -82,7 +89,7 @@ def section_panel(
     *,
     body_size: str = GUIDE_BODY_PT,
 ) -> dict:
-    """Card-style panel: blue title band + cream body (matches table visuals)."""
+    """Card-style panel: blue title band + white body (matches table visuals)."""
     return visual_container(
         vid(), x, y, w, h, z,
         {
@@ -156,35 +163,36 @@ def build_start_here_page(page_dir: Path) -> None:
     w, h = PAGE_PROFILE_W, PAGE_PROFILE_H
     margin = 32
     content_w = w - (margin * 2)
-    header_h = 128
+    header_h = PAGE_HEADER_H
     col_w = (content_w - 16) // 2
     row1_y = header_h + 12
-    panel_h = 360
+    panel_h = 170
     callout_y = row1_y + panel_h + 12
     callout_h = 48
-    row2_y = callout_y + callout_h + 12
-    how_to_h = 300  # 9+ body lines + title band; short panels caused stacked text in PBI
+    diagram_y = callout_y + callout_h + 12
+    diagram_h = 400
+    caption_y = diagram_y + diagram_h + 6
+    caption_h = 28
+    row2_y = caption_y + caption_h + 8
     footer_h = 52
+    how_to_h = h - footer_h - row2_y - 8
 
     visuals = [
         shape_rect(vid(), 0, 0, w, header_h, 0, PRIMARY_BLUE),
-        textbox(
-            vid(), margin, 20, 1200, 56, 1,
-            PAGE_TITLE,
-            bold=True, size="28pt", color=TEXT_WHITE, transparent=True,
-        ),
-        textbox(
-            vid(), margin, 80, 1750, 44, 2,
-            PAGE_SUBTITLE,
-            size="13pt", color=TEXT_WHITE, transparent=True,
-        ),
+        page_header_title(vid(), content_w, 1, TAB_START_HERE),
         section_panel(margin, row1_y, col_w, panel_h, 3, "Purpose", PURPOSE_LINES),
         section_panel(margin + col_w + 16, row1_y, col_w, panel_h, 4, "Sources of truth", SOURCES_LINES),
         callout_banner(margin, callout_y, content_w, callout_h, 5, PILOT_CALLOUT),
-        section_panel(margin, row2_y, content_w, how_to_h, 6, "How to use this report", HOW_TO_USE_LINES),
-        shape_rect(vid(), 0, h - footer_h, w, footer_h, 8, PRIMARY_YELLOW),
+        registered_image(vid(), margin, diagram_y, content_w, diagram_h, 6, SEMANTIC_DIAGRAM_FILE),
         textbox(
-            vid(), margin, h - footer_h + 10, content_w, 36, 9,
+            vid(), margin, caption_y, content_w, caption_h, 7,
+            DIAGRAM_CAPTION,
+            size=GUIDE_BODY_PT, color=TEXT_BLACK, transparent=True,
+        ),
+        section_panel(margin, row2_y, content_w, how_to_h, 8, "How to use this report", HOW_TO_USE_LINES),
+        shape_rect(vid(), 0, h - footer_h, w, footer_h, 9, PRIMARY_YELLOW),
+        textbox(
+            vid(), margin, h - footer_h + 10, content_w, 36, 10,
             "Read-only | docs/product-vision.md | docs/sources-of-truth.md | docs/shie-standards-reference.md",
             size=GUIDE_FOOTER_PT, color=TEXT_BLACK, transparent=True,
         ),
@@ -194,6 +202,10 @@ def build_start_here_page(page_dir: Path) -> None:
 
 
 def main() -> None:
+    from enhance_pbip_report import sync_semantic_diagram_asset, update_report_json  # noqa: E402
+
+    sync_semantic_diagram_asset()
+    update_report_json()
     page_dir = REPORT / "pages" / START_HERE_PAGE_ID
     page_dir.mkdir(parents=True, exist_ok=True)
     write_page_json(
@@ -210,7 +222,7 @@ def main() -> None:
     sync_pages_json()
     sync_page_tab_styles()
     print(f"Wrote PBIP page: {START_HERE_DISPLAY_NAME} ({START_HERE_PAGE_ID})")
-    print("  Landing page unchanged (use add_pbip_demo_page.py to set Demo tab landing).")
+    print("  Landing page unchanged (default: Guide · Start here).")
     from pbip_paths import PBIP_FILE  # noqa: E402
 
     print(f"  Re-open {PBIP_FILE} in Power BI Desktop.")

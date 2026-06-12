@@ -1,0 +1,73 @@
+---
+config:
+  theme: mc
+  layout: elk
+---
+flowchart LR
+    SID["semantic_id<br/>(spine of relationship)"]
+
+    subgraph nat ["National — CHI cites (does not own)"]
+      direction TB
+      NATREF["Authority lookup<br/><i>Guide · National standards</i>"]
+      USCDI["USCDI<br/><i>Concept Profile (catalog)</i>"]
+      USCORE["US Core on FHIR R4<br/><i>Standards & Contexts</i>"]
+      FHIR["FHIR R4 structure<br/><i>Standards & Contexts</i>"]
+      TERM["Terminology sets<br/>CDCREC, BCP 47, LOINC, SNOMED<br/><i>Standards & Contexts</i>"]
+      MSG["Message standards<br/>HL7 v2 ADT, C-CDA R2.1<br/><i>Standards & Contexts</i>"]
+    end
+
+    subgraph chi ["CHI curates — governs semantic_id"]
+      direction TB
+      WHAT["WHAT — Catalog<br/><i>Concept Profile</i>"]
+      HOW["HOW — Dictionary + survivorship<br/><i>Concept Profile</i><br/><small>FHIR path also on Standards & Contexts</small>"]
+      WHICH["WHICH — Governed codes<br/><i>Standards & Contexts</i>"]
+      WHERE["WHERE — ADT + CCDA placement<br/><i>Standards & Contexts</i>"]
+      GOV["Governance — steward, approval_status<br/><i>Concept Profile + Governance Overview</i>"]
+      SURV["Survivorship — chi_survivorship_logic<br/><i>Concept Profile</i>"]
+    end
+
+    subgraph local ["Local / Enterprise — input or runtime"]
+      direction TB
+      PARTNER["Partner strings — intake / CMT<br/><i>Local data</i>"]
+      COUNTY["County survivorship SQL<br/><i>Local logic</i>"]
+      XW["Source value crosswalk<br/><i>Mapping</i>"]
+      DAP["Innovaccer DAP<br/>ICD-10-CM, RxNorm<br/><i>Runtime reference</i>"]
+    end
+
+    USCDI --> WHAT
+    USCORE --> HOW
+    FHIR --> HOW
+    TERM --> WHICH
+    MSG --> WHERE
+    NATREF -.-> USCDI
+    NATREF -.-> USCORE
+    NATREF -.-> TERM
+
+    SID --> WHAT
+    SID --> HOW
+    SID --> WHICH
+    SID --> WHERE
+    WHAT --> SID
+    HOW --> SID
+    WHICH --> SID
+    WHERE --> SID
+
+    GOV --> WHAT
+    GOV --> HOW
+    GOV --> WHICH
+    SURV --> HOW
+
+    PARTNER --> XW
+    COUNTY --> XW
+    XW -->|"target_code"| WHICH
+    DAP -.->|"clinical concepts (reference only)"| WHICH
+
+    classDef natClass fill:#eef2ff,stroke:#818cf8,color:#000000
+    classDef chiClass fill:#fdf4ff,stroke:#e879f9,color:#000000
+    classDef localClass fill:#f0fdf4,stroke:#4ade80,color:#000000
+    classDef hub fill:#fefce8,stroke:#facc15,color:#000000,font-weight:bold
+
+    class nat natClass
+    class chi chiClass
+    class local localClass
+    class SID hub

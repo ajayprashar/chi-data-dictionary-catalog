@@ -12,29 +12,59 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "data"))
 from pbip_layout_constants import (  # noqa: E402
-    ADT_CALLOUT_TEXT,
     ADT_CONTEXT_COLUMNS,
+    ADT_CONTEXT_SUBTITLE,
     ADT_CONTEXT_TITLE,
-    CONCEPT_BLANK_CALLOUT,
+    CCDA_STANDARDS_COLUMNS,
+    CCDA_SUBTITLE,
+    CCDA_TITLE,
+    CONCEPT_DICT_SUBTITLE,
+    CONCEPT_DICT_TITLE,
+    CONCEPT_GOV_SUBTITLE,
+    CONCEPT_GOV_TITLE,
+    CONCEPT_PROFILE_CALLOUT,
+    CONCEPT_PROFILE_HEADER,
+    CONCEPT_SOURCE_SUBTITLE,
+    CONCEPT_SOURCE_TITLE,
     CONCEPT_CARD_GAP,
     CONCEPT_FOOTER_H,
     CONTENT_W,
     concept_profile_layout,
     DEFAULT_LANDING_PAGE_ID,
     DEMO_PAGE_ID,
-    DEMO_LANDING_PAGE_ID,
+    WALKTHROUGH_PAGE_ID,
+    WALKTHROUGH_PAGE_ID,
     FHIR_STANDARDS_COLUMNS,
+    FHIR_STANDARDS_SUBTITLE,
     FHIR_STANDARDS_TABLE_H,
+    FHIR_STANDARDS_TITLE,
+    GOVERNANCE_PORTFOLIO_CALLOUT,
+    GOVERNANCE_PORTFOLIO_CALLOUT_H,
+    GOVERNANCE_TABLE_SUBTITLE,
+    GOVERNANCE_HEADER,
+    GOVERNANCE_TABLE_TITLE,
+    PAGE_HEADER_H,
+    PAGE_HEADER_TITLE_H,
+    PAGE_HEADER_TITLE_SIZE,
+    PAGE_HEADER_TITLE_Y,
     PAGE_MARGIN,
+    PILOT_SLICER_SUBTITLE,
     PILOT_SLICER_TITLE,
     SLICER_H_PROFILE,
+    SLICER_SUBTITLE,
     SLICER_H_STANDARDS,
     SLICER_TITLE,
     SLICER_W,
     STANDARDS_PAGE_H,
     STANDARDS_HEADER_H,
+    GOVERNED_CODES_COLUMNS,
+    GOVERNED_CODES_SUBTITLE,
+    GOVERNED_CODES_TITLE,
+    SOURCE_XW_SUBTITLE,
+    SOURCE_XW_TITLE,
     STANDARDS_LAYER_H,
-    STANDARDS_ADT_CALLOUT_H,
+    STANDARDS_LAYER_TEXT,
+    STANDARDS_PAGE_HEADER,
     STANDARDS_TABLE_GAP,
     standards_page_y_positions,
     PAGE_CONCEPT_PROFILE_ID,
@@ -45,6 +75,7 @@ from pbip_layout_constants import (  # noqa: E402
     PAGE_START_HERE_ID,
     STANDARDS_PAGE_ID,
     TAB_CONCEPT_PROFILE,
+    TAB_WALKTHROUGH,
     TAB_DEMO,
     TAB_FIELD_GUIDE,
     TAB_GOVERNANCE_OVERVIEW,
@@ -65,10 +96,13 @@ PAGES_JSON_SCHEMA = (
 
 from pbip_paths import (  # noqa: E402
     REPO_PARQUET,
+    SEMANTIC_DIAGRAM_DOC_PNG,
+    SEMANTIC_DIAGRAM_FILE,
     THEME_FILE,
     THEME_LABEL,
     THEME_RESOURCE_PATH,
     pbip_root,
+    registered_resources_dir,
     report_definition,
     semantic_model_definition,
     theme_dir,
@@ -89,11 +123,6 @@ SOURCE_XW = "ddc-source_value_crosswalk"
 
 SEMANTIC_MODEL = semantic_model_definition(REPO)
 TABLES_DIR = SEMANTIC_MODEL / "tables"
-
-STANDARDS_LAYER_TEXT = (
-    "USCDI = Catalog (what) | US Core + FHIR R4 = Dictionary (how) | Governed codes = Value_Set_Members | "
-    "Source maps = Source_Value_Crosswalk | HL7 v2 ADT + C-CDA R2.1 = message context | Survivorship = chi_survivorship_logic"
-)
 
 # High-contrast primary palette (background vs text)
 PRIMARY_BLUE = "#0047AB"
@@ -186,17 +215,19 @@ def visual_container(name: str, x: float, y: float, w: float, h: float, z: int, 
 def container_title(
     title: str,
     *,
+    subtitle: str | None = None,
     bg: str = PRIMARY_BLUE,
     fg: str = TEXT_WHITE,
     size: int = 14,
     pad: int = 12,
 ) -> dict:
+    display = f"{title} - {subtitle}" if subtitle else title
     return {
         "title": [
             {
                 "properties": {
                     "show": lit_bool(True),
-                    "text": lit_str(title),
+                    "text": lit_str(display),
                     "fontSize": lit_pt(size),
                     "fontColor": {"solid": {"color": lit_str(fg)}},
                     "background": {"solid": {"color": lit_str(bg)}},
@@ -427,6 +458,30 @@ def textbox(
     return visual_container(name, x, y, w, h, z, visual)
 
 
+def page_header_title(name: str, w: float, z: int, title: str) -> dict:
+    """Single-line page title on the blue header band (see pbip_layout_constants PAGE_HEADER_*)."""
+    run: dict = {
+        "value": title,
+        "textStyle": text_run_style(
+            PAGE_HEADER_TITLE_SIZE, TEXT_WHITE, bold=True, font_face=TEXT_FONT_FACE_SEMIBOLD
+        ),
+    }
+    return visual_container(
+        name,
+        PAGE_MARGIN,
+        PAGE_HEADER_TITLE_Y,
+        w,
+        PAGE_HEADER_TITLE_H,
+        z,
+        {
+            "visualType": "textbox",
+            "objects": {"general": [{"properties": {"paragraphs": [{"textRuns": [run]}]}}]},
+            "drillFilterOtherVisuals": True,
+            "visualContainerObjects": transparent_container(),
+        },
+    )
+
+
 def shape_rect(name: str, x: float, y: float, w: float, h: float, z: int, color: str) -> dict:
     return visual_container(
         name, x, y, w, h, z,
@@ -436,6 +491,64 @@ def shape_rect(name: str, x: float, y: float, w: float, h: float, z: int, color:
                 "shape": [{"properties": {"tileShape": {"expr": {"Literal": {"Value": "'rectangle'"}}}}}],
                 "fill": [{"properties": {"fillColor": {"solid": {"color": lit_str(color)}}}}],
                 "outline": [{"properties": {"show": lit_bool(False)}}],
+            },
+            "drillFilterOtherVisuals": True,
+        },
+    )
+
+
+def registered_image(
+    name: str,
+    x: float,
+    y: float,
+    w: float,
+    h: float,
+    z: int,
+    item_name: str,
+) -> dict:
+    """Static image from RegisteredResources (see sync_semantic_diagram_asset).
+
+    Local-file image visuals use objects.general.imageUrl + ResourcePackageItem
+    (not objects.image.sourceFile — that pattern is for URL/data-bound sources).
+    """
+    return visual_container(
+        name, x, y, w, h, z,
+        {
+            "visualType": "image",
+            "objects": {
+                "general": [
+                    {
+                        "properties": {
+                            "imageUrl": {
+                                "expr": {
+                                    "ResourcePackageItem": {
+                                        "PackageName": "RegisteredResources",
+                                        "PackageType": 1,
+                                        "ItemName": item_name,
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ]
+            },
+            "visualContainerObjects": {
+                "background": [
+                    {"properties": {"show": lit_bool(True), "color": {"solid": {"color": lit_str(BG_LIGHT)}}}}
+                ],
+                "border": [
+                    {"properties": {"show": lit_bool(True), "color": {"solid": {"color": lit_str(PRIMARY_BLUE)}}}}
+                ],
+                "padding": [
+                    {
+                        "properties": {
+                            "top": lit_pt(8),
+                            "bottom": lit_pt(8),
+                            "left": lit_pt(8),
+                            "right": lit_pt(8),
+                        }
+                    }
+                ],
             },
             "drillFilterOtherVisuals": True,
         },
@@ -454,6 +567,7 @@ def slicer_dropdown(
     default_value: str,
     *,
     title: str | None = None,
+    subtitle: str | None = None,
     source_alias: str = "c",
 ) -> dict:
     objects: dict = {
@@ -493,6 +607,7 @@ def slicer_dropdown(
             "objects": objects,
             "visualContainerObjects": container_title(
                 title or SLICER_TITLE,
+                subtitle=subtitle if subtitle is not None else (SLICER_SUBTITLE if title is None and SLICER_SUBTITLE else None),
                 bg=PRIMARY_YELLOW,
                 fg=TEXT_BLACK,
                 size=14,
@@ -529,14 +644,26 @@ def card(name: str, x: float, y: float, w: float, h: float, z: int, entity: str,
     )
 
 
-def table_ex(name: str, x: float, y: float, w: float, h: float, z: int, entity: str, props: list[str], *, title: str) -> dict:
+def table_ex(
+    name: str,
+    x: float,
+    y: float,
+    w: float,
+    h: float,
+    z: int,
+    entity: str,
+    props: list[str],
+    *,
+    title: str,
+    subtitle: str | None = None,
+) -> dict:
     return visual_container(
         name, x, y, w, h, z,
         {
             "visualType": "tableEx",
             "query": {"queryState": {"Values": {"projections": [projection(entity, p) for p in props]}}},
             "objects": table_format(),
-            "visualContainerObjects": container_title(title),
+            "visualContainerObjects": container_title(title, subtitle=subtitle),
             "drillFilterOtherVisuals": True,
         },
     )
@@ -600,18 +727,9 @@ def build_concept_profile_page(page_dir: Path) -> None:
     source_h = layout["source_h"]
     visuals = [
         shape_rect(vid(), 0, 0, w, header_h, 0, PRIMARY_BLUE),
-        textbox(
-            vid(), margin, 20, 1700, 56, 1,
-            "CHI Data Dictionary Catalog",
-            bold=True, size="28pt", color=TEXT_WHITE, transparent=True,
-        ),
-        textbox(
-            vid(), margin, 80, 1750, 40, 2,
-            "Concept profile - catalog, dictionary (FHIR R4), and source availability on one semantic_id",
-            size="13pt", color=TEXT_WHITE, transparent=True,
-        ),
-        slicer_dropdown(vid(), margin, slicer_y, SLICER_W, SLICER_H_PROFILE, 3, CATALOG, "semantic_id", "Patient.race"),
-        callout_strip(vid(), margin, callout_y, content_w, callout_h, 4, CONCEPT_BLANK_CALLOUT),
+        page_header_title(vid(), content_w, 1, CONCEPT_PROFILE_HEADER),
+        slicer_dropdown(vid(), margin, slicer_y, SLICER_W, SLICER_H_PROFILE, 2, CATALOG, "semantic_id", "Patient.race"),
+        callout_strip(vid(), margin, callout_y, content_w, callout_h, 3, CONCEPT_PROFILE_CALLOUT),
         *[
             card(
                 vid(),
@@ -619,7 +737,7 @@ def build_concept_profile_page(page_dir: Path) -> None:
                 cards_y,
                 card_w,
                 card_h,
-                5 + idx,
+                4 + idx,
                 CATALOG,
                 measure_name,
                 measure=True,
@@ -628,12 +746,13 @@ def build_concept_profile_page(page_dir: Path) -> None:
             for idx, (measure_name, value_pt) in enumerate(PROFILE_CARD_MEASURES)
         ],
         table_ex(
-            vid(), margin, tables_y, 1184, biz_h, 10, CATALOG,
+            vid(), margin, tables_y, 1184, biz_h, 9, CATALOG,
             ["uscdi_description", "ruleset_category", "uscdi_data_class", "uscdi_data_element", "hipaa_category", "steward_contact"],
-            title="Business & USCDI governance",
+            title=CONCEPT_GOV_TITLE,
+            subtitle=CONCEPT_GOV_SUBTITLE,
         ),
         table_ex(
-            vid(), margin, dict_y, 1184, dict_h, 11, DICTIONARY,
+            vid(), margin, dict_y, 1184, dict_h, 10, DICTIONARY,
             [
                 "fhir_r4_path",
                 "fhir_profile",
@@ -642,16 +761,18 @@ def build_concept_profile_page(page_dir: Path) -> None:
                 "data_quality_notes",
                 "data_source_rank_reference",
             ],
-            title="Implementation & survivorship (FHIR R4 + standards)",
+            title=CONCEPT_DICT_TITLE,
+            subtitle=CONCEPT_DICT_SUBTITLE,
         ),
         table_ex(
-            vid(), margin + 1200, tables_y, 656, source_h, 12, SOURCES,
+            vid(), margin + 1200, tables_y, 656, source_h, 11, SOURCES,
             ["source_id", "availability", "completeness_pct", "timeliness_sla_hours", "notes"],
-            title="Source availability",
+            title=CONCEPT_SOURCE_TITLE,
+            subtitle=CONCEPT_SOURCE_SUBTITLE,
         ),
-        shape_rect(vid(), 0, footer_y, w, footer_h, 13, PRIMARY_YELLOW),
+        shape_rect(vid(), 0, footer_y, w, footer_h, 12, PRIMARY_YELLOW),
         textbox(
-            vid(), margin, footer_y + 10, content_w, 36, 14,
+            vid(), margin, footer_y + 10, content_w, 36, 13,
             "Read-only view. Edit chi-steward-workbook.xlsx, run import_steward_workbook_to_parquet.py, then Refresh.",
             size="12pt", color=TEXT_BLACK, transparent=True,
         ),
@@ -676,8 +797,6 @@ def build_standards_contexts_page(page_dir: Path) -> None:
     fhir_h = layout["fhir_h"]
     codes_y = layout["codes_y"]
     codes_h = layout["codes_h"]
-    adt_callout_y = layout["adt_callout_y"]
-    adt_callout_h = layout["adt_callout_h"]
     adt_ccda_y = layout["adt_y"]
     adt_h = layout["adt_h"]
     footer_y = layout["footer_y"]
@@ -687,41 +806,34 @@ def build_standards_contexts_page(page_dir: Path) -> None:
     pilot_slicer_w = content_w - concept_slicer_w - 16
     visuals = [
         shape_rect(vid(), 0, 0, w, header_h, 0, PRIMARY_BLUE),
-        textbox(
-            vid(), margin, 20, 1700, 56, 1,
-            "Standards & interoperability contexts",
-            bold=True, size="28pt", color=TEXT_WHITE, transparent=True,
-        ),
-        textbox(
-            vid(), margin, 80, 1750, 40, 2,
-            "Healthcare standards + HL7 v2 ADT + C-CDA R2.1 + FHIR R4 for one semantic_id",
-            size="13pt", color=TEXT_WHITE, transparent=True,
-        ),
+        page_header_title(vid(), content_w, 1, STANDARDS_PAGE_HEADER),
         callout_strip(
-            vid(), margin, layer_y, content_w, layer_h, 3,
+            vid(), margin, layer_y, content_w, layer_h, 2,
             STANDARDS_LAYER_TEXT,
             size="12pt",
             bold=False,
         ),
         slicer_dropdown(
-            vid(), margin, slicer_y, concept_slicer_w, slicer_h, 4,
+            vid(), margin, slicer_y, concept_slicer_w, slicer_h, 3,
             CATALOG, "semantic_id", "Patient.race",
         ),
         slicer_dropdown(
-            vid(), margin + concept_slicer_w + 16, slicer_y, pilot_slicer_w, slicer_h, 5,
+            vid(), margin + concept_slicer_w + 16, slicer_y, pilot_slicer_w, slicer_h, 4,
             CATALOG, "is_demographics_pilot", "yes",
             title=PILOT_SLICER_TITLE,
             source_alias="p",
         ),
         table_ex(
-            vid(), margin, tables_y, content_w, fhir_h, 6, DICTIONARY,
+            vid(), margin, tables_y, content_w, fhir_h, 5, DICTIONARY,
             FHIR_STANDARDS_COLUMNS,
-            title="FHIR R4 + US Core (Dictionary)",
+            title=FHIR_STANDARDS_TITLE,
+            subtitle=FHIR_STANDARDS_SUBTITLE,
         ),
         table_ex(
             vid(), margin, codes_y, half_w, codes_h, 7, VALUE_MEMBER,
-            ["semantic_id", "code_system_oid", "code", "display", "member_type", "binding_strength", "notes"],
-            title="Governed value set codes",
+            GOVERNED_CODES_COLUMNS,
+            title=GOVERNED_CODES_TITLE,
+            subtitle=GOVERNED_CODES_SUBTITLE,
         ),
         table_ex(
             vid(), margin + half_w + 16, codes_y, half_w, codes_h, 8, SOURCE_XW,
@@ -735,23 +847,25 @@ def build_standards_contexts_page(page_dir: Path) -> None:
                 "mapping_type",
                 "approval_status",
             ],
-            title="Source value crosswalk",
+            title=SOURCE_XW_TITLE,
+            subtitle=SOURCE_XW_SUBTITLE,
         ),
-        callout_strip(vid(), margin, adt_callout_y, content_w, adt_callout_h, 9, ADT_CALLOUT_TEXT),
         table_ex(
-            vid(), margin, adt_ccda_y, half_w, adt_h, 10, ADT,
+            vid(), margin, adt_ccda_y, half_w, adt_h, 9, ADT,
             ADT_CONTEXT_COLUMNS,
             title=ADT_CONTEXT_TITLE,
+            subtitle=ADT_CONTEXT_SUBTITLE,
         ),
         table_ex(
-            vid(), margin + half_w + 16, adt_ccda_y, half_w, adt_h, 11, CCDA,
-            ["semantic_id", "section_name", "entry_type", "xml_path", "mapping_status", "notes"],
-            title="C-CDA / CCD context",
+            vid(), margin + half_w + 16, adt_ccda_y, half_w, adt_h, 10, CCDA,
+            CCDA_STANDARDS_COLUMNS,
+            title=CCDA_TITLE,
+            subtitle=CCDA_SUBTITLE,
         ),
-        shape_rect(vid(), 0, footer_y, w, footer_h, 12, PRIMARY_YELLOW),
+        shape_rect(vid(), 0, footer_y, w, footer_h, 11, PRIMARY_YELLOW),
         textbox(
-            vid(), margin, footer_y + 10, content_w, 36, 13,
-            "Standards: docs/shie-standards-reference.md | Crosswalk model: docs/crosswalk-model.md",
+            vid(), margin, footer_y + 10, content_w, 36, 12,
+            "Filtered by Concept slicer above | Long notes columns: Guide Field guide | docs/crosswalk-model.md",
             size="12pt", color=TEXT_BLACK, transparent=True,
         ),
     ]
@@ -935,29 +1049,33 @@ def build_overview_page(page_dir: Path) -> None:
     clear_visuals(page_dir)
     w, h = PAGE_OVERVIEW_W, PAGE_OVERVIEW_H
     margin = 32
-    header_h = 128
+    content_w = w - (margin * 2)
+    header_h = PAGE_HEADER_H
+    portfolio_y = header_h + 8
+    cards_y = portfolio_y + GOVERNANCE_PORTFOLIO_CALLOUT_H + 12
+    card_h = 148
+    charts_y = cards_y + card_h + 20
+    charts_h = 340
+    table_y = charts_y + charts_h + 20
+    table_h = h - table_y - 12
     visuals = [
         shape_rect(vid(), 0, 0, w, header_h, 0, PRIMARY_BLUE),
-        textbox(
-            vid(), margin, 20, 900, 56, 1,
-            "Governance overview",
-            bold=True, size="28pt", color=TEXT_WHITE, transparent=True,
+        page_header_title(vid(), content_w, 1, GOVERNANCE_HEADER),
+        callout_strip(
+            vid(), margin, portfolio_y, content_w, GOVERNANCE_PORTFOLIO_CALLOUT_H, 2,
+            GOVERNANCE_PORTFOLIO_CALLOUT,
         ),
-        textbox(
-            vid(), margin, 80, 1200, 40, 2,
-            "Portfolio of governed patient concepts - approval and classification",
-            size="13pt", color=TEXT_WHITE, transparent=True,
-        ),
-        card(vid(), margin, 148, 448, 148, 3, CATALOG, "Total Concepts", measure=True, value_pt=32),
-        card(vid(), margin + 464, 148, 448, 148, 4, CATALOG, "Approved Concepts", measure=True, value_pt=32),
-        card(vid(), margin + 928, 148, 448, 148, 5, CATALOG, "Pending Approval", measure=True, value_pt=32),
-        card(vid(), margin + 1392, 148, 448, 148, 6, CATALOG, "Demographics Pilot", measure=True, value_pt=32),
-        bar_chart(vid(), margin, 316, 900, 340, 7, CATALOG, "classification", "Concepts by classification"),
-        bar_chart(vid(), margin + 924, 316, 900, 340, 8, CATALOG, "approval_status", "Concepts by approval status"),
+        card(vid(), margin, cards_y, 448, card_h, 3, CATALOG, "Total Concepts", measure=True, value_pt=32),
+        card(vid(), margin + 464, cards_y, 448, card_h, 4, CATALOG, "Approved Concepts", measure=True, value_pt=32),
+        card(vid(), margin + 928, cards_y, 448, card_h, 5, CATALOG, "Pending Approval", measure=True, value_pt=32),
+        card(vid(), margin + 1392, cards_y, 448, card_h, 6, CATALOG, "Demographics Pilot", measure=True, value_pt=32),
+        bar_chart(vid(), margin, charts_y, 900, charts_h, 7, CATALOG, "classification", "Concepts by classification"),
+        bar_chart(vid(), margin + 924, charts_y, 900, charts_h, 8, CATALOG, "approval_status", "Concepts by approval status"),
         table_ex(
-            vid(), margin, 676, w - (margin * 2), 372, 9, CATALOG,
+            vid(), margin, table_y, content_w, table_h, 9, CATALOG,
             ["semantic_id", "uscdi_element", "uscdi_description", "classification", "data_steward", "approval_status"],
-            title="All governed concepts",
+            title=GOVERNANCE_TABLE_TITLE,
+            subtitle=GOVERNANCE_TABLE_SUBTITLE,
         ),
     ]
     for v in visuals:
@@ -1047,6 +1165,16 @@ def write_chi_theme() -> None:
     write_text_utf8_no_bom(THEME_DIR / THEME_FILE, json.dumps(theme, indent=2))
 
 
+def sync_semantic_diagram_asset() -> None:
+    """Copy docs PNG into PBIP RegisteredResources (OPC-safe filename)."""
+    src = REPO / SEMANTIC_DIAGRAM_DOC_PNG
+    if not src.is_file():
+        raise FileNotFoundError(f"Semantic diagram source missing: {src}")
+    dest_dir = registered_resources_dir(REPO)
+    dest_dir.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(src, dest_dir / SEMANTIC_DIAGRAM_FILE)
+
+
 def update_report_json() -> None:
     path = REPORT / "report.json"
     data = json.loads(path.read_text(encoding="utf-8"))
@@ -1064,12 +1192,23 @@ def update_report_json() -> None:
             "items": [
                 {"name": THEME_LABEL, "path": THEME_RESOURCE_PATH, "type": "BaseTheme"},
             ],
-        }
+        },
+        {
+            "name": "RegisteredResources",
+            "type": "RegisteredResources",
+            "items": [
+                {
+                    "name": SEMANTIC_DIAGRAM_FILE,
+                    "path": SEMANTIC_DIAGRAM_FILE,
+                    "type": "Image",
+                },
+            ],
+        },
     ]
     write_text_utf8_no_bom(path, json.dumps(data, indent=2))
 
 
-def sync_pages_json(*, landing_page_id: str = DEMO_LANDING_PAGE_ID) -> None:
+def sync_pages_json(*, landing_page_id: str = DEFAULT_LANDING_PAGE_ID) -> None:
     """Write canonical tab order and landing page to pages.json."""
     pages_json = REPORT / "pages" / "pages.json"
     data: dict = {}
@@ -1086,7 +1225,7 @@ def sync_page_tab_styles() -> None:
     """Refresh tab labels and guide vs functional canvas colors without rebuilding visuals."""
     pages: list[tuple[str, str, int, int, bool]] = [
         (PAGE_START_HERE_ID, TAB_START_HERE, PAGE_PROFILE_W, PAGE_PROFILE_H, True),
-        (DEMO_PAGE_ID, TAB_DEMO, PAGE_PROFILE_W, PAGE_PROFILE_H, True),
+        (WALKTHROUGH_PAGE_ID, TAB_WALKTHROUGH, PAGE_PROFILE_W, PAGE_PROFILE_H, True),
         (PAGE_STANDARDS_REF_ID, TAB_STANDARDS_REF, PAGE_PROFILE_W, PAGE_PROFILE_H, True),
         (STANDARDS_PAGE_ID, TAB_STANDARDS_CONTEXTS, PAGE_PROFILE_W, STANDARDS_PAGE_H, False),
         (PAGE_CONCEPT_PROFILE_ID, TAB_CONCEPT_PROFILE, PAGE_PROFILE_W, PAGE_PROFILE_H, False),
@@ -1143,11 +1282,11 @@ def write_page_json(
 
 
 def main() -> None:
-    from add_pbip_demo_page import build_demo_page
+    from add_pbip_walkthrough_page import build_walkthrough_page
     from add_pbip_start_here_page import START_HERE_PAGE_ID
 
     start_page = REPORT / "pages" / START_HERE_PAGE_ID
-    demo_page = REPORT / "pages" / DEMO_PAGE_ID
+    walkthrough_page = REPORT / "pages" / WALKTHROUGH_PAGE_ID
     standards_ref_page = REPORT / "pages" / PAGE_STANDARDS_REF_ID
     field_guide_page = REPORT / "pages" / PAGE_FIELD_GUIDE_ID
     profile_page = REPORT / "pages" / PAGE_CONCEPT_PROFILE_ID
@@ -1155,7 +1294,7 @@ def main() -> None:
     overview_page = REPORT / "pages" / PAGE_GOVERNANCE_ID
     for p in (
         start_page,
-        demo_page,
+        walkthrough_page,
         standards_ref_page,
         field_guide_page,
         profile_page,
@@ -1170,6 +1309,7 @@ def main() -> None:
     THEME_DIR.mkdir(parents=True, exist_ok=True)
     sync_semantic_model()
     write_chi_theme()
+    sync_semantic_diagram_asset()
     update_report_json()
     from add_pbip_standards_reference_page import build_standards_reference_page
     from add_pbip_start_here_page import build_start_here_page
@@ -1184,7 +1324,7 @@ def main() -> None:
     write_gaps_table_tmdl()
     sync_guide_model()
     build_start_here_page(start_page)
-    build_demo_page(demo_page)
+    build_walkthrough_page(walkthrough_page)
     build_standards_reference_page(standards_ref_page)
     build_field_guide_page(field_guide_page)
     build_concept_profile_page(profile_page)

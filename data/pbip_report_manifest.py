@@ -13,7 +13,7 @@ if str(_SCRIPTS) not in sys.path:
     sys.path.insert(0, str(_SCRIPTS))
 
 from pbip_layout_constants import (  # noqa: E402
-    DEMO_PAGE_ID as PAGE_DEMO,
+    WALKTHROUGH_PAGE_ID as PAGE_WALKTHROUGH,
     PAGE_CONCEPT_PROFILE_ID as PAGE_CONCEPT_PROFILE,
     PAGE_FIELD_GUIDE_ID as PAGE_FIELD_GUIDE,
     PAGE_GOVERNANCE_ID as PAGE_GOVERNANCE,
@@ -21,7 +21,7 @@ from pbip_layout_constants import (  # noqa: E402
     PAGE_START_HERE_ID as PAGE_START_HERE,
     STANDARDS_PAGE_ID as PAGE_STANDARDS,
     TAB_CONCEPT_PROFILE,
-    TAB_DEMO,
+    TAB_WALKTHROUGH,
     TAB_FIELD_GUIDE,
     TAB_GOVERNANCE_OVERVIEW,
     TAB_STANDARDS_CONTEXTS,
@@ -41,10 +41,10 @@ PAGES: list[dict] = [
         "primary_audience": "All",
     },
     {
-        "page_id": PAGE_DEMO,
-        "page_display_name": TAB_DEMO,
+        "page_id": PAGE_WALKTHROUGH,
+        "page_display_name": TAB_WALKTHROUGH,
         "page_purpose": "5-minute guided tour: pilots, slicers, and where to drill next.",
-        "page_interop_summary": "Demo landing page - walk through Patient.race and related pilots.",
+        "page_interop_summary": "Walk through Patient.race and related Approved pilot concepts.",
         "primary_audience": "All",
     },
     {
@@ -140,7 +140,7 @@ VISUALS: list[dict] = [
         "visual_title": "FHIR R4 + US Core (Dictionary)",
         "semantic_model_table": "ddc-master_patient_dictionary",
         "layer": "Dictionary",
-        "columns": ["semantic_id", "fhir_r4_path", "fhir_profile", "data_quality_notes"],
+        "columns": ["fhir_r4_path", "fhir_profile"],
     },
     {
         "page_id": PAGE_STANDARDS,
@@ -148,13 +148,11 @@ VISUALS: list[dict] = [
         "semantic_model_table": "ddc-value_set_member",
         "layer": "Terminology",
         "columns": [
-            "semantic_id",
             "code_system_oid",
             "code",
             "display",
             "member_type",
             "binding_strength",
-            "notes",
         ],
     },
     {
@@ -175,18 +173,14 @@ VISUALS: list[dict] = [
     },
     {
         "page_id": PAGE_STANDARDS,
-        "visual_title": "HL7 v2 ADT context (CE fields merged: .1 code ^ .2 text)",
+        "visual_title": "HL7 v2 ADT context",
         "semantic_model_table": "ddc-hl7_adt_catalog",
         "layer": "Message context",
         "columns": [
-            "semantic_id",
-            "segment_id",
             "field_id",
-            "hl7_ce_encoding",
             "field_name",
-            "message_type",
+            "hl7_ce_encoding",
             "mapping_status",
-            "notes",
         ],
     },
     {
@@ -195,12 +189,10 @@ VISUALS: list[dict] = [
         "semantic_model_table": "ddc-ccda_catalog",
         "layer": "Message context",
         "columns": [
-            "semantic_id",
             "section_name",
             "entry_type",
             "xml_path",
             "mapping_status",
-            "notes",
         ],
     },
     {
@@ -585,14 +577,21 @@ FIELD_GUIDE: dict[tuple[str, str], dict] = {
         "doc_ref": "docs/crosswalk-model.md",
     },
     ("ddc-value_set_member", "member_type"): {
-        "purpose_short": "Member role in the value set (e.g. OMB vs detailed).",
-        "interop_role": "Distinguishes rollup vs granular codes for reporting vs clinical detail.",
-        "standards_touchpoint": "US Core race/ethnicity pattern",
+        "purpose_short": "Member role in CHI's governed subset (rollup, detail, language, sentinel).",
+        "interop_role": (
+            "Links each row to a national authority pattern: omb_rollup/detailed (CDCREC race/ethnicity), "
+            "language_tag (BCP 47), nullflavor (HL7), exclude/administrative/standard (pilot governance). "
+            "See Guide National standards for authority definitions."
+        ),
+        "standards_touchpoint": "CDCREC, BCP 47, HL7 NullFlavor",
         "exchange_formats": "FHIR, Terminology",
         "excel_sheet": "Value_Set_Members",
         "editable_in_excel": "yes",
-        "pilot_example": "OMB category vs CDC detailed race code.",
-        "doc_ref": "docs/shie-standards-reference.md",
+        "pilot_example": (
+            "Patient.race omb_rollup=2054-5; detailed=2131-1; Patient.language language_tag=en; "
+            "nullflavor=UNK; exclude=und."
+        ),
+        "doc_ref": "docs/crosswalk-model.md",
     },
     ("ddc-value_set_member", "binding_strength"): {
         "purpose_short": "FHIR binding strength (required, extensible, preferred).",

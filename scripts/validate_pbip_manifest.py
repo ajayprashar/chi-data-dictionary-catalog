@@ -15,14 +15,14 @@ REPORT_PAGES = report_definition(REPO) / "pages"
 
 sys.path.insert(0, str(REPO / "data"))
 sys.path.insert(0, str(REPO / "scripts"))
-from pbip_layout_constants import DEMO_PAGE_ID  # noqa: E402
+from pbip_layout_constants import WALKTHROUGH_PAGE_ID  # noqa: E402
 from pbip_report_manifest import (  # noqa: E402
     PAGE_FIELD_GUIDE,
     PAGE_START_HERE,
     VISUALS,
 )
 
-SKIP_PAGES = {PAGE_START_HERE, PAGE_FIELD_GUIDE, DEMO_PAGE_ID}
+SKIP_PAGES = {PAGE_START_HERE, PAGE_FIELD_GUIDE, WALKTHROUGH_PAGE_ID}
 
 
 @dataclass(frozen=True)
@@ -44,6 +44,20 @@ def visual_title(container: dict) -> str:
         if text:
             return _literal_text(text)
     return ""
+
+
+def visual_title_base(title: str) -> str:
+    """Primary title before subtitle (newline or hyphen separator)."""
+    base = title.split("\n", 1)[0]
+    if " - " in base:
+        base = base.split(" - ", 1)[0]
+    return base
+
+
+def titles_match(expected: str, actual: str) -> bool:
+    if actual == expected:
+        return True
+    return visual_title_base(actual) == expected
 
 
 def projection_field(projection: dict) -> tuple[str | None, str | None, bool]:
@@ -145,7 +159,7 @@ def validate_manifest() -> list[str]:
             (
                 v
                 for v in tables_and_charts
-                if v.page_id == page_id and v.title == title
+                if v.page_id == page_id and titles_match(title, v.title)
             ),
             None,
         )

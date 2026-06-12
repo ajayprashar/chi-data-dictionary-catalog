@@ -1,7 +1,7 @@
 """Copy for PBIP Start here page - keep in sync with docs/sources-of-truth.md."""
 
 PAGE_TITLE = "CHI Data Dictionary Catalog"
-PAGE_SUBTITLE = "Governed catalog + dictionary aligned to US interoperability standards (SHIE / CHI)"
+PAGE_SUBTITLE = "Read-only Power BI viewer - governed catalog + dictionary aligned to US interoperability standards (SHIE / CHI)"
 
 PURPOSE_LINES = [
     "This application is CHI's read surface for governed patient concepts (semantic_id). "
@@ -11,6 +11,17 @@ PURPOSE_LINES = [
     "Excel is the authoring surface; parquet is the published machine copy; "
     "Power BI is for discovery and review.",
 ]
+
+LAYERS_LINES = [
+    "Layers at a glance:",
+    "WHAT = catalog (USCDI)  |  HOW = dictionary (FHIR; survivorship on Concept Profile)",
+    "WHICH = governed codes + partner crosswalk  |  WHERE = ADT + C-CDA message placement",
+]
+
+DIAGRAM_CAPTION = (
+    "semantic_id joins national standards, CHI curation, and local crosswalk. "
+    "Tab labels on the diagram show where to read each layer in this report."
+)
 
 SOURCES_LINES = [
     "National standards - USCDI (what), US Core + FHIR R4 (how), HL7 / LOINC / SNOMED / "
@@ -29,15 +40,17 @@ SOURCES_LINES = [
 ]
 
 HOW_TO_USE_LINES = [
-    "1. Guide · Start here - purpose and sources of truth (this page).",
-    "2. Guide · Demo tour - 5-minute walkthrough (default landing for demos).",
+    "",
+    "1. Guide · Start here - purpose, sources of truth, and layers diagram (default landing; this page).",
+    "2. Guide · Walkthrough - 5-minute guided tour of key tabs.",
     "3. Guide · National standards - external authorities (FHIR R4, USCDI, terminology).",
-    "4. Standards & Contexts - per-concept mapping: FHIR, codes, crosswalk, ADT/CCDA.",
+    "4. Standards & Contexts - per-concept FHIR, governed codes (left), partner crosswalk (right), ADT/CCDA.",
     "5. Concept Profile - governance, survivorship, and source availability.",
     "6. Guide · Field guide - column purpose, steward workflow, and curation gaps.",
     "7. Governance Overview - portfolio KPIs and full concept list.",
     "",
-    "Tip: On Standards & Contexts, set Show concepts = yes and pick Patient.race or Patient.language.",
+    "Standards vs Concept Profile: use Standards for codes and message placement; "
+    "use Concept Profile for steward approval and survivorship rules.",
 ]
 
 PILOT_CALLOUT = (

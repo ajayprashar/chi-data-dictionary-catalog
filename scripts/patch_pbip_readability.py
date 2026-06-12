@@ -20,21 +20,24 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from pbip_layout_constants import (  # noqa: E402
     ADT_CONTEXT_COLUMNS,
     ADT_CONTEXT_TITLE,
+    CCDA_STANDARDS_COLUMNS,
+    CCDA_TITLE,
     DICT_PROFILE_TITLE,
     FHIR_STANDARDS_COLUMNS,
     FHIR_STANDARDS_TABLE_H,
     FHIR_STANDARDS_TITLE,
+    GOVERNED_CODES_COLUMNS,
+    GOVERNED_CODES_SUBTITLE,
+    GOVERNED_CODES_TITLE,
     SLICER_H_PROFILE,
     SLICER_H_STANDARDS,
     SLICER_TITLE,
     SLICER_W,
+    SOURCE_XW_SUBTITLE,
+    SOURCE_XW_TITLE,
     STANDARDS_ADT_TABLE_H,
     standards_page_y_positions,
 )
-
-GOVERNED_CODES_TITLE = "Governed value set codes"
-SOURCE_XW_TITLE = "Source value crosswalk"
-CCDA_TITLE = "C-CDA / CCD context"
 
 
 def _visual_title(visual: dict) -> str:
@@ -102,7 +105,7 @@ def patch_visual(container: dict) -> list[str]:
             changes.append(f"slicer {name}: height -> {target_h}")
 
     if vtype == "tableEx":
-        if title == FHIR_STANDARDS_TITLE:
+        if title.startswith(FHIR_STANDARDS_TITLE):
             layout = standards_page_y_positions()
             _set_table_columns(visual, "ddc-master_patient_dictionary", FHIR_STANDARDS_COLUMNS)
             pos = container.setdefault("position", {})
@@ -119,9 +122,11 @@ def patch_visual(container: dict) -> list[str]:
             _enable_word_wrap(visual)
             changes.append(f"dictionary table {name}: word wrap")
 
-        elif title.startswith(GOVERNED_CODES_TITLE) or title == SOURCE_XW_TITLE:
+        elif title.startswith(GOVERNED_CODES_TITLE) or title.startswith(SOURCE_XW_TITLE):
             layout = standards_page_y_positions()
             pos = container.setdefault("position", {})
+            if title.startswith(GOVERNED_CODES_TITLE):
+                _set_table_columns(visual, "ddc-value_set_member", GOVERNED_CODES_COLUMNS)
             if pos.get("y") != layout["codes_y"]:
                 pos["y"] = layout["codes_y"]
                 changes.append(f"{title[:24]}… {name}: y -> {layout['codes_y']}")
@@ -143,6 +148,10 @@ def patch_visual(container: dict) -> list[str]:
                 _set_table_columns(visual, "ddc-hl7_adt_catalog", ADT_CONTEXT_COLUMNS)
                 _enable_word_wrap(visual)
                 changes.append(f"ADT table {name}: columns include field_id + hl7_ce_encoding")
+            elif title.startswith(CCDA_TITLE):
+                _set_table_columns(visual, "ddc-ccda_catalog", CCDA_STANDARDS_COLUMNS)
+                _enable_word_wrap(visual)
+                changes.append(f"CCDA table {name}: slim columns")
 
     return changes
 

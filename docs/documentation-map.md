@@ -10,6 +10,8 @@ Use this page as the index for which documents are actively maintained versus ke
   - North star: governed catalog + dictionary, healthcare standards, ADT/CDA/FHIR contexts.
 - `docs/sources-of-truth.md`
   - Layered authority: US standards, DAP, CHI steward publish, operational crosswalk; aligned with PBIP Start here.
+- `docs/assets/chi_ddc_semantic.{mmd,svg,png}`
+  - Curator diagram: national standards → CHI layers on `semantic_id` → local crosswalk; rendered on **Guide · Start here**.
 - `README.md`
   - Entry point for the operating model, pipeline commands, and core files.
 - `TECH-SPEC.md`
@@ -24,8 +26,10 @@ Use this page as the index for which documents are actively maintained versus ke
   - openpyxl DO/DON'T rules so Excel opens workbooks without repair prompts.
 - `docs/power-bi-concept-profile-setup.md`
   - Power BI PBIP viewer - open, refresh, troubleshooting (read surface after Excel import).
+- `docs/presenter-script.md`
+  - 5-minute presenter script for DOPS and steward walkthroughs (Patient.race walkthrough; what to skip).
 - `docs/faq.md`
-  - Catalog vs dictionary, **concept vs element** (with plain example), PBIP pages vs tables, **seven data + two guide semantic model tables**, where to edit vs read (steward and demo audiences).
+  - Catalog vs dictionary, **concept vs element**, **governed codes vs source crosswalk**, **Standards & Contexts vs Concept Profile**, PBIP pages vs tables, **seven data + two guide semantic model tables**, where to edit vs read (steward and reviewer audiences).
 - `data/pbip_report_manifest.py`
   - Source manifest for in-report Field guide (`ddc-application_guide.parquet`); validate with `scripts/validate_pbip_manifest.py`; regenerate via `scripts/generate_pbip_model_guide.py`.
 - `data/pilot_curation_checks.py`

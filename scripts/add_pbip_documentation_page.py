@@ -32,6 +32,7 @@ from enhance_pbip_report import (  # noqa: E402
     lit_pt,
     lit_str,
     projection,
+    page_header_title,
     shape_rect,
     table_format,
     textbox,
@@ -43,7 +44,13 @@ from enhance_pbip_report import (  # noqa: E402
 )
 from generate_pbip_model_guide import generate as generate_guide  # noqa: E402
 from generate_pbip_model_guide import generate_gaps  # noqa: E402
-from pbip_layout_constants import GUIDE_BODY_PT, GUIDE_FOOTER_PT, TAB_FIELD_GUIDE  # noqa: E402
+from pbip_layout_constants import (  # noqa: E402
+    FIELD_GUIDE_HEADER,
+    GUIDE_BODY_PT,
+    GUIDE_FOOTER_PT,
+    PAGE_HEADER_H,
+    TAB_FIELD_GUIDE,
+)
 from pbip_report_manifest import (  # noqa: E402
     GUIDE_COLUMNS,
     GUIDE_PARQUET,
@@ -279,7 +286,7 @@ def build_field_guide_page(page_dir: Path) -> None:
     w, h = PAGE_PROFILE_W, PAGE_PROFILE_H
     margin = 32
     content_w = w - (margin * 2)
-    header_h = 128
+    header_h = PAGE_HEADER_H
     slicer_y = header_h + 12
     slicer_h = 92
     workflow_y = slicer_y + slicer_h + 8
@@ -300,16 +307,7 @@ def build_field_guide_page(page_dir: Path) -> None:
 
     visuals = [
         shape_rect(vid(), 0, 0, w, header_h, 0, PRIMARY_BLUE),
-        textbox(
-            vid(), margin, 20, 1200, 56, 1,
-            "Report field guide",
-            bold=True, size="28pt", color=TEXT_WHITE, transparent=True,
-        ),
-        textbox(
-            vid(), margin, 80, 1750, 40, 2,
-            "Steward workflow + column reference - links Excel sheets to Concept Profile and curation gaps",
-            size="13pt", color=TEXT_WHITE, transparent=True,
-        ),
+        page_header_title(vid(), content_w, 1, FIELD_GUIDE_HEADER),
         guide_slicer(
             vid(), margin, slicer_y, third_w, slicer_h, 3,
             "page_display_name", "Filter by report page", default_value="Concept Profile",

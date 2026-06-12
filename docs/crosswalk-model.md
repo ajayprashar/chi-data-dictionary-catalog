@@ -61,8 +61,22 @@ flowchart LR
 |--------|---------|
 | `code` | `2054-5` |
 | `display` | Black or African American |
-| `member_type` | `omb_rollup` / `nullflavor` / `language_tag` / `administrative` |
+| `member_type` | See table below |
 | `active` | `true` |
+
+#### `member_type` values (Standards & Contexts left table)
+
+| `member_type` | National authority | When to use |
+|---------------|-------------------|-------------|
+| `omb_rollup` | CDCREC / HL7 Race or Ethnicity Value Set | OMB reporting category (e.g. `2054-5` Black or African American) |
+| `detailed` | CDCREC detailed PHIN codes | Granular race/ethnicity codes under an OMB category |
+| `language_tag` | BCP 47 (`urn:ietf:bcp:47`) | FHIR `Patient.language` tags (e.g. `en`, `es`); often built from ISO 639 intake |
+| `nullflavor` | HL7 v3 NullFlavor | Unknown, declined, not asked - do not collapse for reporting |
+| `exclude` | CHI governance | Sentinel values excluded from aggregates (e.g. `und`, declined-to-specify) |
+| `administrative` | US Core birth sex / local admin codes | Non-CDCREC administrative codes (e.g. birth sex M/F/U) |
+| `standard` | SNOMED / US Core bindings | Standard coded values outside CDCREC rollups (e.g. gender identity) |
+
+Authority definitions and URLs: **Guide · National standards** tab and `docs/shie-standards-reference.md`.
 
 ### Source value crosswalk
 

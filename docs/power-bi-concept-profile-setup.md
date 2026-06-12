@@ -2,6 +2,8 @@
 
 Read-only **governed catalog and dictionary viewer** (see `docs/product-vision.md`). Excel authors data; Power BI presents governance, standards, and ADT/CDA/FHIR contexts.
 
+**Presenting to others:** `docs/presenter-script.md` - 5-minute script (Patient.race, what to skip, DOPS time split).
+
 **Recommended:** open the PBIP project in Power BI Desktop:
 
 ```text
@@ -12,12 +14,12 @@ The report includes seven tabs (left-to-right):
 
 | Page | Purpose |
 |------|---------|
-| **Guide · Start here** | Purpose, sources-of-truth layers, how to navigate the report (static text; cream canvas) |
-| **Guide · Demo tour** | 5-minute guided tour (default landing in demo package; cream canvas) |
-| **Guide · National standards** | Static lookup of external authorities (FHIR R4, USCDI, terminology; cream canvas) |
+| **Guide · Start here** | Purpose, sources-of-truth layers, how to navigate the report (static text; white canvas) |
+| **Guide · Walkthrough** | 5-minute guided tour (white canvas) |
+| **Guide · National standards** | Static lookup of external authorities (FHIR R4, USCDI, terminology; white canvas) |
 | **Standards & Contexts** | Per `semantic_id` - FHIR/terminology, value sets, crosswalk, **HL7 ADT**, **C-CDA** (no survivorship column on FHIR table) |
 | **Concept Profile** | One `semantic_id` - governance, FHIR/US Core, **survivorship**, sources |
-| **Guide · Field guide** | In-report column reference + curation gaps (slicers; cream canvas) |
+| **Guide · Field guide** | In-report column reference + curation gaps (slicers; white canvas) |
 | **Governance Overview** | Portfolio KPIs, classification/approval charts, full concept table |
 
 Add or refresh **Start here** only: `python scripts/add_pbip_start_here_page.py` (does not rebuild other pages).
@@ -32,7 +34,11 @@ python scripts/add_pbip_documentation_page.py
 
 The Field guide tab includes **page summary cards**, **steward workflow** (Excel sheet → import → Refresh), an **editable in Excel** slicer, column detail with `steward_action` / `review_on_page`, and a **curation gaps** table (`ddc-application_guide_gaps.parquet`) built from live catalog/dictionary parquet. Regenerate gaps after each steward publish. After changing PBIP table columns, update `data/pbip_report_manifest.py` so validation stays green.
 
-**Default landing page:** **Guide · Demo tour** in the demo package; **Standards & Contexts** in maintainer full regen unless overridden. Guide tabs use a cream canvas and `Guide ·` prefix; functional tabs use a white canvas.
+**Default landing page:** **Guide · Start here**. All tabs use a **white** canvas; guide tabs add the `Guide ·` prefix.
+
+**Page headers:** all tabs use a **96px** blue band with the **tab title only** (26pt); hints live in yellow banners or section panels below. Constants: `PAGE_HEADER_H` in `scripts/pbip_layout_constants.py`.
+
+**Table title hints:** key tables use a single-line title band with a hyphen hint (e.g. *Governed value set codes - CHI-approved standard codes for this concept*).
 
 ### Semantic model: nine tables
 
@@ -63,11 +69,11 @@ Pilot dictionary notes use `\n` line breaks in `scripts/seed_demographics_pilot.
 
 The report uses **Actual size** (not Fit to page) and a **high-contrast** theme (blue / yellow / black on white).
 
-**Guide tab text:** informational pages (`Guide · …` tabs) use **textbox** visuals with **Segoe UI 13pt** on a **white** canvas—the same font family as tables/cards. Rebuild after script changes: `python scripts/rebuild_all_pbip_pages.py`.
+**Guide tab text:** informational pages (`Guide · …` tabs) use **textbox** visuals with **Segoe UI 13pt** on a **white** canvas-the same font family as tables/cards. Rebuild after script changes: `python scripts/rebuild_all_pbip_pages.py`.
 
 **Table readability:** each table has three visual layers - **dark blue title band** (visual title), **light blue column header row** (field names), **white/zebra data rows**. If column headers look like the title after manual edits, select the visual → **Format** → **Reset to default** (theme + `enhance_pbip_report.py` set the header row separately).
 
-**Table height tiers** (`scripts/pbip_layout_constants.py`): **Standard** = 300px (~8–10 visible rows) for value sets and crosswalk; **Compact** = 160px (~4–5 rows) for ADT/CCDA. **Standards & Contexts** uses a **1920×1200** page (other tabs stay 1920×1080) so the middle tables meet the standard tier without overlapping FHIR or ADT bands. Layout is validated in `standards_page_y_positions()` — rebuild with `python scripts/rebuild_all_pbip_pages.py`.
+**Table height tiers** (`scripts/pbip_layout_constants.py`): **Standard** = 300px (~8–10 visible rows) for value sets and crosswalk; **Compact** = 160px (~4–5 rows) for ADT/CCDA. **Standards & Contexts** uses the same **1920×1080** canvas as other tabs so the governed-code tables and ADT/CCDA row fit above Power BI’s bottom tab bar. The ADT `hl7_ce_encoding` hint lives in the ADT table subtitle (no separate callout band). Layout is validated in `standards_page_y_positions()` - rebuild with `python scripts/rebuild_all_pbip_pages.py`.
 
 In Power BI Desktop:
 
@@ -81,7 +87,7 @@ Power BI OPC packaging validates **relative paths** inside the project when bund
 
 | Item | Path |
 |------|------|
-| Demo / parquet root | `C:\AI\chiddc\` |
+| Parquet root | `C:\AI\chiddc\` |
 | PBIP entry | `workbooks\pbip\chiddc.pbip` |
 | Report / model folders | `chiddc.Report`, `chiddc.SemanticModel` |
 | Theme file (no spaces in filename) | `BaseThemes/CHIHighContrast.json` |
@@ -102,21 +108,21 @@ Purge non-Power BI artifacts from `.Report` / `.SemanticModel` before Publish. C
 | Yellow banner: *"Some tables have incomplete or no data"* | Click **Refresh now** (or **Home → Refresh**). Parquet must exist at `C:\AI\chiddc\ddc-*.parquet`. |
 | Red error icons on measures | Close the report, reopen `chiddc.pbip`. KPI measures live under `ddc-master_patient_catalog` → **Governance KPIs** (not a separate metrics table). |
 | Source shows wrong `source_id` | Run `import_steward_workbook_to_parquet.py`, then Refresh. |
-| **Unable to save document** / invalid path when saving `.pbix` | Not caused by repo cleanup. This project uses **PBIP + TMDL + PBIR**; **Save a copy → PBIX** is unreliable on some Desktop builds (especially Microsoft Store, June 2026). Use the **demo package** below instead of fighting PBIX export. |
+| **Unable to save document** / invalid path when saving `.pbix` | Not caused by repo cleanup. This project uses **PBIP + TMDL + PBIR**; **Save a copy → PBIX** is unreliable on some Desktop builds (especially Microsoft Store, June 2026). Use the **release package** below instead of fighting PBIX export. |
 | Report opens but has no data | Parquet must be at `C:\AI\chiddc\ddc-*.parquet` (hardcoded in the model). Refresh after parquets are in place. |
-| **Transform data** → query preview: `Container exited unexpectedly` **0x80131623** | **Not corrupt parquet.** Known Power BI Mashup crash when previewing parquet queries inside PBIP (common on **Microsoft Store** app, **US Gov cloud**, June 2026). **Close Power Query** without Apply if broken; use **Home → Refresh** on the report canvas instead. Do not use Transform data for routine demos. Try **EXE installer**, clear `%LocalAppData%\Microsoft\Power BI Desktop\Cache`, or re-run `python scripts/package_pbi_demo.py` (rewrites parquets to Parquet 1.0). |
-| **Unable to save auto recovery file** / invalid path in `...\Power BI Desktop Store App\TempSaves\` | **Not corrupt PBIP.** Store-app auto-recovery cannot write its temp `.pbix`. Click **Close** and demo anyway - switch to **Report** view → **Home → Refresh**. On demo PC: **File → Options → Global → Auto recovery** → uncheck; or use the **EXE** installer. Repo sets `"enableAutoRecovery": false` in `chiddc.pbip`. |
+| **Transform data** → query preview: `Container exited unexpectedly` **0x80131623** | **Not corrupt parquet.** Known Power BI Mashup crash when previewing parquet queries inside PBIP (common on **Microsoft Store** app, **US Gov cloud**, June 2026). **Close Power Query** without Apply if broken; use **Home → Refresh** on the report canvas instead. Do not use Transform data for routine review. Try **EXE installer**, clear `%LocalAppData%\Microsoft\Power BI Desktop\Cache`, or re-run `python scripts/package_pbip_release.py` (rewrites parquets to Parquet 1.0). |
+| **Unable to save auto recovery file** / invalid path in `...\Power BI Desktop Store App\TempSaves\` | **Not corrupt PBIP.** Store-app auto-recovery cannot write its temp `.pbix`. Click **Close** and continue - switch to **Report** view → **Home → Refresh**. On target PC: **File → Options → Global → Auto recovery** → uncheck; or use the **EXE** installer. Repo sets `"enableAutoRecovery": false` in `chiddc.pbip`. |
 
 ---
 
-## Demonstrating on another computer
+## Deploying on another computer
 
 **Recommended:** do **not** depend on exporting a `.pbix`. Ship PBIP + parquet instead.
 
-### Create a demo zip (on your machine)
+### Create a release zip (on your machine)
 
 ```powershell
-python scripts/package_pbi_demo.py
+python scripts/package_pbip_release.py
 ```
 
 Writes `workbooks/chiddcYYYYMMDD.zip` (alphanumeric only, e.g. `chiddc20260611.zip`) containing:
@@ -125,7 +131,7 @@ Writes `workbooks/chiddcYYYYMMDD.zip` (alphanumeric only, e.g. `chiddc20260611.z
 - `workbooks/chi-steward-workbook.xlsx` and `workbooks/chi-partner-intake-workbook.xlsx`
 - `workbooks/pbip/` (report + semantic model; excludes local `.pbi` cache)
 
-### On the demo PC
+### On the target PC
 
 1. Extract the zip to **`C:\AI\chiddc\`** (same path the model expects).
 2. Install [Power BI Desktop](https://www.microsoft.com/en-us/download/details.aspx?id=58494) (EXE installer preferred over Store for PBIP work).
@@ -141,12 +147,12 @@ Only if you need one portable file:
 
 1. Open the **repo** PBIP (`workbooks/pbip/...`), not a copy under `C:\AI\Incoming\`.
 2. **Home → Refresh** (all queries must succeed).
-3. **File → Save a copy** → `C:\Temp\chi-demo.pbix` (short path; use file picker).
+3. **File → Save a copy** → `C:\Temp\chi-catalog.pbix` (short path; use file picker).
 4. Disable **OneDrive save** preview feature if the dialog misbehaves.
 
-If export still fails, use the demo zip or **Publish** to a Power BI workspace and download `.pbix` from the service.
+If export still fails, use the release zip or **Publish** to a Power BI workspace and download `.pbix` from the service.
 
-**Excel workbooks** are included in the demo zip for stewardship walkthroughs. They are not required to *view* the report; running `import_steward_workbook_to_parquet.py` on the demo PC still requires a full repo clone with Python.
+**Excel workbooks** are included in the release zip for stewardship walkthroughs. They are not required to *view* the report; running `import_steward_workbook_to_parquet.py` on the target PC still requires a full repo clone with Python.
 
 ---
 

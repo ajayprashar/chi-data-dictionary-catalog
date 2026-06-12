@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Apply demo usability sprint: enrich catalog, rebuild key pages, demo tab.
+"""Apply PBIP usability pipeline: enrich catalog, rebuild key pages, walkthrough tab.
 
 Run after pulling usability changes:
   python scripts/apply_pbip_usability.py

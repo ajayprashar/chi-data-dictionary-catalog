@@ -7,6 +7,7 @@ from __future__ import annotations
 
 PAGE_TITLE = "Authoritative standards reference"
 PAGE_SUBTITLE = "National and exchange standards cited by CHI metadata - not steward-signed content"
+# Header band uses tab label only; subtitle is the first section panel below.
 
 LAYER_LINES = [
     "USCDI = WHAT (Catalog) | US Core on FHIR R4 = HOW (Dictionary) | Terminology = WHICH codes",
@@ -25,10 +26,11 @@ EXCHANGE_STANDARDS_LINES = [
 TERMINOLOGY_LINES = [
     "CDCREC Race / Ethnicity (OID 2.16.840.1.113883.6.238) - Patient.race, Patient.ethnicity",
     "HL7 v3 NullFlavor (OID 2.16.840.1.113883.5.1008) - unknown vs declined vs not asked",
-    "BCP 47 (urn:ietf:bcp:47) - primary FHIR binding for Patient.language",
+    "BCP 47 (urn:ietf:bcp:47) - primary FHIR binding for Patient.language (RFC 5646 tags)",
+    "BCP 47 language subtags often use ISO 639 codes; ISO 639 lists are for legacy intake only",
+    "ISO 639 - stewardship / crosswalk: partner or county labels map into BCP 47 for FHIR exchange",
     "LOINC (OID 2.16.840.1.113883.6.1) - e.g. 76691-5 Gender identity for Patient.gender_id",
     "SNOMED CT - coded clinical concepts where US Core bindings apply",
-    "ISO 639 - stewardship / crosswalk only; not primary FHIR exchange binding",
 ]
 
 SUPPORTING_LINES = [

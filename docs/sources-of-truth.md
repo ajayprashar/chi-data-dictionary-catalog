@@ -20,6 +20,10 @@ This application documents those layers on a single spine: **`semantic_id`**.
 
 ## Layered model
 
+![CHI curates semantic_id — national standards, CHI layers, and local crosswalk](assets/chi_ddc_semantic.png)
+
+*Source: [`docs/assets/chi_ddc_semantic.mmd`](assets/chi_ddc_semantic.mmd) (Mermaid) · SVG: [`chi_ddc_semantic.svg`](assets/chi_ddc_semantic.svg). Same diagram on Power BI **Guide · Start here**.*
+
 ```text
 USCDI              →  WHAT elements are in scope        (Catalog)
 US Core + FHIR R4  →  HOW elements are represented      (Dictionary)
@@ -38,7 +42,7 @@ Governance         →  WHO approved metadata             (approval_status, stew
 
 | Layer | Source of truth | In this repo | This repo does **not** |
 |-------|-----------------|--------------|-------------------------|
-| Federal data content | [USCDI](https://www.healthit.gov/isa/united-states-core-data-interoperability-uscdi) — **v3** cert baseline (2026); **v3.1+** via SVAP | Catalog: `uscdi_element`, classification | Replace ONC policy |
+| Federal data content | [USCDI](https://www.healthit.gov/isa/united-states-core-data-interoperability-uscdi) - **v3** cert baseline (2026); **v3.1+** via SVAP | Catalog: `uscdi_element`, classification | Replace ONC policy |
 | US exchange profiles | [US Core](https://hl7.org/fhir/us/core/) on FHIR R4 | Dictionary: `fhir_r4_path`, `fhir_profile` | Act as FHIR server or certifier |
 | National terminologies | HL7 THO, LOINC, SNOMED, BCP 47, CDCREC | Bindings → `value_set_url`; members = CHI subset | Host full code systems |
 | Enterprise terminology | **Innovaccer DAP** | References in notes; future `dap_value_set_id` | Duplicate ICD/SNOMED catalogs |
@@ -89,8 +93,8 @@ Operational ritual: `docs/operational-runbook.md`.
 
 | Page | Role |
 |------|------|
-| **Start here** | Purpose + sources of truth (static); first tab |
-| **Standards & Contexts** | **Default landing** - terminology + crosswalk + ADT/CCDA per `semantic_id` |
+| **Start here** | Purpose, sources of truth, and layers diagram (static); **default landing** |
+| **Standards & Contexts** | Terminology + crosswalk + ADT/CCDA per `semantic_id` |
 | **Concept Profile** | Governance + survivorship + sources per `semantic_id` |
 | **Governance Overview** | Portfolio status |
 
