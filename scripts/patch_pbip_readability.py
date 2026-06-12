@@ -28,6 +28,7 @@ from pbip_layout_constants import (  # noqa: E402
     SLICER_H_STANDARDS,
     SLICER_TITLE,
     SLICER_W,
+    STANDARDS_ADT_TABLE_H,
     standards_page_y_positions,
 )
 
@@ -124,6 +125,10 @@ def patch_visual(container: dict) -> list[str]:
             if pos.get("y") != layout["codes_y"]:
                 pos["y"] = layout["codes_y"]
                 changes.append(f"{title[:24]}… {name}: y -> {layout['codes_y']}")
+            if pos.get("height", 0) < layout["codes_h"]:
+                pos["height"] = layout["codes_h"]
+                changes.append(f"{title[:24]}… {name}: height -> {layout['codes_h']}")
+            _enable_word_wrap(visual)
 
         elif title.startswith(ADT_CONTEXT_TITLE) or title == CCDA_TITLE:
             layout = standards_page_y_positions()
@@ -131,6 +136,9 @@ def patch_visual(container: dict) -> list[str]:
             if pos.get("y") != layout["adt_y"]:
                 pos["y"] = layout["adt_y"]
                 changes.append(f"{title[:24]}… {name}: y -> {layout['adt_y']}")
+            if pos.get("height", 0) < STANDARDS_ADT_TABLE_H:
+                pos["height"] = STANDARDS_ADT_TABLE_H
+                changes.append(f"{title[:24]}… {name}: height -> {STANDARDS_ADT_TABLE_H}")
             if title.startswith(ADT_CONTEXT_TITLE):
                 _set_table_columns(visual, "ddc-hl7_adt_catalog", ADT_CONTEXT_COLUMNS)
                 _enable_word_wrap(visual)

@@ -27,6 +27,7 @@ from enhance_pbip_report import (  # noqa: E402
     lit_pt,
     lit_str,
     shape_rect,
+    text_run_style,
     textbox,
     vid,
     visual_container,
@@ -34,7 +35,7 @@ from enhance_pbip_report import (  # noqa: E402
     write_text_utf8_no_bom,
     write_visual,
 )
-from pbip_layout_constants import TAB_START_HERE  # noqa: E402
+from pbip_layout_constants import GUIDE_BODY_PT, GUIDE_FOOTER_PT, TAB_START_HERE  # noqa: E402
 from pbip_start_here_content import (  # noqa: E402
     HOW_TO_USE_LINES,
     PAGE_SUBTITLE,
@@ -48,19 +49,19 @@ START_HERE_PAGE_ID = "e1f2a3b4c5d607182934"
 START_HERE_DISPLAY_NAME = TAB_START_HERE
 
 
-def _body_paragraphs(lines: list[str], *, size: str = "12pt") -> list[dict]:
+def _body_paragraphs(lines: list[str], *, size: str = GUIDE_BODY_PT) -> list[dict]:
     paragraphs: list[dict] = []
     for line in lines:
         if not line:
-            paragraphs.append({"textRuns": [{"value": "", "textStyle": {"fontSize": "6pt"}}]})
+            paragraphs.append({"textRuns": [{"value": "", "textStyle": text_run_style("6pt", TEXT_BLACK)}]})
             continue
-        style: dict = {"fontSize": size, "color": TEXT_BLACK}
+        style = text_run_style(size, TEXT_BLACK)
         if " - " in line and not line[0].isdigit() and not line.strip().startswith(("1.", "2.", "3.", "4.")):
             label, rest = line.split(" - ", 1)
             paragraphs.append(
                 {
                     "textRuns": [
-                        {"value": f"{label} - ", "textStyle": {**style, "fontWeight": "bold"}},
+                        {"value": f"{label} - ", "textStyle": text_run_style(size, TEXT_BLACK, bold=True)},
                         {"value": rest, "textStyle": style},
                     ]
                 }
@@ -79,7 +80,7 @@ def section_panel(
     title: str,
     body_lines: list[str],
     *,
-    body_size: str = "12pt",
+    body_size: str = GUIDE_BODY_PT,
 ) -> dict:
     """Card-style panel: blue title band + cream body (matches table visuals)."""
     return visual_container(
@@ -108,11 +109,7 @@ def callout_banner(x: float, y: float, w: float, h: float, z: int, text: str) ->
                                     "textRuns": [
                                         {
                                             "value": text,
-                                            "textStyle": {
-                                                "fontSize": "12pt",
-                                                "fontWeight": "bold",
-                                                "color": TEXT_BLACK,
-                                            },
+                                            "textStyle": text_run_style(GUIDE_BODY_PT, TEXT_BLACK, bold=True),
                                         }
                                     ]
                                 }
@@ -189,7 +186,7 @@ def build_start_here_page(page_dir: Path) -> None:
         textbox(
             vid(), margin, h - footer_h + 10, content_w, 36, 9,
             "Read-only | docs/product-vision.md | docs/sources-of-truth.md | docs/shie-standards-reference.md",
-            size="12pt", color=TEXT_BLACK, transparent=True,
+            size=GUIDE_FOOTER_PT, color=TEXT_BLACK, transparent=True,
         ),
     ]
     for v in visuals:

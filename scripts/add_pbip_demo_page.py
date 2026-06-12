@@ -42,7 +42,13 @@ from pbip_demo_walkthrough_content import (  # noqa: E402
     STEPS_LINES,
     TIPS_LINES,
 )
-from pbip_layout_constants import DEMO_LANDING_PAGE_ID, DEMO_PAGE_ID, TAB_DEMO  # noqa: E402
+from pbip_layout_constants import (  # noqa: E402
+    DEMO_LANDING_PAGE_ID,
+    DEMO_PAGE_ID,
+    GUIDE_BODY_PT,
+    GUIDE_FOOTER_PT,
+    TAB_DEMO,
+)
 
 DEMO_DISPLAY_NAME = TAB_DEMO
 
@@ -76,7 +82,7 @@ def build_demo_page(page_dir: Path) -> None:
             PAGE_SUBTITLE,
             size="13pt", color=TEXT_WHITE, transparent=True,
         ),
-        section_panel(margin, row1_y, content_w, steps_h, 3, "Follow these steps", STEPS_LINES, body_size="12pt"),
+        section_panel(margin, row1_y, content_w, steps_h, 3, "Follow these steps", STEPS_LINES),
         section_panel(
             margin,
             quick_ref_y,
@@ -85,7 +91,6 @@ def build_demo_page(page_dir: Path) -> None:
             4,
             PILOT_QUICK_REF_TITLE,
             PILOT_QUICK_REF_LINES,
-            body_size="11pt",
         ),
         section_panel(margin, row2_y, (content_w - 16) // 2, row2_h, 5, "Who uses which tab", PERSONA_LINES),
         section_panel(
@@ -96,14 +101,13 @@ def build_demo_page(page_dir: Path) -> None:
             6,
             "Tips",
             TIPS_LINES,
-            body_size="11pt",
         ),
-        section_panel(margin, row3_y, content_w, about_h, 7, "About this report", INTRO_LINES, body_size="11pt"),
+        section_panel(margin, row3_y, content_w, about_h, 7, "About this report", INTRO_LINES),
         shape_rect(vid(), 0, h - footer_h, w, footer_h, 8, PRIMARY_YELLOW),
         textbox(
             vid(), margin, h - footer_h + 10, content_w, 36, 9,
             "Next: Standards & Contexts tab | OPEN-DEMO.bat and DEMO-WALKTHROUGH.txt in demo zip",
-            size="11pt", color=TEXT_BLACK, transparent=True,
+            size=GUIDE_FOOTER_PT, color=TEXT_BLACK, transparent=True,
         ),
     ]
     for v in visuals:

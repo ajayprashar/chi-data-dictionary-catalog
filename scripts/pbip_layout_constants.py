@@ -11,8 +11,15 @@ SLICER_W = 920
 SLICER_H_PROFILE = 120
 SLICER_H_STANDARDS = 108
 
+# Standards page: taller canvas (1920x1200) so middle tables meet TABLE_STANDARD_H without overlap.
+STANDARDS_PAGE_H = 1200
+
+# Table height tiers (visible-row budget at 12pt + 8px row padding; ~32px per row, ~68px chrome).
+TABLE_STANDARD_H = 300  # ~8-10 rows - value sets, crosswalk, source lists
+TABLE_COMPACT_H = 160  # ~4-5 rows - ADT/CCDA per concept
+
 # Standards page: FHIR terminology table (survivorship stays on Concept Profile only).
-FHIR_STANDARDS_TABLE_H = 248
+FHIR_STANDARDS_TABLE_H = 220
 FHIR_STANDARDS_COLUMNS = [
     "semantic_id",
     "fhir_r4_path",
@@ -32,10 +39,16 @@ PAGE_FIELD_GUIDE_ID = "f7a8b9c0d1e2f304152637"
 DEMO_PAGE_ID = "a9b8c7d6e5f403120918"
 DEMO_LANDING_PAGE_ID = DEMO_PAGE_ID
 
-# Informational (guide) vs functional (data) tabs - canvas background + tab label prefix.
+# Informational (guide) vs functional (data) tabs - tab label prefix; both use white canvas for readability.
 GUIDE_TAB_PREFIX = "Guide · "
-PAGE_BG_INFORMATIONAL = "#FFF9E6"
+PAGE_BG_INFORMATIONAL = "#FFFFFF"
 PAGE_BG_FUNCTIONAL = "#FFFFFF"
+
+# Guide textbox typography (match tableEx theme: Segoe UI, 13pt body).
+TEXT_FONT_FACE = "Segoe UI"
+TEXT_FONT_FACE_SEMIBOLD = "Segoe UI Semibold"
+GUIDE_BODY_PT = "13pt"
+GUIDE_FOOTER_PT = "12pt"
 PAGE_STANDARDS_REF_ID = "b1c2d3e4f5061728394a"
 INFORMATIONAL_PAGE_IDS = frozenset(
     {PAGE_START_HERE_ID, DEMO_PAGE_ID, PAGE_STANDARDS_REF_ID, PAGE_FIELD_GUIDE_ID}
@@ -76,7 +89,6 @@ CONCEPT_CALLOUT_H = 56
 CONCEPT_CARD_H = 148
 CONCEPT_CARD_GAP = 16
 CONCEPT_PROFILE_CARD_COUNT = 5
-STANDARDS_ADT_CALLOUT_H = 80
 ADT_CALLOUT_TEXT = (
     "ADT: field_id = HL7 position (e.g. PID-15 for language). "
     "hl7_ce_encoding = code^text CE pair when both components are mapped (race, ethnicity)."
@@ -100,10 +112,11 @@ ADT_CONTEXT_COLUMNS = [
 ]
 
 STANDARDS_HEADER_H = 128
-STANDARDS_LAYER_H = 88
+STANDARDS_LAYER_H = 72
 STANDARDS_TABLE_GAP = 12
-STANDARDS_HALF_TABLE_H = 200
-STANDARDS_ADT_TABLE_H = 148
+STANDARDS_HALF_TABLE_H = TABLE_STANDARD_H  # alias: half-width pair on Standards page
+STANDARDS_ADT_TABLE_H = TABLE_COMPACT_H
+STANDARDS_ADT_CALLOUT_H = 64
 
 
 def concept_profile_layout() -> dict[str, int]:
@@ -136,20 +149,33 @@ def concept_profile_layout() -> dict[str, int]:
     }
 
 
-def standards_page_y_positions() -> dict[str, int]:
-    """Vertical layout for Standards & Contexts (1920x1080) - sized from footer up."""
-    content_bottom = PROFILE_PAGE_H - CONCEPT_FOOTER_H - 12
+def standards_page_y_positions(*, page_h: int = STANDARDS_PAGE_H) -> dict[str, int]:
+    """Vertical layout for Standards & Contexts (1920x1200) - bottom-up with overlap check."""
+    content_bottom = page_h - CONCEPT_FOOTER_H - 12
     layer_y = STANDARDS_HEADER_H + 8
     slicer_y = layer_y + STANDARDS_LAYER_H + STANDARDS_TABLE_GAP
     fhir_y = slicer_y + SLICER_H_STANDARDS + 16
     fhir_h = FHIR_STANDARDS_TABLE_H
+    codes_y = fhir_y + fhir_h + STANDARDS_TABLE_GAP
     adt_h = STANDARDS_ADT_TABLE_H
     adt_callout_h = STANDARDS_ADT_CALLOUT_H
     adt_y = content_bottom - adt_h
     adt_callout_y = adt_y - adt_callout_h - 4
-    codes_y = fhir_y + fhir_h + STANDARDS_TABLE_GAP
     codes_h = adt_callout_y - codes_y - STANDARDS_TABLE_GAP
+    if codes_h < TABLE_STANDARD_H:
+        raise ValueError(
+            f"Standards page layout: codes_h={codes_h}px < TABLE_STANDARD_H={TABLE_STANDARD_H}. "
+            f"Increase STANDARDS_PAGE_H or shrink bands above the codes row."
+        )
+    codes_end = codes_y + codes_h
+    callout_end = codes_end + STANDARDS_TABLE_GAP + adt_callout_h
+    if callout_end + 4 > adt_y:
+        raise ValueError(
+            f"Standards page layout overlap: codes/callout end at {callout_end + 4}px "
+            f"but ADT row starts at {adt_y}px."
+        )
     return {
+        "page_h": page_h,
         "layer_y": layer_y,
         "layer_h": STANDARDS_LAYER_H,
         "slicer_y": slicer_y,
@@ -161,6 +187,6 @@ def standards_page_y_positions() -> dict[str, int]:
         "adt_callout_h": adt_callout_h,
         "adt_y": adt_y,
         "adt_h": adt_h,
-        "footer_y": PROFILE_PAGE_H - CONCEPT_FOOTER_H,
+        "footer_y": page_h - CONCEPT_FOOTER_H,
         "content_bottom": content_bottom,
     }

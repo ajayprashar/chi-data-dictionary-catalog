@@ -63,7 +63,11 @@ Pilot dictionary notes use `\n` line breaks in `scripts/seed_demographics_pilot.
 
 The report uses **Actual size** (not Fit to page) and a **high-contrast** theme (blue / yellow / black on white).
 
+**Guide tab text:** informational pages (`Guide · …` tabs) use **textbox** visuals with **Segoe UI 13pt** on a **white** canvas—the same font family as tables/cards. Rebuild after script changes: `python scripts/rebuild_all_pbip_pages.py`.
+
 **Table readability:** each table has three visual layers - **dark blue title band** (visual title), **light blue column header row** (field names), **white/zebra data rows**. If column headers look like the title after manual edits, select the visual → **Format** → **Reset to default** (theme + `enhance_pbip_report.py` set the header row separately).
+
+**Table height tiers** (`scripts/pbip_layout_constants.py`): **Standard** = 300px (~8–10 visible rows) for value sets and crosswalk; **Compact** = 160px (~4–5 rows) for ADT/CCDA. **Standards & Contexts** uses a **1920×1200** page (other tabs stay 1920×1080) so the middle tables meet the standard tier without overlapping FHIR or ADT bands. Layout is validated in `standards_page_y_positions()` — rebuild with `python scripts/rebuild_all_pbip_pages.py`.
 
 In Power BI Desktop:
 

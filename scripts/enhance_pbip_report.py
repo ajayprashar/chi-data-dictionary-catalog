@@ -31,7 +31,7 @@ from pbip_layout_constants import (  # noqa: E402
     SLICER_H_STANDARDS,
     SLICER_TITLE,
     SLICER_W,
-    STANDARDS_HALF_TABLE_H,
+    STANDARDS_PAGE_H,
     STANDARDS_HEADER_H,
     STANDARDS_LAYER_H,
     STANDARDS_ADT_CALLOUT_H,
@@ -51,8 +51,12 @@ from pbip_layout_constants import (  # noqa: E402
     TAB_STANDARDS_CONTEXTS,
     TAB_STANDARDS_REF,
     TAB_START_HERE,
+    GUIDE_BODY_PT,
+    GUIDE_FOOTER_PT,
     PAGE_BG_FUNCTIONAL,
     PAGE_BG_INFORMATIONAL,
+    TEXT_FONT_FACE,
+    TEXT_FONT_FACE_SEMIBOLD,
 )
 
 PAGES_JSON_SCHEMA = (
@@ -320,6 +324,21 @@ def bar_format() -> dict:
     }
 
 
+def text_run_style(
+    size: str,
+    color: str,
+    *,
+    bold: bool = False,
+    font_face: str | None = None,
+) -> dict:
+    """Inline style for textbox textRuns - Segoe UI matches tableEx theme rendering."""
+    face = font_face or (TEXT_FONT_FACE_SEMIBOLD if bold else TEXT_FONT_FACE)
+    style: dict = {"fontSize": size, "color": color, "fontFace": face}
+    if bold:
+        style["fontWeight"] = "bold"
+    return style
+
+
 def callout_strip(
     name: str,
     x: float,
@@ -329,13 +348,11 @@ def callout_strip(
     z: int,
     text: str,
     *,
-    size: str = "11pt",
+    size: str = GUIDE_BODY_PT,
     bold: bool = True,
 ) -> dict:
     """Yellow accent callout - needs explicit height so wrapped text does not stack in PBI."""
-    run_style: dict = {"fontSize": size, "color": TEXT_BLACK}
-    if bold:
-        run_style["fontWeight"] = "bold"
+    run_style = text_run_style(size, TEXT_BLACK, bold=bold)
     return visual_container(
         name, x, y, w, h, z,
         {
@@ -394,10 +411,12 @@ def textbox(
     size: str = "14pt",
     color: str = TEXT_BLACK,
     transparent: bool = False,
+    font_face: str | None = None,
 ) -> dict:
-    run: dict = {"value": text, "textStyle": {"fontSize": size, "color": color}}
-    if bold:
-        run["textStyle"]["fontWeight"] = "bold"
+    run: dict = {
+        "value": text,
+        "textStyle": text_run_style(size, color, bold=bold, font_face=font_face),
+    }
     visual: dict = {
         "visualType": "textbox",
         "objects": {"general": [{"properties": {"paragraphs": [{"textRuns": [run]}]}}]},
@@ -643,7 +662,8 @@ def build_concept_profile_page(page_dir: Path) -> None:
 
 def build_standards_contexts_page(page_dir: Path) -> None:
     clear_visuals(page_dir)
-    w, h = PAGE_PROFILE_W, PAGE_PROFILE_H
+    w = PAGE_PROFILE_W
+    h = STANDARDS_PAGE_H
     margin = PAGE_MARGIN
     content_w = CONTENT_W
     header_h = STANDARDS_HEADER_H
@@ -1068,7 +1088,7 @@ def sync_page_tab_styles() -> None:
         (PAGE_START_HERE_ID, TAB_START_HERE, PAGE_PROFILE_W, PAGE_PROFILE_H, True),
         (DEMO_PAGE_ID, TAB_DEMO, PAGE_PROFILE_W, PAGE_PROFILE_H, True),
         (PAGE_STANDARDS_REF_ID, TAB_STANDARDS_REF, PAGE_PROFILE_W, PAGE_PROFILE_H, True),
-        (STANDARDS_PAGE_ID, TAB_STANDARDS_CONTEXTS, PAGE_PROFILE_W, PAGE_PROFILE_H, False),
+        (STANDARDS_PAGE_ID, TAB_STANDARDS_CONTEXTS, PAGE_PROFILE_W, STANDARDS_PAGE_H, False),
         (PAGE_CONCEPT_PROFILE_ID, TAB_CONCEPT_PROFILE, PAGE_PROFILE_W, PAGE_PROFILE_H, False),
         (PAGE_FIELD_GUIDE_ID, TAB_FIELD_GUIDE, PAGE_PROFILE_W, PAGE_PROFILE_H, True),
         (PAGE_GOVERNANCE_ID, TAB_GOVERNANCE_OVERVIEW, PAGE_OVERVIEW_W, PAGE_OVERVIEW_H, False),

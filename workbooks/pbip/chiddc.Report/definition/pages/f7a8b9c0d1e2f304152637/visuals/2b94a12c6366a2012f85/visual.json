@@ -1,0 +1,38 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
+  "name": "2b94a12c6366a2012f85",
+  "position": {
+    "x": 32,
+    "y": 394,
+    "z": 10,
+    "height": 36,
+    "width": 1856,
+    "tabOrder": 10
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Layers: Catalog = WHAT | Dictionary = HOW | Terminology/Crosswalk = WHICH | Message context = WHERE | Sources = coverage",
+                    "textStyle": {
+                      "fontSize": "13pt",
+                      "color": "#000000",
+                      "fontFace": "Segoe UI"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

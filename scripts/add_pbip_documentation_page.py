@@ -43,7 +43,7 @@ from enhance_pbip_report import (  # noqa: E402
 )
 from generate_pbip_model_guide import generate as generate_guide  # noqa: E402
 from generate_pbip_model_guide import generate_gaps  # noqa: E402
-from pbip_layout_constants import TAB_FIELD_GUIDE  # noqa: E402
+from pbip_layout_constants import GUIDE_BODY_PT, GUIDE_FOOTER_PT, TAB_FIELD_GUIDE  # noqa: E402
 from pbip_report_manifest import (  # noqa: E402
     GUIDE_COLUMNS,
     GUIDE_PARQUET,
@@ -325,7 +325,7 @@ def build_field_guide_page(page_dir: Path) -> None:
         textbox(
             vid(), margin, workflow_y, content_w, workflow_h, 6,
             PUBLISH_RITUAL + " | Concept Profile: pick semantic_id slicer after publish | docs/excel-workbook-guide.md",
-            size="11pt", color=TEXT_BLACK,
+            size=GUIDE_BODY_PT, color=TEXT_BLACK,
         ),
         card(vid(), margin, card_y, purpose_w, card_h, 7, GUIDE, "page_purpose", value_pt=13),
         card(vid(), margin + purpose_w + 16, card_y, interop_w - audience_w - 16, card_h, 8, GUIDE, "page_interop_summary", value_pt=12),
@@ -333,7 +333,7 @@ def build_field_guide_page(page_dir: Path) -> None:
         textbox(
             vid(), margin, legend_y, content_w, legend_h, 10,
             "Layers: Catalog = WHAT | Dictionary = HOW | Terminology/Crosswalk = WHICH | Message context = WHERE | Sources = coverage",
-            size="11pt", color=TEXT_BLACK,
+            size=GUIDE_BODY_PT, color=TEXT_BLACK,
         ),
         guide_detail_table(vid(), margin, table_y, content_w, table_h, 11),
         guide_gaps_table(vid(), margin, gaps_y, content_w, gaps_h, 12),
@@ -341,7 +341,7 @@ def build_field_guide_page(page_dir: Path) -> None:
         textbox(
             vid(), margin, h - footer_h + 10, content_w, 36, 14,
             "Gaps from live parquet | docs/demographics-pilot-plan.md | validate: scripts/validate_pbip_manifest.py",
-            size="11pt", color=TEXT_BLACK, transparent=True,
+            size=GUIDE_FOOTER_PT, color=TEXT_BLACK, transparent=True,
         ),
     ]
     for v in visuals:

@@ -27,6 +27,7 @@ from enhance_pbip_report import (  # noqa: E402
     write_visual,
 )
 from pbip_layout_constants import (  # noqa: E402
+    GUIDE_FOOTER_PT,
     PAGE_STANDARDS_REF_ID,
     TAB_STANDARDS_REF,
 )
@@ -52,7 +53,7 @@ def build_standards_reference_page(page_dir: Path) -> None:
     content_bottom = h - footer_h - 12
     row1_y = header_h + 12
     col_w = (content_w - 16) // 2
-    layer_h = 120  # 3 body lines at 11pt + title band; 88px caused vertical scroll
+    layer_h = 128  # 3 body lines at 13pt + title band
     cols_gap = 12
     cols_h = 300
     cols_y = row1_y + layer_h + cols_gap
@@ -71,24 +72,24 @@ def build_standards_reference_page(page_dir: Path) -> None:
             PAGE_SUBTITLE,
             size="13pt", color=TEXT_WHITE, transparent=True,
         ),
-        section_panel(margin, row1_y, content_w, layer_h, 3, "How standards layer together", LAYER_LINES, body_size="11pt"),
+        section_panel(margin, row1_y, content_w, layer_h, 3, "How standards layer together", LAYER_LINES),
         section_panel(
             margin, cols_y, col_w, cols_h, 4,
-            "Exchange & content standards", EXCHANGE_STANDARDS_LINES, body_size="11pt",
+            "Exchange & content standards", EXCHANGE_STANDARDS_LINES,
         ),
         section_panel(
             margin + col_w + 16, cols_y, col_w, cols_h, 5,
-            "Terminology authorities", TERMINOLOGY_LINES, body_size="11pt",
+            "Terminology authorities", TERMINOLOGY_LINES,
         ),
         section_panel(
             margin, row2_y, content_w, row2_h, 6,
-            "Supporting references", SUPPORTING_LINES, body_size="11pt",
+            "Supporting references", SUPPORTING_LINES,
         ),
         shape_rect(vid(), 0, h - footer_h, w, footer_h, 7, PRIMARY_YELLOW),
         textbox(
             vid(), margin, h - footer_h + 10, content_w, 36, 8,
             "Mirror: docs/shie-standards-reference.md | Notion Authoritative Standards / Sources of Truth",
-            size="11pt", color=TEXT_BLACK, transparent=True,
+            size=GUIDE_FOOTER_PT, color=TEXT_BLACK, transparent=True,
         ),
     ]
     for v in visuals:
