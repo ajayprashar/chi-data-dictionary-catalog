@@ -69,7 +69,7 @@ table ddc-ccda_catalog
 		mode: import
 		source =
 				let
-				    Source = Parquet.Document(File.Contents("C:\AI\chiddc\ddc-ccda_catalog.parquet"), [Compression=null, LegacyColumnNameEncoding=false, MaxDepth=null])
+				    Source = Parquet.Document(File.Contents("C:\AI\Incoming\chiddc\ddc-ccda_catalog.parquet"), [Compression=null, LegacyColumnNameEncoding=false, MaxDepth=null])
 				in
 				    Source
 

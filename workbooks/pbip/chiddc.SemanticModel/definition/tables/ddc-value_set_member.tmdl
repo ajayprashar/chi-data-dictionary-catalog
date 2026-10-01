@@ -93,7 +93,7 @@ table ddc-value_set_member
 		mode: import
 		source =
 				let
-				    Source = Parquet.Document(File.Contents("C:\AI\chiddc\ddc-value_set_member.parquet"), [Compression=null, LegacyColumnNameEncoding=false, MaxDepth=null]),
+				    Source = Parquet.Document(File.Contents("C:\AI\Incoming\chiddc\ddc-value_set_member.parquet"), [Compression=null, LegacyColumnNameEncoding=false, MaxDepth=null]),
 				    #"PBIP default subset" = Table.SelectRows(Source, each [pbi_default_show] = "true")
 				in
 				    #"PBIP default subset"

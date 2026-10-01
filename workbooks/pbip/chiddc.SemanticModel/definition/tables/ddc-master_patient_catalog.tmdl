@@ -246,7 +246,7 @@ table ddc-master_patient_catalog
 		mode: import
 		source =
 				let
-				    Source = Parquet.Document(File.Contents("C:\AI\chiddc\ddc-master_patient_catalog.parquet"), [Compression=null, LegacyColumnNameEncoding=false, MaxDepth=null])
+				    Source = Parquet.Document(File.Contents("C:\AI\Incoming\chiddc\ddc-master_patient_catalog.parquet"), [Compression=null, LegacyColumnNameEncoding=false, MaxDepth=null])
 				in
 				    Source
 

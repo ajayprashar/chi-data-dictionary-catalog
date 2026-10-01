@@ -1,5 +1,9 @@
 ## chi-data-dictionary-catalog (POC)
 
+**Local path:** `C:\AI\Incoming\chiddc` (moved from `C:\AI\chiddc`).  
+**Sibling extract:** [`lookup-rollup`](../lookup-rollup) — see [RELATED.md](RELATED.md).  
+**Cursor workspace:** [`../data-curation-standards.code-workspace`](../data-curation-standards.code-workspace)
+
 **Governed data catalog and data dictionary** for CHI patient concepts (`semantic_id`), curated against **healthcare standards** (USCDI, US Core, terminology), with dictionary detail and **interop views for HL7 ADT, C-CDA, and FHIR**.
 
 Layered model diagram: [`docs/assets/chi_ddc_semantic.png`](docs/assets/chi_ddc_semantic.png) (also on Power BI **Guide · Start here**). Narrative: [`docs/sources-of-truth.md`](docs/sources-of-truth.md).

@@ -197,7 +197,7 @@ table ddc-application_guide
 		mode: import
 		source =
 				let
-				    Source = Parquet.Document(File.Contents("C:\AI\chiddc\ddc-application_guide.parquet"), [Compression=null, LegacyColumnNameEncoding=false, MaxDepth=null])
+				    Source = Parquet.Document(File.Contents("C:\AI\Incoming\chiddc\ddc-application_guide.parquet"), [Compression=null, LegacyColumnNameEncoding=false, MaxDepth=null])
 				in
 				    Source
 
