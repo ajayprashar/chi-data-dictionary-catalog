@@ -1,6 +1,6 @@
 # SHIE Standards Reference
 
-Governed interoperability and terminology standards used by **SHIE (Community Health Insights)**. Maps each standard to the demographics pilot `semantic_id`s and to steward workbook / dictionary columns.
+Governed interoperability and terminology standards used by **CHI** (Community Health Insights; formerly **SHIE**). Maps each standard to the demographics pilot `semantic_id`s and to steward workbook / dictionary columns. Both names appear in older notes and file titles; prefer CHI in new prose.
 
 **Related:** `docs/demographics-pilot-plan.md` (pilot curation), `docs/sources-of-truth.md` (layered authority), `TECH-SPEC.md` (schemas), `ccd_interface_mapping.md` (CCD paths).
 
