@@ -14,6 +14,8 @@ Use this page as the index for which documents are actively maintained versus ke
   - Curator diagram: national standards → CHI layers on `semantic_id` → local crosswalk; rendered on **Guide · Start here**.
 - `README.md`
   - Entry point for the operating model, pipeline commands, and core files.
+- `RELATED.md`
+  - Sibling repo `lookup-rollup` (full demographic terminology). This repo governs concepts. Do not merge. Approved colleague doors are SharePoint, Excel, and Power BI. The extract → value-set feed is not wired yet.
 - `TECH-SPEC.md`
   - Architecture, data model, and implementation behavior.
 - `docs/demographics-pilot-plan.md`
@@ -71,4 +73,4 @@ Use this page as the index for which documents are actively maintained versus ke
 
 When content conflicts, prefer the canonical set first.
 
-Notion pages are treated as planning/reference input. The repo's canonical documents above are the source-controlled implementation contract.
+Notion pages are planning input only. Notion is not an approved corporate surface. The repo's canonical documents above are the source-controlled implementation contract. Colleagues receive an Excel snapshot or a Power BI service report after a manual copy into the work environment (`RELATED.md`). SharePoint does not reach this machine.

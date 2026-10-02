@@ -44,7 +44,7 @@ Governance         →  WHO approved metadata             (approval_status, stew
 |-------|-----------------|--------------|-------------------------|
 | Federal data content | [USCDI](https://www.healthit.gov/isa/united-states-core-data-interoperability-uscdi) - **v3** cert baseline (2026); **v3.1+** via SVAP | Catalog: `uscdi_element`, classification | Replace ONC policy |
 | US exchange profiles | [US Core](https://hl7.org/fhir/us/core/) on FHIR R4 | Dictionary: `fhir_r4_path`, `fhir_profile` | Act as FHIR server or certifier |
-| National terminologies | HL7 THO, LOINC, SNOMED, BCP 47, CDCREC | Bindings → `value_set_url`; members = CHI subset | Host full code systems |
+| National terminologies | HL7 THO, LOINC, SNOMED, BCP 47, CDCREC | Bindings → `value_set_url`; members = CHI subset | Host full code systems. Full demographic extracts live in sibling repo `lookup-rollup` ([RELATED.md](../RELATED.md)); the feed into these members is not wired yet |
 | Enterprise terminology | **Innovaccer DAP** | References in notes; future `dap_value_set_id` | Duplicate ICD/SNOMED catalogs |
 | CHI governance | Steward-signed Excel → parquet → git | `approval_status`, survivorship, bindings | Auto-approve without steward |
 | County / partner codes | Survivorship SQL, CMT, intake | `Source_Value_Crosswalk` | Treat local strings as national codes |

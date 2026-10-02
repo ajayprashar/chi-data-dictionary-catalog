@@ -2,7 +2,7 @@
 
 How CHI documents **which standards apply**, **which codes are governed**, and **how source values map** - without duplicating full terminology catalogs (DAP remains system of record per `TECH-SPEC.md` §1.7).
 
-**Related:** `docs/shie-standards-reference.md`, `docs/operational-runbook.md`, `docs/demographics-pilot-plan.md`
+**Related:** `docs/shie-standards-reference.md`, `docs/operational-runbook.md`, `docs/demographics-pilot-plan.md`, [RELATED.md](../RELATED.md) (full lists live in sibling repo `lookup-rollup`)
 
 ---
 
@@ -34,7 +34,7 @@ flowchart LR
 
 | Do not duplicate locally | Use instead |
 |--------------------------|-------------|
-| Full CDCREC / SNOMED / LOINC / ICD-10 | HL7 terminology URLs + **DAP** at runtime |
+| Full CDCREC / SNOMED / LOINC / ICD-10 | HL7 terminology URLs + **DAP** at runtime. Full demographic extracts (including CDCREC) are built in sibling repo `lookup-rollup`. This repo should consume that extract for value-set members. That feed is not wired; local seed and HL7 `$expand` can drift from the extract. See [RELATED.md](../RELATED.md). |
 | Every BCP 47 language tag | Binding + pilot **examples**; expand as needed |
 | ICD-10 / ICD-9 (not in demographics pilot) | Add when curating clinical `semantic_id`s |
 

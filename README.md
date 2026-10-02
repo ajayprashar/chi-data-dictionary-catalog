@@ -22,13 +22,15 @@ Edit `chi-steward-workbook.xlsx` → import to parquet → review in Power BI (*
 
 | Authoring (use now) | Optional read | Defer |
 |---------------------|---------------|-------|
-| `workbooks/chi-steward-workbook.xlsx` | `workbooks/pbip/chiddc.pbip` (Power BI) | SharePoint |
+| `workbooks/chi-steward-workbook.xlsx` | `workbooks/pbip/chiddc.pbip` (Power BI) | SharePoint co-authoring of this workbook |
 | `Catalog` + `Dictionary` + `Source_Availability` + `ADT_Mappings` + `CCDA_Mappings` | See `docs/power-bi-concept-profile-setup.md` | Partner intake workbook |
 | `Concept_Explorer` sheet | Jupyter notebook (`chi-data-dictionary-catalog.ipynb`) for ad-hoc DuckDB queries only | Full 28-source coverage |
 | `import_steward_workbook_to_parquet.py` | | Azure DevOps, Innovaccer DEM |
 | 5 demographics attributes | `workbooks/chi-partner-intake-workbook.xlsx` when onboarding partners | FHIR inventory curation |
 
 **POC goal:** prove governed catalog + dictionary + standards + message contexts (ADT/CDA/FHIR) on one `semantic_id`.
+
+SharePoint is not connected to this machine. A colleague page there can only point at files you copy over RDP, or at a report already published to the Power BI service. Co-authoring the steward workbook on SharePoint stays deferred. See [RELATED.md](RELATED.md).
 
 **Pilot status:** `docs/demographics-pilot-plan.md` · **Standards:** `docs/shie-standards-reference.md` · **FAQ:** `docs/faq.md` (catalog vs dictionary, PBIP pages)
 
