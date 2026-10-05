@@ -37,8 +37,9 @@ CATALOG_UPDATES: dict[str, dict[str, str]] = {
 DICTIONARY_UPDATES: dict[str, dict[str, str]] = {
     "Patient.race": {
         "chi_survivorship_logic": (
-            "County: CDC PHIN OMB rollup (R1–R5, R9, Multi-Racial)\n"
-            "Detail trumps rollup (e.g. Japanese > Asian)\n"
+            "Store the most specific CDCREC code known (e.g. Japanese), not the OMB chart bucket\n"
+            "Today's county crosswalk (Japanese → Asian) is the legacy reporting map, not the stored code\n"
+            "Chart bucket = OMB (R1–R5, R9, Multi-Racial). Do not write that bucket back onto the person\n"
             "Exclude Unknown, DTS, Other Race from aggregates\n"
             "Self-report first; else reliability-tiered (FQHC/community > BH > hospital > payer)\n"
             "Multi-racial when consistent; alert on unmapped values"
@@ -47,9 +48,9 @@ DICTIONARY_UPDATES: dict[str, dict[str, str]] = {
             "Terminology: CDCREC urn:oid:2.16.840.1.113883.6.238\n"
             "Value set: HL7 v3-Race\n"
             "US Core: us-core-race ombCategory (required), detailed (optional), text\n"
-            "OMB examples: 1002-5, 2028-9, 2054-5, 2076-8, 2106-3, 2131-1\n"
+            "Store detailed when known; OMB examples for the chart only: 1002-5, 2028-9, 2054-5, 2076-8, 2106-3, 2131-1\n"
             "NullFlavor: unknown, declined, missing are distinct\n"
-            "Reporting: OMB/CDC PHIN v1.3 + county Table 5\n"
+            "Legacy reporting map: county Table 5 → OMB bucket. Not the L3 stored code\n"
             "Sources: 28+ race values; granularity varies"
         ),
         "data_source_rank_reference": (
@@ -58,19 +59,20 @@ DICTIONARY_UPDATES: dict[str, dict[str, str]] = {
     },
     "Patient.ethnicity": {
         "chi_survivorship_logic": (
-            "County: CDC OMB ethnicity rollup (Hispanic or Latino / Not Hispanic or Latino)\n"
-            "Detail trumps rollup (e.g. Mexican, Cuban > Hispanic or Latino)\n"
+            "Store the most specific CDCREC code known (e.g. Mexican), not the OMB chart bucket\n"
+            "Today's county crosswalk (Mexican → Hispanic or Latino) is the legacy reporting map, not the stored code\n"
+            "Chart bucket = Hispanic or Latino / Not Hispanic or Latino. Do not write that bucket back onto the person\n"
             "Exclude Unknown, declined, patient-refused from aggregates\n"
             "Self-report first; reliability-tiered fallback"
         ),
         "data_quality_notes": (
             "Terminology: CDCREC urn:oid:2.16.840.1.113883.6.238\n"
             "Value set: HL7 v3-Ethnicity\n"
-            "US Core: us-core-ethnicity extension\n"
-            "OMB examples: 2135-2 Hispanic or Latino, 2186-5 Not Hispanic or Latino\n"
-            "Detail (Mexican, Cuban) maps to rollup\n"
+            "US Core: us-core-ethnicity ombCategory + detailed\n"
+            "Chart only: 2135-2 Hispanic or Latino, 2186-5 Not Hispanic or Latino\n"
+            "Store Mexican, Cuban, and other detailed codes when known\n"
             "NullFlavor: do not collapse unknown, declined, patient-refused\n"
-            "Reporting: OMB E1/E2 + county Table 5\n"
+            "Legacy reporting map: county Table 5 → OMB bucket. Not the L3 stored code\n"
             "Sources: 7+ values; Housing high coverage"
         ),
         "data_source_rank_reference": (

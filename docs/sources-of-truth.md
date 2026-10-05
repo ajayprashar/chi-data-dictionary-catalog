@@ -36,6 +36,19 @@ Governance         →  WHO approved metadata             (approval_status, stew
 
 **Master patient truth (L3)** is the canonical demographics layer in operations. ADT, CCDA, and FHIR are **renderings** of governed concepts for exchange - see `TECH-SPEC.md` §1.1.
 
+## Store versus chart
+
+Partner string → **store the standard code you know** → **chart is a separate map**. Do not write the chart bucket back onto the person.
+
+| Step | What it holds | Example |
+| --- | --- | --- |
+| Store | Most specific standard code actually known | Mandarin `cmn`; Japanese when the source sent Japanese |
+| Inbound crosswalk | Partner or county string → that stored code | `Mandarin` → `cmn` |
+| Chart / reporting | Stored code → county shortlist or OMB bucket | `cmn` → Mandarin or Other; Japanese → Asian on the chart only |
+| CHR | Shows the stored code | Mandarin, not Chinese; Dutch, not European |
+
+The same split is `Src*` / `Map*` / `RptRollup*` in sibling repo `lookup-rollup` (`ARCHITECTURE.md`). Language `RptRollup*` stays blank until the county signs the shortlist. Today's race and ethnicity county crosswalk (Japanese → Asian, Mexican → Hispanic or Latino) is the **legacy reporting map**, not the stored code.
+
 ---
 
 ## Who owns what
@@ -81,9 +94,9 @@ Operational ritual: `docs/operational-runbook.md`.
 
 | `semantic_id` | Standards spine | Deliberate distinction |
 |---------------|-----------------|------------------------|
-| `Patient.race` | USCDI Race → us-core-race → CDCREC / HL7 Race | OMB rollup vs detailed; NullFlavor ≠ race |
-| `Patient.ethnicity` | USCDI Ethnicity → us-core-ethnicity → CDCREC | Detail rolls to Hispanic / Not Hispanic |
-| `Patient.language` | Preferred language → BCP 47 | ISO 639 crosswalk only |
+| `Patient.race` | USCDI Race → us-core-race → CDCREC / HL7 Race | Store detailed CDCREC when known; OMB bucket is the chart. County Japanese → Asian crosswalk is the legacy reporting map. NullFlavor ≠ race |
+| `Patient.ethnicity` | USCDI Ethnicity → us-core-ethnicity → CDCREC | Store Mexican when known; Hispanic or Latino is the chart. County crosswalk to the OMB bucket is the legacy reporting map |
+| `Patient.language` | Preferred language → BCP 47 | Store `cmn` / `yue`. SIL parent is not the chart. Shortlist unsigned |
 | `Patient.gender_id` | Gender identity → LOINC 76691-5 → HL7 gender-identity | **Not** CMT SexID / not `birth_sex` |
 | `Patient.birth_sex` | Sex → us-core-birthsex | County Table 2 / SexID rollup |
 

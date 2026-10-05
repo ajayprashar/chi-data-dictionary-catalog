@@ -102,8 +102,8 @@ Maps **SHIE county master-demographics logic** (survivorship spreadsheet, CMT SQ
 
 | SHIE master-demographics attribute | Pilot `semantic_id` | Notes |
 |-----------------------------------|---------------------|-------|
-| Race – Rollup / Detail | `Patient.race` | CDC OMB; detail trumps rollup |
-| Ethnicity – Rollup / Detail | `Patient.ethnicity` | CDC E1/E2; detail trumps rollup |
+| Race – Rollup / Detail | `Patient.race` | Store detailed CDCREC when known; OMB is the chart. County crosswalk to OMB is the legacy reporting map |
+| Ethnicity – Rollup / Detail | `Patient.ethnicity` | Store detailed CDCREC when known; OMB is the chart. County crosswalk to OMB is the legacy reporting map |
 | Language – Rollup / Detail | `Patient.language` | BCP 47 on the person; chart = county shortlist (unsigned); SIL parent ≠ chart |
 | Gender Identity (USCDI) | `Patient.gender_id` | Self-report; LOINC 76691-5 - **not** CMT `SexID` rollup |
 | Birth sex / Sex (`SexID`) | `Patient.birth_sex` | CMT “Gender – Rollup/Detail” SQL applies here, not `gender_id` |
@@ -129,7 +129,7 @@ Use these themes in `chi_survivorship_logic` or `data_source_rank_reference` whe
 - **Data enterprises:** Non-operational enterprises with patient records; exclusions per county SQL (e.g. `0`, `1000`, `3000`, `3001`, `1400`, `1600`, `2603` - confirm current list with Andrea/county logic).
 - **Source reliability tiers (1–3):** Low = distress/infrequent/poor-known (e.g. ESO, ZOLL); high = trusted clinical/registration; weigh by tier then recency/completeness.
 - **Unknown / not informative:** Treat `Unknown`, `DTS`, `Declined`, `Other` (where noted) as null for aggregates - same as missing.
-- **Detail trumps rollup:** Prefer granular value when mapping to reporting rollup (e.g. Japanese → Asian, Mexican → Hispanic or Latino).
+- **Store versus chart:** Follow [docs/sources-of-truth.md](sources-of-truth.md). Do not restate that rule here.
 - **INV / curation alert:** Unmapped new source values trigger steward review (document in `data_quality_notes`).
 
 ### Example steward text (copy and adapt)
@@ -143,9 +143,10 @@ Replace bracketed placeholders. Keep each `chi_survivorship_logic` cell to **~3�
 **Dictionary - `chi_survivorship_logic`:**
 
 ```text
-County: CDC PHIN Race/Ethnicity v1.3 OMB rollup (R1–R5, R9, Multi-Racial). Detail trumps rollup (e.g. Japanese > Asian).
-Exclude Unknown, DTS, Other Race from aggregates. Self-report first; else reliability-tiered (FQHC/community > BH > hospital > payer).
-Multi-racial when consistent across sources. Alert on unmapped values for curation.
+Store the most specific CDCREC code known (e.g. Japanese), not the OMB chart bucket.
+Today's county crosswalk (Japanese → Asian) is the legacy reporting map, not the stored code.
+Chart bucket = OMB. Do not write that bucket back onto the person.
+Exclude Unknown, DTS, Other Race from aggregates. Self-report first; else reliability-tiered.
 ```
 
 **Dictionary - `data_quality_notes`:** CDCREC OID, HL7 Race Value Set, example ombCategory codes, NullFlavor, OMB/Table 5 rollup - see `docs/shie-standards-reference.md` and seeded text in `seed_demographics_pilot.py`.
@@ -163,8 +164,9 @@ Multi-racial when consistent across sources. Alert on unmapped values for curati
 **Dictionary - `chi_survivorship_logic`:**
 
 ```text
-County: CDC OMB ethnicity rollup (Hispanic or Latino / Not Hispanic or Latino). Detail trumps rollup (e.g. Mexican, Cuban > Hispanic or Latino).
-Exclude Unknown, declined, and patient-refused from aggregates. Self-report first; reliability-tiered fallback.
+Store the most specific CDCREC code known (e.g. Mexican), not the OMB chart bucket.
+Today's county crosswalk (Mexican → Hispanic or Latino) is the legacy reporting map, not the stored code.
+Chart bucket = Hispanic or Latino / Not Hispanic or Latino. Do not write that bucket back onto the person.
 ```
 
 **Dictionary - `data_quality_notes`:** `7+ ethnicity values; Housing high coverage, lower granularity; Table 5 – Initial Ethnicity Groupings.`
