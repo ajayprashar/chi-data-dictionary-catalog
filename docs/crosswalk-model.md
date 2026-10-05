@@ -136,7 +136,7 @@ For production clinical expansion, reference DAP by ID in `authority_reference` 
 | Question | Answer |
 |----------|--------|
 | Does crosswalk replace HL7 `Value_Set_Members`? | **No.** Members = governed standard codes (HL7 `$expand`). Crosswalk = **county source strings** → those standards. |
-| Do we map county language *groups* (Asian, European other)? | **Not in crosswalk.** Those are reporting rollups in `chi_survivorship_logic` / Table 4 narrative. Crosswalk maps detail → **BCP 47** only. |
+| Do we map county language *groups* (Asian, European other)? | **Not in crosswalk.** Those are a future county chart shortlist in `RptRollup*` / unsigned Table 4 narrative. Crosswalk maps detail → **BCP 47** only. SIL macrolanguage parent is not the chart. |
 | Do we map race detail → CDCREC granular (e.g. Japanese → `2029-7`)? | **Not yet.** County SQL maps source → **OMB rollup** first; granular CDCREC stays in `Value_Set_Members` from HL7. |
 | Who approves rows? | All seeded rows start `approval_status` = `draft`; steward sets `Approved` in Excel after review. |
 | Where is source truth for mappings? | `data/county_survivorship_mappings.py` (extracted from survivorship SQL); script validates before write. |

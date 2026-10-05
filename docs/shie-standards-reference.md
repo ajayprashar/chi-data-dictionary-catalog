@@ -61,7 +61,7 @@ Governance **approval** (`approval_status` = Approved) is steward sign-off on me
 |---------------|-------|-----------------|----------------------|-------------------------|---------------|-----------------|
 | `Patient.race` | Race | `us-core-race` | CDCREC + HL7 Race Value Set; OMB/CDC PHIN for reporting | Unknown, DTS, Other Race excluded from aggregates | Table 5 – Race Groupings; R1–R5, R9, Multi-Racial | ADT PID-10; CCD race |
 | `Patient.ethnicity` | Ethnicity | `us-core-ethnicity` | CDCREC + HL7 Ethnicity Value Set | Unknown, declined, patient-refused excluded | Table 5 – Ethnicity; E1/E2 | ADT / CCD ethnicity |
-| `Patient.language` | Preferred Language | US Core Patient `communication.language` | **BCP 47** (`urn:ietf:bcp:47`); ISO 639 for crosswalk only | `und`, declined-to-specify excluded | Table 4 – Language Groupings | ADT / CCD language |
+| `Patient.language` | Preferred Language | US Core Patient `communication.language` | **BCP 47** (`urn:ietf:bcp:47`); ISO 639 for crosswalk only | `und`, declined-to-specify excluded | County shortlist + Other (unsigned; Table 4 narrative until signed). SIL parent ≠ chart | ADT / CCD language |
 | `Patient.gender_id` | Gender Identity | US Core Observation (LOINC 76691-5) | SNOMED / US Core gender identity bindings | Distinct from birth sex / SexID | Table 2 – Gender Groupings (SBR only) | Source-specific |
 | `Patient.birth_sex` | Sex | `us-core-birthsex` | Administrative sex codes (not CDCREC) | Unknown (U) treated as null | Table 2 – SexID / SBR rollup | ADT PID-8 etc. |
 

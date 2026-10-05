@@ -104,7 +104,7 @@ Maps **SHIE county master-demographics logic** (survivorship spreadsheet, CMT SQ
 |-----------------------------------|---------------------|-------|
 | Race – Rollup / Detail | `Patient.race` | CDC OMB; detail trumps rollup |
 | Ethnicity – Rollup / Detail | `Patient.ethnicity` | CDC E1/E2; detail trumps rollup |
-| Language – Rollup / Detail | `Patient.language` | ISO 639 detail → macrolanguage rollup |
+| Language – Rollup / Detail | `Patient.language` | BCP 47 on the person; chart = county shortlist (unsigned); SIL parent ≠ chart |
 | Gender Identity (USCDI) | `Patient.gender_id` | Self-report; LOINC 76691-5 - **not** CMT `SexID` rollup |
 | Birth sex / Sex (`SexID`) | `Patient.birth_sex` | CMT “Gender – Rollup/Detail” SQL applies here, not `gender_id` |
 
@@ -178,7 +178,8 @@ Exclude Unknown, declined, and patient-refused from aggregates. Self-report firs
 **Dictionary - `chi_survivorship_logic`:**
 
 ```text
-County: ISO 639 detail preferred over macrolanguage rollup (e.g. Japanese > Asian group). Preferred/self-reported language wins when timestamped.
+Keep the specific BCP 47 language on the person (e.g. Mandarin cmn, not Chinese zho). Preferred/self-reported wins when timestamped.
+Dashboard chart = county shortlist + Other once signed; SIL macrolanguage parent is not the chart.
 Exclude undetermined and declined-to-specify from aggregates. Interpreter/clinical context may override when documented.
 ```
 

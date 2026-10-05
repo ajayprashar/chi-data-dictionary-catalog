@@ -79,17 +79,18 @@ DICTIONARY_UPDATES: dict[str, dict[str, str]] = {
     },
     "Patient.language": {
         "chi_survivorship_logic": (
-            "County: ISO 639 detail preferred over macrolanguage (e.g. Japanese > Asian group)\n"
+            "Keep the specific BCP 47 language on the person (e.g. Mandarin cmn, not Chinese zho)\n"
             "Preferred/self-reported language wins when timestamped\n"
+            "Dashboard chart = county shortlist + Other once signed; SIL parent is not the chart\n"
             "Exclude undetermined and declined-to-specify from aggregates\n"
             "Interpreter/clinical context may override when documented"
         ),
         "data_quality_notes": (
             "Terminology: BCP 47 urn:ietf:bcp:47 (RFC 5646)\n"
             "FHIR: Patient.communication.language (primary binding)\n"
-            "ISO 639: stewardship/crosswalk only, not primary exchange\n"
+            "ISO 639 / SIL parent: encyclopedia only, not the dashboard chart\n"
             "Exclude: undetermined (und) and declined from aggregates\n"
-            "County: Table 4 Language Groupings\n"
+            "County chart shortlist: unsigned (Table 4 narrative until signed)\n"
             "Sources: 112+ values; critical for Mam-speaking outreach"
         ),
         "data_source_rank_reference": "Highland #1 (broad language capture); St Rose #17 per Mark Table 2.",
